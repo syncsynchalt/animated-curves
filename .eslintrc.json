@@ -1,0 +1,79 @@
+{
+  "env": {
+    "browser": true,
+    "es6": true,
+    "node": true,
+    "mocha": true
+  },
+  "extends": "eslint:recommended",
+  "parserOptions": {
+    "ecmaVersion": 2020,
+    "sourceType": "module"
+  },
+  "globals": {
+    "BigInt": true,
+    "Metacom": true
+  },
+  "rules": {
+    "indent": ["error", 4],
+    "linebreak-style": ["error", "unix"],
+    "quotes": ["error", "single"],
+    "semi": ["error", "always", {
+      "omitLastInOneLineBlock": true
+    }],
+    "no-unused-vars": ["error", {
+      "vars": "all",
+      "varsIgnorePattern": "^_.*"
+    }],
+    "no-loop-func": ["error"],
+    "strict": ["error", "global"],
+    "brace-style": ["error", "1tbs", {
+      "allowSingleLine": true
+    }],
+    "key-spacing": ["error", {
+      "mode": "minimum"
+    }],
+    "max-len": ["error", {
+      "code": 120,
+      "ignoreUrls": true
+    }],
+    "no-lonely-if": ["error"],
+    "no-trailing-spaces": ["error"],
+    "no-unneeded-ternary": ["error"],
+    "no-whitespace-before-property": ["error"],
+    "operator-linebreak": ["error", "after"],
+    "space-before-function-paren": ["error", {
+      "anonymous": "never",
+      "named": "never",
+      "asyncArrow": "always"
+    }],
+    "space-unary-ops": ["error", {
+      "words": true,
+      "nonwords": false,
+      "overrides": {
+        "typeof": false
+      }
+    }],
+    "no-constant-condition": ["error", {
+      "checkLoops": false
+    }],
+    "no-console": ["off"],
+    "arrow-parens": ["error", "always"],
+    "arrow-body-style": ["error", "always"],
+    "arrow-spacing": ["error", {
+      "before": true,
+      "after": true
+    }],
+    "no-confusing-arrow": ["error"],
+    "no-useless-computed-key": ["error"],
+    "no-useless-rename": ["error"],
+    "no-var": ["error"],
+    "object-shorthand": ["error", "always"],
+    "prefer-arrow-callback": ["error"],
+    "prefer-numeric-literals": ["error"],
+    "prefer-rest-params": ["error"],
+    "prefer-spread": ["error"],
+    "rest-spread-spacing": ["error", "never"],
+    "template-curly-spacing": ["error", "never"]
+  }
+}

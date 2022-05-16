@@ -1,0 +1,24 @@
+{
+  "name": "illustrated-x25519",
+  "version": "1.0.0",
+  "description": "",
+  "type": "module",
+  "main": "main.js",
+  "directories": {
+    "test": "**/test"
+  },
+  "scripts": {
+    "test": "node_modules/mocha/bin/mocha"
+  },
+  "repository": {
+    "type": "git",
+    "url": ".."
+  },
+  "author": "Michael Driscoll <fenris@ulfheim.net>",
+  "license": "MIT",
+  "devDependencies": {
+    "chai": "^4.3.6",
+    "mocha": "^9.2.2",
+    "eslint": "^8.14.0"
+  }
+}
