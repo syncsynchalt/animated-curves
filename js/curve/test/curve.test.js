@@ -23,7 +23,7 @@ describe('curve library', () => {
         for (let i = 0; i < n - 2; i++) {
             ({ x: next_x, z: next_z } = curve.xAdd1(x, z, prev_x, prev_z));
             [prev_x, prev_z] = [x, z];
-            // next_x = curve85.X(next_x, next_z);
+            // next_x = curve.X(next_x, next_z);
             // next_z = 1;
             [x, z] = [next_x, next_z];
         }
@@ -128,7 +128,7 @@ describe('curve library', () => {
         let p1 = {x: curve.basePointX, y: curve.Y(curve.basePointX)[0]};
         console.log(`1P: ${JSON.stringify(p1)}`);
         let p = {...p1};
-        for (let n = 2; n <= 34; n++) {
+        for (let n = 2; n <= 72; n++) {
             let newP = curve.pointAdd(p, p1);
             let pchk = curve.pointAdd(p1, p);
             expect(newP).to.eql(pchk);
@@ -144,5 +144,23 @@ describe('curve library', () => {
             p = curve.pointDouble(p);
             console.log(`${n}P: ${JSON.stringify(p)}`);
         }
+    });
+
+    it('adds and doubles the same', () => {
+        let a1p = {x: curve.basePointX, y: curve.Y(curve.basePointX)[0]};
+        let a2p = curve.pointAdd(a1p, a1p);
+        let a3p = curve.pointAdd(a1p, a2p);
+        let a5p = curve.pointAdd(a3p, a2p);
+        let a6p = curve.pointAdd(a1p, a5p);
+        let a11p = curve.pointAdd(a5p, a6p);
+        let a12p = curve.pointAdd(a11p, a1p);
+
+        let d2p = curve.pointDouble(a1p);
+        let d6p = curve.pointDouble(a3p);
+        let d12p = curve.pointDouble(a6p);
+
+        expect(d2p).to.eql(a2p);
+        expect(d6p).to.eql(a6p);
+        expect(d12p).to.eql(a12p);
     });
 });

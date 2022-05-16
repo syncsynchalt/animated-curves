@@ -1,5 +1,5 @@
 /**
- * Operations of curve85
+ * Operations of curve
  *
  * Curve85 is the Montgomery curve y^2 = x^3 + 76x^2 + x
  * in the field Fp where p = 2^8-5 (251).
@@ -7,8 +7,12 @@
 
 import * as field from './field.js';
 
-// curve order of 32, subgroup order of 32
-let curveA = 22;
+// subgroup order of 32
+// let curveA = 22;
+// const basePointX = 7;
+
+// subgroup order of 36
+let curveA = 38;
 const basePointX = 7;
 
 /**
