@@ -21,7 +21,7 @@ primes.forEach((p) => {
             for (n; n < (field.p); n++) {
                 let x;
                 try {
-                    x = curve.pointMult(base, n);
+                    x = curve.xLadderMult(base, n);
                 } catch (e) {
                     console.log(`!thro! p=${p} A=${A} base=${base} n=${n}`);
                     return;

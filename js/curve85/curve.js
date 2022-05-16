@@ -7,8 +7,13 @@
 
 import * as field from './field.js';
 
-let curveA = 14;
+// curve order of 32, subgroup order of 32
+let curveA = 22;
 const basePointX = 7;
+
+/**
+ * @typedef Point {{x: Number, y: Number}}
+ */
 
 /**
  * Given intermediate ratio x/z for a point, compute X=(x/z)
@@ -34,7 +39,7 @@ const doubleA24 = Math.floor((curveA + 2) / 4);
  * @param z {Number} from intermediate ratio form of X=x/z for point P
  * @return {{x: Number, z: Number}} x/z for point 2P
  */
-function pointDouble(x, z) {
+function xDouble(x, z) {
     let x2_1 = (x + z) * (x + z);
     let x2_2 = (x - z) * (x - z);
     let x2 = field.reduce(x2_1 * x2_2);
@@ -58,7 +63,7 @@ function pointDouble(x, z) {
  * @param prevZ {Number} X coordinate of point n-1, in intermediate x/z form.
  * @returns {{x: Number, z: Number}} the X coordinate of point n+1, in intermediate x/z form.
  */
-function pointAdd1(x, z, prevX, prevZ) {
+function xAdd1(x, z, prevX, prevZ) {
     let [ baseX, baseZ ] = [ basePointX, 1 ];
     let xa = (x - z) * (baseX + baseZ);
     let xb = (x + z) * (baseX - baseZ);
@@ -96,7 +101,7 @@ const multBits = Math.ceil(Math.log2(field.p));
  * @param n {Number} multiplicand
  * @return {Number} X-Coordinate for point nP
  */
-function pointMult(X_, n) {
+function xLadderMult(X_, n) {
     let x_1 = X_;
     let x_2 = 1;
     let z_2 = 0;
@@ -141,10 +146,71 @@ function pointMult(X_, n) {
 function Y(X) {
     let YY = field.pow(X, 3) + curveA * field.pow(X, 2) + X;
     try {
-        return field.sqrt(YY % field.p);
+        return field.sqrt(field.reduce(YY));
     } catch (e) {
         return undefined;
     }
+}
+
+/**
+ * For the given point, double it on the curve.
+ *
+ * See https://en.wikipedia.org/wiki/Montgomery_curve#Doubling
+ *
+ * @param p {Point} the point to double
+ * @return {Point} the result
+ */
+function pointDouble(p) {
+    // if (p.y === 0) {
+    //     return {x: 0, y: 0};
+    // }
+    let slopeN = field.reduce(3 * field.pow(p.x, 2) + 2 * curveA * p.x + 1);
+    let slopeD = 2 * p.y;
+    let slope = field.reduce(slopeN * field.inverseOf(slopeD));
+
+    let x = field.reduce(field.pow(slope, 2) - curveA - p.x - p.x);
+    let ya = 2 * p.x + p.x + curveA;
+    let yb = field.reduce(ya * slope);
+    let yc = field.pow(slope, 3);
+    let y = field.reduce(yb - yc - p.y);
+
+    return {x, y};
+}
+
+/**
+ * Add two points on the curve to get a third point.
+ *
+ * See https://en.wikipedia.org/wiki/Montgomery_curve#Doubling
+ *
+ * @param p1
+ * @param p2
+ * @return {Point} p3 = p1 + p2
+ */
+function pointAdd(p1, p2) {
+    if (p1.x === p2.x && p1.y === p2.y) {
+        return pointDouble(p1);
+    }
+    if (p1.x === 0 && p1.y === 0) {
+        return p2;
+    }
+    if (p2.x === 0 && p2.y === 0) {
+        return p1;
+    }
+
+    // console.log(`add p1: ${JSON.stringify(p1)}`);
+    // console.log(`add p2: ${JSON.stringify(p2)}`);
+    let xa = field.pow(p2.y - p1.y, 2);
+    let xb = field.pow(p2.x - p1.x, 2);
+    let x = field.reduce(xa * field.inverseOf(xb) - curveA - p1.x - p2.x);
+    let ya = field.reduce((2*p1.x + p2.x + curveA) * (p2.y - p1.y));
+    let yb = field.reduce(p2.x - p1.x);
+    let yc = field.reduce(ya * field.inverseOf(yb));
+    let yd = field.reduce(field.pow(p2.y - p1.y, 3));
+    let ye = field.reduce(field.pow(p2.x - p1.x, 3));
+    let yf = yd * field.inverseOf(ye);
+    let y = field.reduce(yc - yf - p1.y);
+
+    return {x, y};
 }
 
 function setCurveA(A) {
@@ -157,7 +223,9 @@ export {
     basePointX,
     X,
     Y,
+    xDouble,
+    xAdd1,
+    xLadderMult,
     pointDouble,
-    pointAdd1,
-    pointMult
+    pointAdd,
 };

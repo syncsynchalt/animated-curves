@@ -32,17 +32,17 @@ let drawGreyLines = (ctx, vals) => {
     // draw the grey lines
     const greyWidth = 5;
     ctx.strokeStyle = 'lightgrey';
-    for (let i = greyWidth; i <= field.p; i += greyWidth) {
+    for (let i = greyWidth; i < field.p; i += greyWidth) {
         ctx.setLineDash([]);
         ctx.beginPath();
         if (i % 10 !== 0) {
             ctx.setLineDash([2, 2]);
         }
         ctx.moveTo(...pointToCtx(vals, 0, i));
-        ctx.lineTo(...pointToCtx(vals, field.p, i));
+        ctx.lineTo(...pointToCtx(vals, field.p - 1, i));
         ctx.stroke();
         ctx.moveTo(...pointToCtx(vals, i, 0));
-        ctx.lineTo(...pointToCtx(vals, i, field.p));
+        ctx.lineTo(...pointToCtx(vals, i, field.p - 1));
         ctx.stroke();
     }
 };
@@ -52,10 +52,10 @@ let drawAxisLines = (ctx, vals) => {
     ctx.beginPath();
     ctx.strokeStyle = 'black';
     ctx.moveTo(...pointToCtx(vals, 0, 0));
-    ctx.lineTo(...pointToCtx(vals, field.p - 0.5, 0));
+    ctx.lineTo(...pointToCtx(vals, field.p - 1 - 0.5, 0));
     ctx.stroke();
     ctx.moveTo(...pointToCtx(vals, 0, 0));
-    ctx.lineTo(...pointToCtx(vals, 0, field.p - 0.5));
+    ctx.lineTo(...pointToCtx(vals, 0, field.p - 1 - 0.5));
     ctx.stroke();
 };
 
@@ -64,7 +64,7 @@ let drawArrowHeads = (ctx, vals) => {
     ctx.strokeStyle = 'black';
     const arrLen = 10;
     const arrWid = 5;
-    const xHead = pointToCtx(vals, field.p, 0);
+    const xHead = pointToCtx(vals, field.p - 1, 0);
     ctx.beginPath();
     ctx.moveTo(...xHead);
     ctx.lineTo(...[xHead[0]-arrLen, xHead[1]-arrWid]);
@@ -73,7 +73,7 @@ let drawArrowHeads = (ctx, vals) => {
     ctx.closePath();
     ctx.fill();
 
-    const yHead = pointToCtx(vals, 0, field.p);
+    const yHead = pointToCtx(vals, 0, field.p - 1);
     ctx.beginPath();
     ctx.moveTo(...yHead);
     ctx.lineTo(...[yHead[0]-arrWid, yHead[1]+arrLen]);
