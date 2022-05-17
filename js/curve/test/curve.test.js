@@ -126,7 +126,7 @@ describe('curve library', () => {
         let p1 = {x: curve.basePointX, y: curve.Y(curve.basePointX)[0]};
         console.log(`1P: ${JSON.stringify(p1)}`);
         let p = {...p1};
-        for (let n = 2; n <= 71; n++) {
+        for (let n = 2; n <= 100; n++) {
             let newP = curve.pointAdd(p, p1);
             let pchk = curve.pointAdd(p1, p);
             expect(newP).to.eql(pchk);
@@ -172,7 +172,7 @@ describe('curve library', () => {
             return p;
         };
 
-        const checks = Array.from({length: 40}, (_, i) => {return i+1});
+        const checks = Array.from({length: 100}, (_, i) => {return i+1});
         checks.forEach((n) => {
             let addP = viaAdd(baseP, n);
             let multP = curve.pointMult(baseP, n);
