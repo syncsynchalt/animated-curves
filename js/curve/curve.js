@@ -165,9 +165,6 @@ function Y(X) {
  * @return {Point} the result
  */
 function pointDouble(p) {
-    // if (p.y === 0) {
-    //     return {x: 0, y: 0};
-    // }
     let slopeN = field.reduce(3 * field.pow(p.x, 2) + 2 * curveA * p.x + 1);
     let slopeD = 2 * p.y;
     let slope = field.reduce(slopeN * field.inverseOf(slopeD));
@@ -191,18 +188,15 @@ function pointDouble(p) {
  * @return {Point} p3 = p1 + p2
  */
 function pointAdd(p1, p2) {
+    if (!p1) return p2;
+    if (!p2) return p1;
     if (p1.x === p2.x && p1.y === p2.y) {
         return pointDouble(p1);
     }
-    if (p1.x === 0 && p1.y === 0) {
-        return p2;
-    }
-    if (p2.x === 0 && p2.y === 0) {
-        return p1;
+    if (p1.x === p2.x) {
+        return undefined;
     }
 
-    // console.log(`add p1: ${JSON.stringify(p1)}`);
-    // console.log(`add p2: ${JSON.stringify(p2)}`);
     let xa = field.pow(p2.y - p1.y, 2);
     let xb = field.pow(p2.x - p1.x, 2);
     let x = field.reduce(xa * field.inverseOf(xb) - curveA - p1.x - p2.x);
@@ -217,13 +211,36 @@ function pointAdd(p1, p2) {
     return {x, y};
 }
 
-function setCurveA(A) {
-    curveA = A;
+/**
+ * Scalar multiplication of a point P on a curve via double-and-add method.
+ *
+ * @param p {Point} point
+ * @param n {Number} scalar
+ * @return {Point} result nP
+ */
+function pointMult(p, n) {
+    const bits = Math.floor(Math.log2(n));
+    const doubledPoints = {};
+    doubledPoints[0] = p;
+    for (let i = 1; i <= bits; i++) {
+        p = pointDouble(p);
+        doubledPoints[i] = p;
+    }
+
+    let result = undefined;
+    let bit = 0;
+    while (n !== 0) {
+        if ((n & 1) === 1) {
+            result = pointAdd(result, doubledPoints[bit]);
+        }
+        n >>= 1;
+        bit++;
+    }
+
+    return result;
 }
 
 export {
-    curveA,
-    setCurveA,
     basePointX,
     X,
     Y,
@@ -232,4 +249,5 @@ export {
     xLadderMult,
     pointDouble,
     pointAdd,
+    pointMult,
 };

@@ -23,8 +23,6 @@ describe('curve library', () => {
         for (let i = 0; i < n - 2; i++) {
             ({ x: next_x, z: next_z } = curve.xAdd1(x, z, prev_x, prev_z));
             [prev_x, prev_z] = [x, z];
-            // next_x = curve.X(next_x, next_z);
-            // next_z = 1;
             [x, z] = [next_x, next_z];
         }
         return { x, z };
@@ -128,7 +126,7 @@ describe('curve library', () => {
         let p1 = {x: curve.basePointX, y: curve.Y(curve.basePointX)[0]};
         console.log(`1P: ${JSON.stringify(p1)}`);
         let p = {...p1};
-        for (let n = 2; n <= 72; n++) {
+        for (let n = 2; n <= 71; n++) {
             let newP = curve.pointAdd(p, p1);
             let pchk = curve.pointAdd(p1, p);
             expect(newP).to.eql(pchk);
@@ -162,5 +160,23 @@ describe('curve library', () => {
         expect(d2p).to.eql(a2p);
         expect(d6p).to.eql(a6p);
         expect(d12p).to.eql(a12p);
+    });
+
+    it('scalar multiplies points via double-and-add', () => {
+        let baseP = {x: curve.basePointX, y: curve.Y(curve.basePointX)[0]};
+        let viaAdd = (base, n) => {
+            let p = {...base};
+            for (let i = 1; i < n; i++) {
+                p = curve.pointAdd(p, base);
+            }
+            return p;
+        };
+
+        const checks = Array.from({length: 40}, (_, i) => {return i+1});
+        checks.forEach((n) => {
+            let addP = viaAdd(baseP, n);
+            let multP = curve.pointMult(baseP, n);
+            expect(multP).to.eql(addP, `failed at n=${n}`);
+        });
     });
 });
