@@ -8,6 +8,10 @@ describe('curve library', () => {
 
     // xxx more
 
+    let range = (n) => {
+        return Array.from({length: n}, (_, i) => {return i+1});
+    };
+
     /**
      * Calculate the x/z of point nP via add1 construction
      * @param baseX {Number}
@@ -39,12 +43,10 @@ describe('curve library', () => {
                 ({x, z} = curve.xDouble(x, z));
             }
             let viaDoubling = curve.X(x, z);
-            console.log(`${nPad}P via 2x is ${field.toHex(viaDoubling, 9)}`);
 
             // get {2^exp}P via add1
             ({x, z} = calcViaAdd1(curve.basePointX, n));
             let viaAdd1 = curve.X(x, z);
-            console.log(`${nPad}P via +1 is ${field.toHex(viaAdd1, 9)}`);
 
             // compare them
             expect(field.toHex(viaDoubling, 9))
@@ -56,11 +58,9 @@ describe('curve library', () => {
     it('should have working scalar multiplication (compare to add1)', () => {
         let runTest = (n, msg) => {
             let X = curve.xLadderMult(curve.basePointX, n);
-            console.log(`mult n:${n} X:${X}`);
             let chkX = X;
             let {x, z} = calcViaAdd1(curve.basePointX, n);
             X = curve.X(x, z);
-            console.log(`add1 n:${n} X:${X}`);
             let expX = X;
 
             expect(chkX).to.equal(expX, msg);
@@ -87,32 +87,29 @@ describe('curve library', () => {
     });
 
     it('has working key exchange', () => {
-        const cKeys = Array.from({length: 100}, (_, i) => {return i+1});
-        const sKeys = Array.from({length: 100}, (_, i) => {return i+1});
+        const cKeys = range(100);
+        const sKeys = range(100);
         let results = {};
         cKeys.forEach((cKey) => {
             sKeys.forEach((sKey) => {
-                // console.log(`cKey:${cKey} sKey:${sKey}`);
                 let cPubKey = curve.xLadderMult(curve.basePointX, cKey);
                 let sPubKey = curve.xLadderMult(curve.basePointX, sKey);
                 const chk1 = curve.xLadderMult(cPubKey, sKey);
                 const chk2 = curve.xLadderMult(sPubKey, cKey);
-                expect(chk1).to.equal(chk2);
+                expect(chk1).to.equal(chk2, `cKey:${cKey} sKey:${sKey}`);
                 results[chk1] = results[chk1] || 0;
                 results[chk1]++;
             });
         });
         console.log(`landed on ${Object.keys(results).length} X values`);
-        console.log(`results: ${JSON.stringify(results, null, 2)}`);
     });
 
-    it('comes back to the same point', () => {
+    it('comes back to the same point in ladder', () => {
         let origY = curve.Y(curve.basePointX);
         for (let n = 1; n < 256; n++) {
             let X = curve.xLadderMult(curve.basePointX, n);
             let Y = (X === 0 ? [0, 0] : curve.Y(X));
             expect(Y).to.not.be.undefined;
-            console.log(`n:${n} X:${X} Y1:${Y[0]} Y2:${Y[1]}`);
             if (X === curve.basePointX) {
                 if (n !== 1) {
                     console.log(`Detected order of ${n}`);
@@ -172,11 +169,36 @@ describe('curve library', () => {
             return p;
         };
 
-        const checks = Array.from({length: 100}, (_, i) => {return i+1});
+        const checks = range(100);
         checks.forEach((n) => {
             let addP = viaAdd(baseP, n);
             let multP = curve.pointMult(baseP, n);
             expect(multP).to.eql(addP, `failed at n=${n}`);
         });
+    });
+
+    it('comes back to the same point in point mult', () => {
+        let base = {x: curve.basePointX, y: curve.Y(curve.basePointX)[0]};
+        for (let n = 1; n < 256; n++) {
+            let p = curve.pointMult(base, n);
+            if (p && p.x === base.x && p.y === base.y) {
+                if (n !== 1) {
+                    console.log(`Detected order of ${n}`);
+                }
+            }
+        }
+    });
+
+    it('comes back to the same point in point add', () => {
+        let base = {x: curve.basePointX, y: curve.Y(curve.basePointX)[0]};
+        let p = undefined;
+        for (let n = 1; n < 256; n++) {
+            p = curve.pointAdd(base, p);
+            if (p && p.x === base.x && p.y === base.y) {
+                if (n !== 1) {
+                    console.log(`Detected order of ${n}`);
+                }
+            }
+        }
     });
 });

@@ -5,7 +5,29 @@ let expect = chai.expect;
 
 describe('field math library', () => {
 
-    // xxx more
+    it('should have functional toHex', () => {
+        expect(field.toHex(0, 256)).to.equal('0'.repeat(64));
+        expect(field.toHex(0)).to.equal('0');
+
+        expect(field.toHex(1, 256)).to.equal('0'.repeat(63) + '1');
+        expect(field.toHex(1)).to.equal('1');
+
+        expect(field.toHex(15)).to.equal('f');
+        expect(field.toHex(15, 0)).to.equal('f');
+        for (let i = 1; i < 8; i++) {
+            expect(field.toHex(15, i)).to.equal('0f', `${i} bits`);
+        }
+        expect(field.toHex(15, 9)).to.equal('000f');
+
+        expect(field.toHex(0xffffff7)).to.equal('ffffff7');
+    });
+
+    it('should round toHex bits properly', () => {
+        expect(field.toHex(1, 0)).to.equal('1');
+        expect(field.toHex(1, 1)).to.equal('01');
+        expect(field.toHex(1, 8)).to.equal('01');
+        expect(field.toHex(1, 9)).to.equal('0001');
+    });
 
     it('should have fixed sqrt values', () => {
         expect(field.sqrt(1)).to.eql([1, 60]);
@@ -55,5 +77,57 @@ describe('field math library', () => {
             expect((i * inv) % field.p).to.equal(1);
         }
         expect(Object.keys(results).length).to.equal(field.p-1);
+    });
+
+    it('should have working multiplicative inverse', () => {
+        let chk = (n, known) => {
+            let result = field.inverseOf(n);
+            expect(field.reduce(n * result)).to.equal(1, `inverseOf(${n})`);
+            if (known !== undefined) {
+                expect(result).to.equal(known, `inverseOf(${n})`);
+            }
+        };
+        chk(1, 1);
+        chk(2, Math.floor(field.p / 2) + 1);
+        chk(Math.floor(field.p / 2) + 1, 2);
+        chk(field.p + 1, 1);
+        chk(123);
+        chk(456);
+    });
+
+    it('it can find exponents efficiently', () => {
+        expect(field.pow(1, 3)).to.equal(1);
+        expect(field.pow(2, 4)).to.equal(16);
+        expect(field.pow(3, 5)).to.equal(60);
+        let p = field.p;
+        // checking euler criteria
+        expect(field.pow(7, (p-1)/2)).to.equal(p-1);
+        expect(field.pow(9, (p-1)/2)).to.equal(1);
+    });
+
+    it('can find roots', () => {
+        let checkSquare = (n) => {
+            let msg = `n=${n}`;
+            let r = field.sqrt(n);
+            if (n === 0) {
+                expect(r[0]).to.equal(0, msg);
+                expect(r[1]).to.equal(0, msg);
+            } else {
+                expect(r[0]).to.not.equal(r[1]);
+                expect(r[0] * r[0] % field.p).to.equal(n, msg);
+                expect(r[1] * r[1] % field.p).to.equal(n, msg);
+            }
+            console.log(`${n} has roots in Fp ${r[0]} and ${r[1]}`);
+        };
+        let checkNotSquare = (n) => {
+            let msg = `n=${n}`;
+            expect(field.sqrt(n), msg).to.be.undefined;
+        };
+
+        let squares = [0, 1, 3, 4, 5, 9, (Math.floor(field.p/2)+4), field.p-1];
+        let notSquares = [2, 6, 7, 8, 10, 100000, (field.p-1)/2-1, (field.p-1)/2, (field.p/2+1)];
+
+        for (let n of squares) checkSquare(n);
+        for (let n of notSquares) checkNotSquare(n);
     });
 });
