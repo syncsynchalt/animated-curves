@@ -32,6 +32,13 @@
         const ctx = canvas.getContext('2d');
         draw.drawGrid(ctx);
         draw.drawCurve(ctx);
+
+        let Q = undefined;
+        document.getElementById('add1').onclick = () => { Q = draw.addP(ctx, Q) };
+        document.getElementById('reset').onclick = () => {
+            Q = undefined;
+            draw.reset(ctx);
+        };
     }
     if (document.readyState === 'complete') {
         onload();

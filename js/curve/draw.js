@@ -1,5 +1,6 @@
 import * as curve from './curve.js';
 import * as field from './field.js';
+import * as misc from './draw-misc.js';
 const TWO_PI = 2*Math.PI;
 
 function preCalcValues(ctx) {
@@ -39,10 +40,10 @@ let drawGreyLines = (ctx, vals) => {
             ctx.setLineDash([2, 2]);
         }
         ctx.moveTo(...pointToCtx(vals, 0, i));
-        ctx.lineTo(...pointToCtx(vals, field.p - 1, i));
+        ctx.lineTo(...pointToCtx(vals, field.p, i));
         ctx.stroke();
         ctx.moveTo(...pointToCtx(vals, i, 0));
-        ctx.lineTo(...pointToCtx(vals, i, field.p - 1));
+        ctx.lineTo(...pointToCtx(vals, i, field.p));
         ctx.stroke();
     }
 };
@@ -52,10 +53,10 @@ let drawAxisLines = (ctx, vals) => {
     ctx.beginPath();
     ctx.strokeStyle = 'black';
     ctx.moveTo(...pointToCtx(vals, 0, 0));
-    ctx.lineTo(...pointToCtx(vals, field.p - 1 - 0.5, 0));
+    ctx.lineTo(...pointToCtx(vals, field.p - 0.5, 0));
     ctx.stroke();
     ctx.moveTo(...pointToCtx(vals, 0, 0));
-    ctx.lineTo(...pointToCtx(vals, 0, field.p - 1 - 0.5));
+    ctx.lineTo(...pointToCtx(vals, 0, field.p - 0.5));
     ctx.stroke();
 };
 
@@ -64,7 +65,7 @@ let drawArrowHeads = (ctx, vals) => {
     ctx.strokeStyle = 'black';
     const arrLen = 10;
     const arrWid = 5;
-    const xHead = pointToCtx(vals, field.p - 1, 0);
+    const xHead = pointToCtx(vals, field.p, 0);
     ctx.beginPath();
     ctx.moveTo(...xHead);
     ctx.lineTo(...[xHead[0]-arrLen, xHead[1]-arrWid]);
@@ -73,7 +74,7 @@ let drawArrowHeads = (ctx, vals) => {
     ctx.closePath();
     ctx.fill();
 
-    const yHead = pointToCtx(vals, 0, field.p - 1);
+    const yHead = pointToCtx(vals, 0, field.p);
     ctx.beginPath();
     ctx.moveTo(...yHead);
     ctx.lineTo(...[yHead[0]-arrWid, yHead[1]+arrLen]);
@@ -82,6 +83,15 @@ let drawArrowHeads = (ctx, vals) => {
     ctx.closePath();
     ctx.fill();
 };
+
+function reset(ctx) {
+    if (animationFrameInProgress) {
+        cancelAnimationFrame(animationFrameInProgress);
+    }
+    ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+    drawGrid(ctx);
+    drawCurve(ctx);
+}
 
 /**
  * Draw a grid for Fp in the given 2d canvas context.
@@ -97,11 +107,11 @@ function drawGrid(ctx) {
     drawArrowHeads(ctx, vals);
 }
 
-function drawDot(vals, x, y) {
+function drawDot(vals, x, y, radius) {
     const ctx = vals.ctx;
     ctx.beginPath();
     ctx.moveTo(...pointToCtx(vals, x, y));
-    ctx.arc(...pointToCtx(vals, x, y), vals.dotRadius, 0, TWO_PI);
+    ctx.arc(...pointToCtx(vals, x, y), radius || vals.dotRadius, 0, TWO_PI);
     ctx.stroke();
     ctx.fill();
 }
@@ -115,17 +125,149 @@ function drawCurve(ctx) {
     const vals = preCalcValues(ctx);
     const origFill = ctx.fillStyle;
     ctx.fillStyle = 'lightblue';
-    for (let x = 1; x < field.p; x++) {
+    for (let x = 0; x < field.p; x++) {
         let yVals = curve.Y(x);
         if (yVals) {
             drawDot(vals, x, yVals[0]);
             drawDot(vals, x, yVals[1]);
         }
     }
+    ctx.fillStyle = 'gold';
+    let P = curve.P();
+    drawDot(vals, P.x, P.y);
     ctx.fillStyle = origFill;
 }
 
+let animationFrameInProgress;
+
+/**
+ * @param ctx {CanvasRenderingContext2D}
+ * @param Q {Point} the current point 'Q', to which 'P' will be added
+ */
+function addP(ctx, Q) {
+    if (animationFrameInProgress) {
+        reset(ctx);
+    }
+    const vals = preCalcValues(ctx);
+    let start, prev;
+    const P = curve.P();
+    if (!Q) {
+        Q = P;
+    }
+    const slope = misc.getSlope(P, Q);
+    const tangentStart = 0, tangentDuration = 500, tangentEnd = 500;
+    const tanPauseStart = tangentEnd, tanPauseDuration = 300, tanPauseEnd = tangentEnd + tanPauseDuration;
+    const lineStart = tanPauseEnd, lineDuration = 5000, lineDoneDuration = 1000;
+    const R = curve.pointAdd(P, Q);
+    let lineXRemaining = undefined;
+    let lineLastPoint = undefined;
+    let lineXPerMs = undefined;
+    let lineDone = undefined;
+    let done = false;
+
+    function step(timestamp) {
+        if (!start) {
+            start = timestamp;
+        }
+        let elapsed = timestamp - start;
+        if (timestamp !== prev) {
+            ctx.save();
+            if (elapsed >= tangentStart && elapsed < tangentEnd) {
+                ctx.beginPath();
+                ctx.lineWidth = 1;
+                ctx.strokeStyle = 'orange';
+                ctx.setLineDash([4, 4]);
+                let mult = elapsed / tangentDuration;
+                let bounds = misc.lineBoxBounds(P, Q);
+                let tanLineForw = bounds[1] - Q.x;
+                let tanLineBack = Q.x - bounds[0];
+                tanLineForw *= mult;
+                tanLineBack *= mult;
+                ctx.moveTo(...pointToCtx(vals, Q.x, Q.y));
+                ctx.lineTo(...pointToCtx(vals, Q.x + Math.abs(tanLineForw),
+                    Q.y + tanLineForw * slope));
+                ctx.moveTo(...pointToCtx(vals, Q.x, Q.y));
+                ctx.lineTo(...pointToCtx(vals, Q.x - Math.abs(tanLineBack),
+                    Q.y - tanLineBack * slope));
+                ctx.stroke();
+            } else if (elapsed >= tanPauseStart && elapsed <= tanPauseEnd) {
+                // wait
+            } else if (!lineDone && elapsed > lineStart) {
+                if (!lineLastPoint) {
+                    let _x;
+                    // noinspection JSUnusedAssignment
+                    [lineLastPoint, _x] = misc.orderPointsByX(P, Q);
+                    lineXRemaining = misc.findTotalXLength(P, Q, curve.negate(R));
+                    lineXPerMs = lineXRemaining / lineDuration;
+                    if (!lineXPerMs) {
+                        lineXPerMs = 1;
+                    }
+                }
+
+                ctx.lineWidth = 2;
+                ctx.strokeStyle = 'orange';
+                ctx.setLineDash([]);
+                let todoX = Math.min(lineXPerMs * (timestamp - prev), lineXRemaining);
+                let check = 10;
+                while (todoX > 0) {
+                    if (check-- < 0) break;
+                    ctx.beginPath();
+                    ctx.moveTo(...pointToCtx(vals, lineLastPoint.x, lineLastPoint.y));
+                    let next = misc.findWrapSegment(lineLastPoint, slope, todoX);
+                    ctx.lineTo(...pointToCtx(vals, next.x, next.y));
+                    ctx.stroke();
+
+                    const eps = 0.00000001;
+                    let drawnX = next.x - lineLastPoint.x;
+                    if (next.y < eps) {
+                        next.y += field.p;
+                    } else if (next.y > field.p - eps) {
+                        next.y -= field.p;
+                    }
+                    if (next.x > field.p - eps) {
+                        next.x -= field.p;
+                    }
+                    lineLastPoint = next;
+                    lineXRemaining -= drawnX;
+                    todoX -= drawnX;
+                }
+                if (lineXRemaining <= 0) {
+                    lineDone = timestamp;
+                    ctx.save();
+                    ctx.fillStyle = 'orange';
+                    ctx.strokeStyle = 'black';
+                    drawDot(vals, R.x, field.negate(R.y), 5);
+                    ctx.restore();
+                }
+            } else if (lineDone) {
+                if (timestamp - lineDone >= lineDoneDuration) {
+                    done = true;
+                }
+            }
+            ctx.restore();
+        }
+        prev = timestamp;
+
+        if (done) {
+            reset(ctx);
+            ctx.save();
+            ctx.fillStyle = 'red';
+            drawDot(vals, R.x, R.y);
+            ctx.restore();
+        } else {
+            animationFrameInProgress = requestAnimationFrame(step);
+        }
+    }
+    if (animationFrameInProgress) {
+        cancelAnimationFrame(animationFrameInProgress);
+    }
+    animationFrameInProgress = requestAnimationFrame(step);
+    return R;
+}
+
 export {
+    reset,
     drawGrid,
-    drawCurve
+    drawCurve,
+    addP,
 };

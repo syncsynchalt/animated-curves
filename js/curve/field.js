@@ -80,6 +80,16 @@ function inverseOf(n) {
     return reduce(x);
 }
 
+
+/**
+ * Negate the number such that n + -n = 0
+ * @param n {Number}
+ * @return {Number} -n in field
+ */
+function negate(n) {
+    return reduce(p - n);
+}
+
 /**
  * "By factoring out powers of 2, find Q and S such that p−1 = Q*2^S with Q odd"
  * @returns {Number[2]} array of [Q, S]
@@ -223,6 +233,7 @@ export {
     square,
     reduce,
     inverseOf,
+    negate,
     pow,
     sqrt,
     toHex,

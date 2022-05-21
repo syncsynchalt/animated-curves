@@ -19,7 +19,7 @@ describe('curve library', () => {
      * @return {{x: Number, z: Number}}
      */
     let calcViaAdd1 = (baseX, n) => {
-        let [ prev_x, prev_z ] = [ curve.basePointX, 1 ]; // 1P
+        let [ prev_x, prev_z ] = [ curve.P().x, 1 ]; // 1P
         let { x, z } = curve.xDouble(prev_x, prev_z);  // 2P
         if (n === 1) return { x: prev_x, z: prev_z };
 
@@ -38,14 +38,14 @@ describe('curve library', () => {
             let nPad = `000${n}`.slice(-3);
 
             // get {2^exp}P via doubling
-            let [x, z] = [curve.basePointX, 1];
+            let [x, z] = [curve.P().x, 1];
             for (let i = 0; i < exp; i++) {
                 ({x, z} = curve.xDouble(x, z));
             }
             let viaDoubling = curve.X(x, z);
 
             // get {2^exp}P via add1
-            ({x, z} = calcViaAdd1(curve.basePointX, n));
+            ({x, z} = calcViaAdd1(curve.P().x, n));
             let viaAdd1 = curve.X(x, z);
 
             // compare them
@@ -57,9 +57,9 @@ describe('curve library', () => {
 
     it('should have working scalar multiplication (compare to add1)', () => {
         let runTest = (n, msg) => {
-            let X = curve.xLadderMult(curve.basePointX, n);
+            let X = curve.xLadderMult(curve.P().x, n);
             let chkX = X;
-            let {x, z} = calcViaAdd1(curve.basePointX, n);
+            let {x, z} = calcViaAdd1(curve.P().x, n);
             X = curve.X(x, z);
             let expX = X;
 
@@ -73,12 +73,12 @@ describe('curve library', () => {
 
     it('should have working scalar multiplication (compare to doubling)', () => {
         let runTest = (exp, msg) => {
-            let [x, z] = [curve.basePointX, 1];
+            let [x, z] = [curve.P().x, 1];
             for (let i = 0; i < exp; i++) {
                 ({x, z} = curve.xDouble(x, z));
             }
             let expX = curve.X(x, z);
-            let chkX = curve.xLadderMult(curve.basePointX, 2 ** exp);
+            let chkX = curve.xLadderMult(curve.P().x, 2 ** exp);
             expect(chkX).to.equal(expX, msg);
         };
         for (let exp = 0; exp <= 5; exp++) {
@@ -92,8 +92,8 @@ describe('curve library', () => {
         let results = {};
         cKeys.forEach((cKey) => {
             sKeys.forEach((sKey) => {
-                let cPubKey = curve.xLadderMult(curve.basePointX, cKey);
-                let sPubKey = curve.xLadderMult(curve.basePointX, sKey);
+                let cPubKey = curve.xLadderMult(curve.P().x, cKey);
+                let sPubKey = curve.xLadderMult(curve.P().x, sKey);
                 const chk1 = curve.xLadderMult(cPubKey, sKey);
                 const chk2 = curve.xLadderMult(sPubKey, cKey);
                 expect(chk1).to.equal(chk2, `cKey:${cKey} sKey:${sKey}`);
@@ -105,12 +105,12 @@ describe('curve library', () => {
     });
 
     it('comes back to the same point in ladder', () => {
-        let origY = curve.Y(curve.basePointX);
+        let origY = curve.Y(curve.P().x);
         for (let n = 1; n < 256; n++) {
-            let X = curve.xLadderMult(curve.basePointX, n);
+            let X = curve.xLadderMult(curve.P().x, n);
             let Y = (X === 0 ? [0, 0] : curve.Y(X));
             expect(Y).to.not.be.undefined;
-            if (X === curve.basePointX) {
+            if (X === curve.P().x) {
                 if (n !== 1) {
                     console.log(`Detected order of ${n}`);
                 }
@@ -120,7 +120,7 @@ describe('curve library', () => {
     });
 
     it('adds', () => {
-        let p1 = {x: curve.basePointX, y: curve.Y(curve.basePointX)[0]};
+        let p1 = curve.P();
         console.log(`1P: ${JSON.stringify(p1)}`);
         let p = {...p1};
         for (let n = 2; n <= 100; n++) {
@@ -133,7 +133,7 @@ describe('curve library', () => {
     });
 
     it('doubles', () => {
-        let p = {x: curve.basePointX, y: curve.Y(curve.basePointX)[0]};
+        let p = curve.P();
         console.log(`1P: ${JSON.stringify(p)}`);
         for (let n = 2; n <= 64; n *= 2) {
             p = curve.pointDouble(p);
@@ -142,7 +142,7 @@ describe('curve library', () => {
     });
 
     it('adds and doubles the same', () => {
-        let a1p = {x: curve.basePointX, y: curve.Y(curve.basePointX)[0]};
+        let a1p = curve.P();
         let a2p = curve.pointAdd(a1p, a1p);
         let a3p = curve.pointAdd(a1p, a2p);
         let a5p = curve.pointAdd(a3p, a2p);
@@ -160,7 +160,7 @@ describe('curve library', () => {
     });
 
     it('scalar multiplies points via double-and-add', () => {
-        let baseP = {x: curve.basePointX, y: curve.Y(curve.basePointX)[0]};
+        let baseP = curve.P();
         let viaAdd = (base, n) => {
             let p = {...base};
             for (let i = 1; i < n; i++) {
@@ -178,7 +178,7 @@ describe('curve library', () => {
     });
 
     it('comes back to the same point in point mult', () => {
-        let base = {x: curve.basePointX, y: curve.Y(curve.basePointX)[0]};
+        let base = curve.P();
         for (let n = 1; n < 256; n++) {
             let p = curve.pointMult(base, n);
             if (p && p.x === base.x && p.y === base.y) {
@@ -190,7 +190,7 @@ describe('curve library', () => {
     });
 
     it('comes back to the same point in point add', () => {
-        let base = {x: curve.basePointX, y: curve.Y(curve.basePointX)[0]};
+        let base = curve.P();
         let p = undefined;
         for (let n = 1; n < 256; n++) {
             p = curve.pointAdd(base, p);

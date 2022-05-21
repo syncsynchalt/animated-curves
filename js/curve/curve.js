@@ -7,10 +7,6 @@
 
 import * as field from './field.js';
 
-// subgroup order of 32
-// let curveA = 22;
-// const basePointX = 7;
-
 // subgroup order of 36
 let curveA = 38;
 const basePointX = 7;
@@ -18,6 +14,13 @@ const basePointX = 7;
 /**
  * @typedef Point {{x: Number, y: Number}}
  */
+
+/**
+ * Return the base point
+ */
+function P() {
+    return {x: basePointX, y: Y(basePointX)[1]};
+}
 
 /**
  * Given intermediate ratio x/z for a point, compute X=(x/z)
@@ -240,8 +243,28 @@ function pointMult(p, n) {
     return result;
 }
 
+/**
+ * Negate the point P to -P
+ * (really this is just mirroring it on y=field.p/2)
+ *
+ * @param P {Point}
+ * @return {Point} -P
+ */
+function negate(P) {
+    return { x: P.x, y: field.negate(P.y) };
+}
+
+/**
+ * Calculate the slope tangent at point P.
+ *
+ * @param P {Point} point on the curve
+ */
+function tangent(P) {
+    return field.reduce((3 * P.x * P.x + 2 * curveA * P.x + 1) * field.inverseOf(2 * P.y));
+}
+
 export {
-    basePointX,
+    P,
     X,
     Y,
     xDouble,
@@ -250,4 +273,6 @@ export {
     pointDouble,
     pointAdd,
     pointMult,
+    negate,
+    tangent,
 };
