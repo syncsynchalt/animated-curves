@@ -2,6 +2,7 @@ import * as curve from './curve.js';
 import * as field from './field.js';
 import * as misc from './draw-misc.js';
 const TWO_PI = 2*Math.PI;
+const EPS = 0.0000001;
 
 function preCalcValues(ctx) {
     const marginWide = 29.5;
@@ -150,20 +151,29 @@ function addP(ctx, Q) {
     }
     const vals = preCalcValues(ctx);
     let start, prev;
+
     const P = curve.P();
     if (!Q) {
         Q = P;
     }
-    const slope = misc.getSlope(P, Q);
-    const tangentStart = 0, tangentDuration = 500, tangentEnd = 500;
-    const tanPauseStart = tangentEnd, tanPauseDuration = 300, tanPauseEnd = tangentEnd + tanPauseDuration;
-    const lineStart = tanPauseEnd, lineDuration = 5000, lineDoneDuration = 1000;
     const R = curve.pointAdd(P, Q);
-    let lineXRemaining = undefined;
-    let lineLastPoint = undefined;
-    let lineXPerMs = undefined;
-    let lineDone = undefined;
-    let done = false;
+    const negR = curve.negate(R);
+
+    const started = {};
+    const finished = {};
+    const duration = {
+        tangent: 500,
+        tanPause: 300,
+        line: 1000,
+        linePause: 300,
+        negate: 1000,
+        done: 1000,
+    };
+    const slope = misc.getSlope(P, Q);
+    const cache = {};
+
+    ctx.fillStyle = 'orange';
+    drawDot(vals, Q.x, Q.y);
 
     function step(timestamp) {
         if (!start) {
@@ -172,12 +182,13 @@ function addP(ctx, Q) {
         let elapsed = timestamp - start;
         if (timestamp !== prev) {
             ctx.save();
-            if (elapsed >= tangentStart && elapsed < tangentEnd) {
+            if (!finished['tangent']) {
+                started.tangent = started.tangent || timestamp;
                 ctx.beginPath();
                 ctx.lineWidth = 1;
                 ctx.strokeStyle = 'orange';
                 ctx.setLineDash([4, 4]);
-                let mult = elapsed / tangentDuration;
+                let mult = elapsed / duration.tangent;
                 let bounds = misc.lineBoxBounds(P, Q);
                 let tanLineForw = bounds[1] - Q.x;
                 let tanLineBack = Q.x - bounds[0];
@@ -190,65 +201,95 @@ function addP(ctx, Q) {
                 ctx.lineTo(...pointToCtx(vals, Q.x - Math.abs(tanLineBack),
                     Q.y - tanLineBack * slope));
                 ctx.stroke();
-            } else if (elapsed >= tanPauseStart && elapsed <= tanPauseEnd) {
-                // wait
-            } else if (!lineDone && elapsed > lineStart) {
-                if (!lineLastPoint) {
+                if (elapsed > duration.tangent) {
+                    finished.tangent = timestamp;
+                }
+            } else if (!finished.tanPause) {
+                started.tanPause = started.tanPause || timestamp;
+                if (timestamp - started.tanPause > duration.tanPause) {
+                    finished.tanPause = timestamp;
+                }
+            } else if (!finished.line) {
+                started.line = started.line || timestamp;
+                if (!cache.lineLast) {
                     let _x;
                     // noinspection JSUnusedAssignment
-                    [lineLastPoint, _x] = misc.orderPointsByX(P, Q);
-                    lineXRemaining = misc.findTotalXLength(P, Q, curve.negate(R));
-                    lineXPerMs = lineXRemaining / lineDuration;
-                    if (!lineXPerMs) {
-                        lineXPerMs = 1;
-                    }
+                    [cache.lineLast, _x] = misc.orderPointsByX(P, Q);
+                    cache.lineXLeft = misc.findTotalXLength(P, Q, negR);
+                    cache.lineXPerMs = cache.lineXLeft / duration.line || 1;
                 }
 
                 ctx.lineWidth = 2;
                 ctx.strokeStyle = 'orange';
                 ctx.setLineDash([]);
-                let todoX = Math.min(lineXPerMs * (timestamp - prev), lineXRemaining);
+                let todoX = Math.min(cache.lineXPerMs * (timestamp - prev), cache.lineXLeft);
                 let check = 10;
                 while (todoX > 0) {
                     if (check-- < 0) break;
                     ctx.beginPath();
-                    ctx.moveTo(...pointToCtx(vals, lineLastPoint.x, lineLastPoint.y));
-                    let next = misc.findWrapSegment(lineLastPoint, slope, todoX);
+                    ctx.moveTo(...pointToCtx(vals, cache.lineLast.x, cache.lineLast.y));
+                    let next = misc.findWrapSegment(cache.lineLast, slope, todoX);
                     ctx.lineTo(...pointToCtx(vals, next.x, next.y));
                     ctx.stroke();
 
-                    const eps = 0.00000001;
-                    let drawnX = next.x - lineLastPoint.x;
-                    if (next.y < eps) {
+                    let drawnX = next.x - cache.lineLast.x;
+                    if (next.y < EPS) {
                         next.y += field.p;
-                    } else if (next.y > field.p - eps) {
+                    } else if (next.y > field.p - EPS) {
                         next.y -= field.p;
                     }
-                    if (next.x > field.p - eps) {
+                    if (next.x > field.p - EPS) {
                         next.x -= field.p;
                     }
-                    lineLastPoint = next;
-                    lineXRemaining -= drawnX;
+                    cache.lineLast = next;
+                    cache.lineXLeft -= drawnX;
                     todoX -= drawnX;
                 }
-                if (lineXRemaining <= 0) {
-                    lineDone = timestamp;
+                if (cache.lineXLeft <= EPS) {
+                    finished.line = timestamp;
                     ctx.save();
                     ctx.fillStyle = 'orange';
                     ctx.strokeStyle = 'black';
-                    drawDot(vals, R.x, field.negate(R.y), 5);
+                    drawDot(vals, negR.x, negR.y, 3);
                     ctx.restore();
                 }
-            } else if (lineDone) {
-                if (timestamp - lineDone >= lineDoneDuration) {
-                    done = true;
+            } else if (!finished.linePause) {
+                started.linePause = started.linePause || timestamp;
+                if (timestamp - started.linePause >= duration.linePause) {
+                    finished.linePause = timestamp;
+                }
+            } else if (!finished.negate) {
+                started.negate = started.negate || timestamp;
+                ctx.beginPath();
+                ctx.lineWidth = 2;
+                ctx.strokeStyle = 'orange';
+                ctx.setLineDash([3, 3]);
+                if (!cache.negateLength) {
+                    cache.negateLength = curve.negate(R).y - R.y;
+                }
+                let mult = (timestamp - started.negate) / duration.negate;
+                mult = Math.min(1, mult);
+                ctx.moveTo(...pointToCtx(vals, negR.x, negR.y));
+                ctx.lineTo(...pointToCtx(vals, negR.x, negR.y - cache.negateLength * mult));
+                ctx.stroke();
+                if (mult === 1.0) {
+                    ctx.setLineDash([]);
+                    ctx.strokeStyle = 'black';
+                    ctx.fillStyle = 'red';
+                    drawDot(vals, R.x, R.y, 5);
+                    finished.negate = timestamp;
+                }
+            } else if (!finished.done) {
+                started.done = started.done || timestamp;
+                if (timestamp - started.done > duration.done) {
+                    finished.done = timestamp;
                 }
             }
             ctx.restore();
         }
         prev = timestamp;
 
-        if (done) {
+        if (finished.done) {
             reset(ctx);
             ctx.save();
             ctx.fillStyle = 'red';
