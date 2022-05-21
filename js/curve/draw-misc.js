@@ -88,9 +88,10 @@ function findTotalXLength(P, Q, negR) {
  * @param P {Point} point to start the line segment at
  * @param slope {Number} slope of the line to draw
  * @param xUnits {Number} max number of x units to draw line for
+ * @param allowedLen {Number} return a segment at most this long
  * @return {Point} point of the end of segment, either stopping at xUnits or at the bounds of Fp
  */
-function findWrapSegment(P, slope, xUnits) {
+function findWrapSegment(P, slope, xUnits, allowedLen) {
     let xPlus = Math.min(xUnits, field.p - P.x);
     let yCandidate = P.y + (slope * xPlus);
     if (yCandidate < 0) {
@@ -98,13 +99,42 @@ function findWrapSegment(P, slope, xUnits) {
     } else if (yCandidate > field.p) {
         xPlus = xAtY(P, slope, field.p) - P.x;
     }
-    return { x: P.x + xPlus, y: P.y + (slope * xPlus) };
+    let Q = {x: P.x + xPlus, y: P.y + (slope * xPlus) };
+    const sLen = segmentLen(P, Q);
+    if (sLen > allowedLen) {
+        xPlus *= allowedLen / sLen;
+        Q = {x: P.x + xPlus, y: P.y + (slope * xPlus) };
+    }
+    return Q;
+}
+
+/**
+ * Calc the length of a line segment from P to Q.
+ * @param P {Point}
+ * @param Q {Point}
+ * @return {Number} length of the line segment
+ */
+function segmentLen(P, Q) {
+    return Math.sqrt((P.x - Q.x)**2 + (P.y - Q.y)**2);
+}
+
+
+/**
+ * Create an ease-in / ease-out effect.
+ * @param t {Number} number between 0 and 1
+ * @return the eased result, eased at the ends
+ */
+function easeInOut(t) {
+    let sq = t * t;
+    return sq / (2 * (sq - t) + 1);
 }
 
 export {
+    easeInOut,
     orderPointsByX,
     lineBoxBounds,
     getSlope,
     findTotalXLength,
     findWrapSegment,
+    segmentLen,
 };

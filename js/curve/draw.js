@@ -1,6 +1,7 @@
 import * as curve from './curve.js';
 import * as field from './field.js';
 import * as misc from './draw-misc.js';
+
 const TWO_PI = 2*Math.PI;
 const EPS = 0.0000001;
 
@@ -34,15 +35,22 @@ let drawGreyLines = (ctx, vals) => {
     // draw the grey lines
     const greyWidth = 5;
     ctx.strokeStyle = 'lightgrey';
+    [field.p/2, field.p].forEach((y) => {
+        ctx.setLineDash([]);
+        ctx.beginPath();
+        if (y !== field.p) {
+            ctx.setLineDash([2, 2]);
+        }
+        ctx.moveTo(...pointToCtx(vals, 0, y));
+        ctx.lineTo(...pointToCtx(vals, field.p-1, y));
+        ctx.stroke();
+    });
     for (let i = greyWidth; i < field.p; i += greyWidth) {
         ctx.setLineDash([]);
         ctx.beginPath();
         if (i % 10 !== 0) {
             ctx.setLineDash([2, 2]);
         }
-        ctx.moveTo(...pointToCtx(vals, 0, i));
-        ctx.lineTo(...pointToCtx(vals, field.p, i));
-        ctx.stroke();
         ctx.moveTo(...pointToCtx(vals, i, 0));
         ctx.lineTo(...pointToCtx(vals, i, field.p));
         ctx.stroke();
@@ -52,6 +60,7 @@ let drawGreyLines = (ctx, vals) => {
 let drawAxisLines = (ctx, vals) => {
     // draw the axis lines
     ctx.beginPath();
+    ctx.fillStyle = 'black';
     ctx.strokeStyle = 'black';
     ctx.moveTo(...pointToCtx(vals, 0, 0));
     ctx.lineTo(...pointToCtx(vals, field.p - 0.5, 0));
@@ -59,11 +68,18 @@ let drawAxisLines = (ctx, vals) => {
     ctx.moveTo(...pointToCtx(vals, 0, 0));
     ctx.lineTo(...pointToCtx(vals, 0, field.p - 0.5));
     ctx.stroke();
+    ctx.font = 'italic 12px serif';
+    const bodge = 1.6;
+    ctx.fillText('0', ...pointToCtx(vals, -bodge, -bodge));
+    ctx.fillText('p', ...pointToCtx(vals, -bodge, field.p - 0.5));
+    ctx.fillText('p/2', ...pointToCtx(vals, -1.5*bodge, field.p/2 - 0.5));
+    ctx.fillText('p', ...pointToCtx(vals, field.p - 0.5, -bodge));
 };
 
 let drawArrowHeads = (ctx, vals) => {
     // draw the arrows
     ctx.strokeStyle = 'black';
+    ctx.fillStyle = 'black';
     const arrLen = 10;
     const arrWid = 5;
     const xHead = pointToCtx(vals, field.p, 0);
@@ -133,9 +149,9 @@ function drawCurve(ctx) {
             drawDot(vals, x, yVals[1]);
         }
     }
-    ctx.fillStyle = 'yellow';
+    ctx.fillStyle = 'black';
     let P = curve.P();
-    drawDot(vals, P.x, P.y);
+    drawDot(vals, P.x, P.y, vals.dotRadius);
     ctx.fillStyle = origFill;
 }
 
@@ -164,7 +180,7 @@ function addP(ctx, Q) {
     const duration = {
         tangent: 500,
         tanPause: 300,
-        line: 1000,
+        line: 500,
         linePause: 300,
         negate: 1000,
         done: 1000,
@@ -189,6 +205,7 @@ function addP(ctx, Q) {
                 ctx.strokeStyle = 'orange';
                 ctx.setLineDash([4, 4]);
                 let mult = elapsed / duration.tangent;
+                mult = misc.easeInOut(mult);
                 let bounds = misc.lineBoxBounds(P, Q);
                 let tanLineForw = bounds[1] - Q.x;
                 let tanLineBack = Q.x - bounds[0];
@@ -211,12 +228,13 @@ function addP(ctx, Q) {
                 }
             } else if (!finished.line) {
                 started.line = started.line || timestamp;
-                if (!cache.lineLast) {
+                if (!cache.lineLastP) {
                     let _x;
                     // noinspection JSUnusedAssignment
-                    [cache.lineLast, _x] = misc.orderPointsByX(P, Q);
+                    [cache.lineLastP, _x] = misc.orderPointsByX(P, Q);
                     cache.lineXLeft = misc.findTotalXLength(P, Q, negR);
                     cache.lineXPerMs = cache.lineXLeft / duration.line || 1;
+                    cache.segmentBudget = 5;
                 }
 
                 ctx.lineWidth = 2;
@@ -224,33 +242,40 @@ function addP(ctx, Q) {
                 ctx.setLineDash([]);
                 let todoX = Math.min(cache.lineXPerMs * (timestamp - prev), cache.lineXLeft);
                 let check = 10;
-                while (todoX > 0) {
+                let segmentsLen = 0;
+                while (todoX > 0 && segmentsLen < cache.segmentBudget) {
                     if (check-- < 0) break;
                     ctx.beginPath();
-                    ctx.moveTo(...pointToCtx(vals, cache.lineLast.x, cache.lineLast.y));
-                    let next = misc.findWrapSegment(cache.lineLast, slope, todoX);
+                    ctx.moveTo(...pointToCtx(vals, cache.lineLastP.x, cache.lineLastP.y));
+                    let next = misc.findWrapSegment(cache.lineLastP, slope, todoX,
+                        cache.segmentBudget - segmentsLen);
                     ctx.lineTo(...pointToCtx(vals, next.x, next.y));
                     ctx.stroke();
+                    segmentsLen += misc.segmentLen(cache.lineLastP, next);
 
-                    let drawnX = next.x - cache.lineLast.x;
+                    let drawnX = next.x - cache.lineLastP.x;
                     if (next.y < EPS) {
                         next.y += field.p;
+                        cache.segmentBudget *= 1.1;
                     } else if (next.y > field.p - EPS) {
                         next.y -= field.p;
+                        cache.segmentBudget *= 1.1;
                     }
                     if (next.x > field.p - EPS) {
                         next.x -= field.p;
+                        cache.segmentBudget *= 1.1;
                     }
-                    cache.lineLast = next;
+                    cache.lineLastP = next;
                     cache.lineXLeft -= drawnX;
                     todoX -= drawnX;
                 }
                 if (cache.lineXLeft <= EPS) {
                     finished.line = timestamp;
                     ctx.save();
+                    ctx.lineWidth = 2;
                     ctx.fillStyle = 'orange';
                     ctx.strokeStyle = 'black';
-                    drawDot(vals, negR.x, negR.y, 3);
+                    drawDot(vals, negR.x, negR.y, vals.dotRadius);
                     ctx.restore();
                 }
             } else if (!finished.linePause) {
@@ -262,21 +287,23 @@ function addP(ctx, Q) {
                 started.negate = started.negate || timestamp;
                 ctx.beginPath();
                 ctx.lineWidth = 2;
-                ctx.strokeStyle = 'orange';
-                ctx.setLineDash([3, 3]);
+                ctx.strokeStyle = 'red';
+                ctx.setLineDash([3, 2]);
                 if (!cache.negateLength) {
                     cache.negateLength = curve.negate(R).y - R.y;
                 }
                 let mult = (timestamp - started.negate) / duration.negate;
                 mult = Math.min(1, mult);
+                mult = misc.easeInOut(mult);
                 ctx.moveTo(...pointToCtx(vals, negR.x, negR.y));
                 ctx.lineTo(...pointToCtx(vals, negR.x, negR.y - cache.negateLength * mult));
                 ctx.stroke();
                 if (mult === 1.0) {
                     ctx.setLineDash([]);
+                    ctx.lineWidth = 2;
                     ctx.strokeStyle = 'black';
                     ctx.fillStyle = 'red';
-                    drawDot(vals, R.x, R.y, 5);
+                    drawDot(vals, R.x, R.y, vals.dotRadius + 1);
                     finished.negate = timestamp;
                 }
             } else if (!finished.done) {

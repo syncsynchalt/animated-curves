@@ -4,20 +4,25 @@
     <meta charset="UTF-8">
     <title>Title</title>
     <script src="page.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-0evHe/X+R7YkIZDRvuzKMRqM+OrBnVFBL6DOitfPri4tjfHxaWutUpFmBp4vmVor" crossorigin="anonymous">
 </head>
 <body>
-<p>
-    Elliptic curve scalar multiplication on the curve y<sup>2</sup> = x<sup>3</sup> + 38x<sup>2</sup> + x.
-</p>
-<div id="canvas-container">
-</div>
+<div class="container">
+<span>
+    EC scalar multiplication on curve
+    y<sup>2</sup> = x<sup>3</sup> + 38x<sup>2</sup> + x over finite field &#x1D53D;<sub>61</sub> (p=61).
+</span>
 <div>
-    <button id="add1">+1</button>
-    <button id="reset">Reset</button>
+    <button class="btn btn-primary" id="add1" style="margin: 2px 0">+1</button>
+    <button class="btn btn-primary" id="reset" style="margin: 2px 0">Reset</button>
+    <div id="canvas-container">
+    </div>
 </div>
-<p>Base point (in yellow) is always (7, 4).</p>
-<p id="np-desc" style="visibility: hidden">
-    Coordinate <span id="n">1</span>P (in red) is <span id="nP">(7, 4)</span>
-</p>
+<span>Base point (in black) is always (7, 4).</span>
+<br>
+<span id="np-desc" style="visibility: hidden">
+    Point <span id="n">1</span>P (in red) is <span id="nP">(7, 4)</span>.
+</span>
+</div>
 </body>
 </html>
