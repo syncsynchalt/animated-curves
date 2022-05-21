@@ -133,7 +133,7 @@ function drawCurve(ctx) {
             drawDot(vals, x, yVals[1]);
         }
     }
-    ctx.fillStyle = 'gold';
+    ctx.fillStyle = 'yellow';
     let P = curve.P();
     drawDot(vals, P.x, P.y);
     ctx.fillStyle = origFill;

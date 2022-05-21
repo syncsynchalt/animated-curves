@@ -33,11 +33,20 @@
         draw.drawGrid(ctx);
         draw.drawCurve(ctx);
 
+        let n = 1;
         let Q = undefined;
-        document.getElementById('add1').onclick = () => { Q = draw.addP(ctx, Q) };
+        document.getElementById('add1').onclick = () => {
+            n++;
+            Q = draw.addP(ctx, Q);
+            document.getElementById('n').textContent = n.toString();
+            document.getElementById('np-desc').style.visibility = 'visible';
+            document.getElementById('nP').textContent = `(${Q.x}, ${Q.y})`;
+        };
         document.getElementById('reset').onclick = () => {
+            n = 1;
             Q = undefined;
             draw.reset(ctx);
+            document.getElementById('np-desc').style.visibility = 'hidden';
         };
     }
     if (document.readyState === 'complete') {
