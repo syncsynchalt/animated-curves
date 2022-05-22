@@ -66,15 +66,8 @@ function getSlope(P, Q) {
 function findTotalXLength(P, Q, negR) {
     [P, Q] = orderPointsByX(P, Q);
     const slope = getSlope(P, Q);
-    // for (let xp = 1; xp < 1000; xp++) {
     for (let xp = 1; xp < 100000; xp++) {
-        // if (Math.abs(((P.x + xp) % field.p) - negR.x) < 1.0) {
-        //     console.log('-----');
-        //     console.log(`xp:${xp} xRed:${(P.x + xp) % field.p} Rx:${negR.x}`);
-        //     console.log(`xp:${xp} yRed:${(P.y + xp * slope) % field.p} Ry:${negR.y}`);
-        // }
         if (field.reduce(P.x + xp) === negR.x && field.reduce(P.y + (xp*slope)) === negR.y) {
-            // console.log(`xxx length ${xp}`);
             return xp;
         }
     }
