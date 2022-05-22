@@ -161,6 +161,7 @@ function drawDot(vals, x, y, color, radius, lineWidth) {
     const ctx = vals.ctx;
     ctx.beginPath();
     ctx.save();
+    ctx.strokeStyle = 'black';
     ctx.fillStyle = color;
     ctx.lineWidth = lineWidth || 1;
     ctx.moveTo(...pointToCtx(vals, x, y));
@@ -225,7 +226,7 @@ async function addP(ctx, Q) {
     const slope = misc.getSlope(P, Q);
     const cache = {};
 
-    drawDot(vals, Q.x, Q.y, 'orange');
+    drawDot(vals, Q.x, Q.y, 'red');
 
     async function step(timestamp) {
         if (!start) {
@@ -254,6 +255,8 @@ async function addP(ctx, Q) {
                 ctx.lineTo(...pointToCtx(vals, Q.x - Math.abs(tanLineBack),
                     Q.y - tanLineBack * slope));
                 ctx.stroke();
+                drawDot(vals, P.x, P.y, 'black');
+                drawDot(vals, Q.x, Q.y, 'red');
                 if (elapsed > duration.tangent) {
                     finished.tangent = timestamp;
                 }
@@ -305,12 +308,11 @@ async function addP(ctx, Q) {
                     cache.lineXLeft -= drawnX;
                     todoX -= drawnX;
                 }
+                drawDot(vals, P.x, P.y, 'black');
+                drawDot(vals, Q.x, Q.y, 'red');
                 if (cache.lineXLeft <= EPS) {
                     finished.line = timestamp;
-                    ctx.save();
-                    ctx.strokeStyle = 'black';
-                    drawDot(vals, negR.x, negR.y, 'orange', null, 2);
-                    ctx.restore();
+                    drawDot(vals, negR.x, negR.y, 'orange');
                 }
             } else if (!finished.linePause) {
                 started.linePause = started.linePause || timestamp;
@@ -332,8 +334,10 @@ async function addP(ctx, Q) {
                 ctx.moveTo(...pointToCtx(vals, negR.x, negR.y));
                 ctx.lineTo(...pointToCtx(vals, negR.x, negR.y - cache.negateLength * mult));
                 ctx.stroke();
+                ctx.setLineDash([]);
+                // overdraw to fix red line covering this dot
+                drawDot(vals, negR.x, negR.y, 'orange');
                 if (mult === 1.0) {
-                    ctx.setLineDash([]);
                     ctx.strokeStyle = 'black';
                     drawDot(vals, R.x, R.y, 'red', vals.dotRadius + 1, 2);
                     finished.negate = timestamp;
