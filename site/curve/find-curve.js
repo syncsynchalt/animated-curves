@@ -2,7 +2,7 @@ import * as field from './field.js';
 import * as curve from './curve.js';
 
 const primes = [61, 67, 71, 73, 79, 83, 89, 97];
-primes.forEach((p) => {
+primes.forEach(p => {
     field.setP(p);
     for (let A = 6; A < 500; A += 4) {
         curve.setCurveA(A);
@@ -10,7 +10,7 @@ primes.forEach((p) => {
         for (let b = 2; b < 256; b += 1) {
             bases.push(b);
         }
-        bases.forEach((base) => {
+        bases.forEach(base => {
             let y = curve.Y(base);
             if (!y) {
                 console.log(`!no-c! p=${p} A=${A} base=${base}`);

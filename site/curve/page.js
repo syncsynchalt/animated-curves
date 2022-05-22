@@ -26,31 +26,32 @@
         return can;
     };
 
-    function onload() {
+    async function onload() {
         const container = document.getElementById('canvas-container');
         const canvas = createHiDPICanvas(container, 500, 500);
         canvas.style.border = '1px solid grey';
         const ctx = canvas.getContext('2d');
-        draw.resetGraph(ctx);
+        await draw.resetGraph(ctx);
 
         let n = 1;
         let Q = undefined;
-        document.getElementById('add1').onclick = () => {
+        document.getElementById('add1').onclick = async () => {
             n++;
-            Q = draw.addP(ctx, Q);
+            Q = await draw.addP(ctx, Q);
             document.getElementById('n').textContent = n.toString();
             document.getElementById('np-desc').style.visibility = 'visible';
             document.getElementById('nP').textContent = `(${Q.x}, ${Q.y})`;
         };
-        document.getElementById('reset').onclick = () => {
+        document.getElementById('reset').onclick = async () => {
             n = 1;
             Q = undefined;
-            draw.resetGraph(ctx);
+            await draw.resetGraph(ctx);
             document.getElementById('np-desc').style.visibility = 'hidden';
         };
     }
+
     if (document.readyState === 'complete') {
-        onload();
+        await onload();
     } else {
         window.onload = onload;
     }

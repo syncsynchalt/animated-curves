@@ -88,8 +88,8 @@ describe('curve library', () => {
         const cKeys = range(100);
         const sKeys = range(100);
         let results = {};
-        cKeys.forEach((cKey) => {
-            sKeys.forEach((sKey) => {
+        cKeys.forEach(cKey => {
+            sKeys.forEach(sKey => {
                 let cPubKey = curve.xLadderMult(curve.P().x, cKey);
                 let sPubKey = curve.xLadderMult(curve.P().x, sKey);
                 const chk1 = curve.xLadderMult(cPubKey, sKey);
@@ -168,7 +168,7 @@ describe('curve library', () => {
         };
 
         const checks = range(100);
-        checks.forEach((n) => {
+        checks.forEach(n => {
             let addP = viaAdd(baseP, n);
             let multP = curve.pointMult(baseP, n);
             expect(multP).to.eql(addP, `failed at n=${n}`);

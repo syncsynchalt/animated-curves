@@ -15,7 +15,8 @@
     "Metacom": true
   },
   "rules": {
-    "indent": ["error", 4],
+    "no-debugger": "warn",
+    "indent": ["warn", 4],
     "linebreak-style": ["error", "unix"],
     "quotes": ["error", "single"],
     "semi": ["error", "always", {
@@ -58,7 +59,6 @@
       "checkLoops": false
     }],
     "no-console": ["off"],
-    "arrow-parens": ["error", "always"],
     "arrow-body-style": ["error", "always"],
     "arrow-spacing": ["error", {
       "before": true,
