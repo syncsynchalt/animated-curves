@@ -144,7 +144,7 @@ function xLadderMult(X_, n) {
 /**
  * For the given X coordinate, find Y on the curve.
  * @param X {Number} X coordinate in range 0...p
- * @return {Number[2] | undefined} the two Y coordinates for X, if defined for the curve
+ * @return {Number[2]|undefined} the two Y coordinates for X, if defined for the curve
  */
 function Y(X) {
     let YY = field.pow(X, 3) + curveA * field.pow(X, 2) + X;
@@ -189,12 +189,8 @@ function pointDouble(p) {
 function pointAdd(p1, p2) {
     if (!p1) return p2;
     if (!p2) return p1;
-    if (p1.x === p2.x && p1.y === p2.y) {
-        return pointDouble(p1);
-    }
-    if (p1.x === p2.x) {
-        return undefined;
-    }
+    if (p1.x === p2.x && p1.y === p2.y) return pointDouble(p1);
+    if (p1.x === p2.x) return null;
 
     let xa = field.pow(p2.y - p1.y, 2);
     let xb = field.pow(p2.x - p1.x, 2);
@@ -226,7 +222,7 @@ function pointMult(p, n) {
         doubledPoints[i] = p;
     }
 
-    let result = undefined;
+    let result = null;
     let bit = 0;
     while (n !== 0) {
         if ((n & 1) === 1) {

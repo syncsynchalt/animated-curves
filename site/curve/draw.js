@@ -4,6 +4,7 @@ import * as misc from './draw-misc.js';
 
 const TWO_PI = 2*Math.PI;
 const EPS = 0.0000001;
+const INFINITY = '\u221E';
 
 function preCalcValues(ctx) {
     const marginWide = 29.5;
@@ -160,6 +161,13 @@ function drawGrid(ctx) {
     drawArrowHeads(ctx, vals);
 }
 
+let setAnimationFrame = (func) => {
+    if (animationFrameInProgress) {
+        cancelAnimationFrame(animationFrameInProgress);
+    }
+    animationFrameInProgress = func();
+};
+
 /**
  * @param vals {Object} return from cacheVals
  * @param x {Number} coordinate
@@ -219,11 +227,22 @@ async function addP(ctx, Q, drawDoneCb) {
     let start, prev;
 
     const P = curve.P();
-    if (!Q) {
+    if (Q === undefined) {
         Q = P;
+    } else if (Q === null) {
+        // reset back to P
+        const R = P;
+        await resetGraph(ctx);
+        drawDot(vals, P.x, P.y, 'red');
+        if (drawDoneCb) drawDoneCb(R);
+        return R;
     }
     const R = curve.pointAdd(P, Q);
+    if (R === null) {
+        return drawInfinity(ctx, P, Q, drawDoneCb);
+    }
     const negR = curve.negate(R);
+    const slope = misc.getSlope(P, Q);
 
     const started = {};
     const finished = {};
@@ -235,10 +254,12 @@ async function addP(ctx, Q, drawDoneCb) {
         negate: 1000,
         done: 1000,
     };
-    const slope = misc.getSlope(P, Q);
     const cache = {};
 
-    drawDot(vals, Q.x, Q.y, 'red');
+    let markState = (state, timestamp) => {
+        started[state] = started[state] || timestamp;
+        return timestamp - started[state];
+    };
 
     async function step(timestamp) {
         if (!start) {
@@ -248,7 +269,7 @@ async function addP(ctx, Q, drawDoneCb) {
         if (timestamp !== prev) {
             ctx.save();
             if (!finished['tangent']) {
-                started.tangent = started.tangent || timestamp;
+                let instate = markState('tangent', timestamp);
                 ctx.beginPath();
                 ctx.lineWidth = 1;
                 ctx.strokeStyle = 'orange';
@@ -269,16 +290,16 @@ async function addP(ctx, Q, drawDoneCb) {
                 ctx.stroke();
                 drawDot(vals, P.x, P.y, 'black');
                 drawDot(vals, Q.x, Q.y, 'red');
-                if (elapsed > duration.tangent) {
+                if (instate > duration.tangent) {
                     finished.tangent = timestamp;
                 }
             } else if (!finished.tanPause) {
-                started.tanPause = started.tanPause || timestamp;
-                if (timestamp - started.tanPause > duration.tanPause) {
+                let instate = markState('tanPause', timestamp);
+                if (instate > duration.tanPause) {
                     finished.tanPause = timestamp;
                 }
             } else if (!finished.line) {
-                started.line = started.line || timestamp;
+                markState('line', timestamp);
                 if (!cache.lineLastP) {
                     let _x;
                     // noinspection JSUnusedAssignment
@@ -327,12 +348,12 @@ async function addP(ctx, Q, drawDoneCb) {
                     drawDot(vals, negR.x, negR.y, 'orange');
                 }
             } else if (!finished.linePause) {
-                started.linePause = started.linePause || timestamp;
-                if (timestamp - started.linePause >= duration.linePause) {
+                let instate = markState('linePause', timestamp);
+                if (instate >= duration.linePause) {
                     finished.linePause = timestamp;
                 }
             } else if (!finished.negate) {
-                started.negate = started.negate || timestamp;
+                let instate = markState('negate', timestamp);
                 ctx.beginPath();
                 ctx.lineWidth = 2;
                 ctx.strokeStyle = 'red';
@@ -340,7 +361,7 @@ async function addP(ctx, Q, drawDoneCb) {
                 if (!cache.negateLength) {
                     cache.negateLength = curve.negate(R).y - R.y;
                 }
-                let mult = (timestamp - started.negate) / duration.negate;
+                let mult = instate / duration.negate;
                 mult = Math.min(1, mult);
                 mult = misc.easeInOut(mult);
                 ctx.moveTo(...pointToCtx(vals, negR.x, negR.y));
@@ -349,14 +370,14 @@ async function addP(ctx, Q, drawDoneCb) {
                 ctx.setLineDash([]);
                 // overdraw to fix red line covering this dot
                 drawDot(vals, negR.x, negR.y, 'orange');
-                if (mult === 1.0) {
+                if (instate > duration.negate) {
                     ctx.strokeStyle = 'black';
                     drawDot(vals, R.x, R.y, 'red', vals.dotRadius + 1, 2);
                     finished.negate = timestamp;
                 }
             } else if (!finished.done) {
-                started.done = started.done || timestamp;
-                if (timestamp - started.done > duration.done) {
+                let instate = markState('done', timestamp);
+                if (instate > duration.done) {
                     finished.done = timestamp;
                 }
             }
@@ -366,24 +387,132 @@ async function addP(ctx, Q, drawDoneCb) {
 
         if (finished.done) {
             await resetGraph(ctx);
-            ctx.save();
             drawDot(vals, R.x, R.y, 'red');
-            ctx.restore();
             if (drawDoneCb) {
                 drawDoneCb(R);
             }
         } else {
-            animationFrameInProgress = requestAnimationFrame(step);
+            setAnimationFrame(() => { return requestAnimationFrame(step) });
         }
     }
-    if (animationFrameInProgress) {
-        cancelAnimationFrame(animationFrameInProgress);
+    setAnimationFrame(() => { return requestAnimationFrame(step) });
+    return R;
+}
+
+/**
+ * @param ctx {CanvasRenderingContext2D}
+ * @param P {Point} the current point 'P'
+ * @param Q {Point} the current point 'Q' (assumed has same x-coord as P)
+ * @param drawDoneCb {Function?} optional callback when done drawing
+ */
+async function drawInfinity(ctx, P, Q, drawDoneCb) {
+    const vals = preCalcValues(ctx);
+    let start, prev;
+    const R = null;
+
+    const started = {};
+    const finished = {};
+    const duration = {
+        tangent: 500,
+        tanPause: 300,
+        line: 500,
+        linePause: 300,
+        infinite: 1,
+        done: 1000,
+    };
+
+    let markState = (state, timestamp) => {
+        started[state] = started[state] || timestamp;
+        return timestamp - started[state];
+    };
+
+    let drawFullVertLine = (mult) => {
+        ctx.beginPath();
+        mult = misc.easeInOut(mult);
+        let lineUp = (field.p - Q.y) * mult;
+        let lineDn = (Q.y) * mult;
+        ctx.moveTo(...pointToCtx(vals, Q.x, Q.y));
+        ctx.lineTo(...pointToCtx(vals, Q.x, Q.y + lineUp));
+        ctx.moveTo(...pointToCtx(vals, Q.x, Q.y));
+        ctx.lineTo(...pointToCtx(vals, Q.x, Q.y - lineDn));
+        ctx.stroke();
+        drawDot(vals, P.x, P.y, 'black');
+        drawDot(vals, Q.x, Q.y, 'red');
+    };
+    async function step(timestamp) {
+        if (!start) {
+            start = timestamp;
+        }
+        if (timestamp !== prev) {
+            if (!finished['tangent']) {
+                let instate = markState('tangent', timestamp);
+                ctx.strokeStyle = 'orange';
+                ctx.lineWidth = 1;
+                ctx.setLineDash([4, 4]);
+                let mult = (timestamp - started.tangent) / duration.tangent;
+                drawFullVertLine(mult);
+                if (instate > duration.tangent) {
+                    finished.tangent = timestamp;
+                    ctx.setLineDash([]);
+                }
+            } else if (!finished.tanPause) {
+                let instate = markState('tanPause', timestamp);
+                if (instate > duration.tanPause) {
+                    finished.tanPause = timestamp;
+                }
+            } else if (!finished.line) {
+                let instate = markState('line', timestamp);
+                ctx.strokeStyle = 'orange';
+                ctx.lineWidth = 2;
+                let mult = (timestamp - started.line) / duration.line;
+                drawFullVertLine(mult);
+                if (instate > duration.line) {
+                    finished.line = timestamp;
+                }
+            } else if (!finished.linePause) {
+                let instate = markState('linePause', timestamp);
+                if (instate > duration.linePause) {
+                    finished.linePause = timestamp;
+                }
+            } else if (!finished.infinite) {
+                markState('infinite', timestamp);
+                // noinspection JSUnresolvedVariable
+                const r = ctx.canvas._ratio || 1;
+                const wide = vals.marginWide, thin = vals.marginThin;
+                ctx.beginPath();
+                ctx.strokeStyle = 'black';
+                ctx.lineWidth = 1;
+                ctx.fillStyle = 'red';
+                const fontPx = 80;
+                ctx.font = `italic ${fontPx}px sans`;
+                const left = r*wide + (vals.w-r*wide-r*thin)/2 - 0.5 - fontPx/2;
+                const down = r*thin + (vals.h-r*wide-r*thin)/2 - 0.5 + 0.8*fontPx/2;
+                ctx.fillText(INFINITY, left, down);
+                ctx.strokeText(INFINITY, left, down);
+                finished.infinite = timestamp;
+            } else if (!finished.done) {
+                let instate = markState('done', timestamp);
+                if (instate > duration.done) {
+                    finished.done = timestamp;
+                }
+            }
+        }
+        prev = timestamp;
+
+        if (finished.done) {
+            if (drawDoneCb) {
+                drawDoneCb(R);
+            }
+        } else {
+            setAnimationFrame(() => { return requestAnimationFrame(step) });
+        }
     }
-    animationFrameInProgress = requestAnimationFrame(step);
+    setAnimationFrame(() => { return requestAnimationFrame(step) });
     return R;
 }
 
 export {
+    INFINITY,
     inSeconds,
     resetGraph,
     addP,

@@ -40,7 +40,7 @@
             Q = await draw.addP(ctx, Q);
             document.getElementById('n').textContent = n.toString();
             document.getElementById('np-desc').style.visibility = 'visible';
-            document.getElementById('nP').textContent = `(${Q.x}, ${Q.y})`;
+            document.getElementById('nP').textContent = Q ? `(${Q.x}, ${Q.y})` : draw.INFINITY;
         };
         document.getElementById('btn-add10').onclick = async () => {
             for (let i = 0; i < 10; i++) {
@@ -49,7 +49,17 @@
             }
             document.getElementById('n').textContent = n.toString();
             document.getElementById('np-desc').style.visibility = 'visible';
-            document.getElementById('nP').textContent = `(${Q.x}, ${Q.y})`;
+            document.getElementById('nP').textContent = Q ? `(${Q.x}, ${Q.y})` : draw.INFINITY;
+        };
+        // xxx remove this
+        document.getElementById('btn-add71').onclick = async () => {
+            for (let i = 0; i < 71; i++) {
+                n++;
+                Q = await draw.addP(ctx, Q);
+            }
+            document.getElementById('n').textContent = n.toString();
+            document.getElementById('np-desc').style.visibility = 'visible';
+            document.getElementById('nP').textContent = Q ? `(${Q.x}, ${Q.y})` : draw.INFINITY;
         };
         document.getElementById('btn-reset').onclick = async () => {
             n = 1;
@@ -67,13 +77,13 @@
                 });
                 document.getElementById('n').textContent = n.toString();
                 document.getElementById('np-desc').style.visibility = 'visible';
-                document.getElementById('nP').textContent = `(${Q.x}, ${Q.y})`;
+                document.getElementById('nP').textContent = Q ? `(${Q.x}, ${Q.y})` : '&infini;';
             };
             next();
             n++;
             document.getElementById('n').textContent = n.toString();
             document.getElementById('np-desc').style.visibility = 'visible';
-            document.getElementById('nP').textContent = `(${Q.x}, ${Q.y})`;
+            document.getElementById('nP').textContent = Q ? `(${Q.x}, ${Q.y})` : '&infini;';
         };
     }
 

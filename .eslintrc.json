@@ -22,7 +22,7 @@
     "semi": ["error", "always", {
       "omitLastInOneLineBlock": true
     }],
-    "no-unused-vars": ["error", {
+    "no-unused-vars": ["warn", {
       "vars": "all",
       "varsIgnorePattern": "^_.*"
     }],
