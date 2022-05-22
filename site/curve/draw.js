@@ -149,13 +149,25 @@ function drawGrid(ctx) {
     drawArrowHeads(ctx, vals);
 }
 
-function drawDot(vals, x, y, radius) {
+/**
+ * @param vals {Object} return from cacheVals
+ * @param x {Number} coordinate
+ * @param y {Number} coordinate
+ * @param color {String} fill style
+ * @param radius {Number?} dot radius
+ * @param lineWidth {Number?} line width
+ */
+function drawDot(vals, x, y, color, radius, lineWidth) {
     const ctx = vals.ctx;
     ctx.beginPath();
+    ctx.save();
+    ctx.fillStyle = color;
+    ctx.lineWidth = lineWidth || 1;
     ctx.moveTo(...pointToCtx(vals, x, y));
     ctx.arc(...pointToCtx(vals, x, y), radius || vals.dotRadius, 0, TWO_PI);
     ctx.stroke();
     ctx.fill();
+    ctx.restore();
 }
 
 /**
@@ -170,13 +182,13 @@ function drawCurve(ctx) {
     for (let x = 0; x < field.p; x++) {
         let yVals = curve.Y(x);
         if (yVals) {
-            drawDot(vals, x, yVals[0]);
-            drawDot(vals, x, yVals[1]);
+            drawDot(vals, x, yVals[0], 'lightblue');
+            drawDot(vals, x, yVals[1], 'lightblue');
         }
     }
     ctx.fillStyle = 'black';
     let P = curve.P();
-    drawDot(vals, P.x, P.y, vals.dotRadius);
+    drawDot(vals, P.x, P.y, 'black', vals.dotRadius);
     ctx.fillStyle = origFill;
 }
 
@@ -213,8 +225,7 @@ async function addP(ctx, Q) {
     const slope = misc.getSlope(P, Q);
     const cache = {};
 
-    ctx.fillStyle = 'orange';
-    drawDot(vals, Q.x, Q.y);
+    drawDot(vals, Q.x, Q.y, 'orange');
 
     async function step(timestamp) {
         if (!start) {
@@ -297,10 +308,8 @@ async function addP(ctx, Q) {
                 if (cache.lineXLeft <= EPS) {
                     finished.line = timestamp;
                     ctx.save();
-                    ctx.lineWidth = 2;
-                    ctx.fillStyle = 'orange';
                     ctx.strokeStyle = 'black';
-                    drawDot(vals, negR.x, negR.y, vals.dotRadius);
+                    drawDot(vals, negR.x, negR.y, 'orange', null, 2);
                     ctx.restore();
                 }
             } else if (!finished.linePause) {
@@ -325,10 +334,8 @@ async function addP(ctx, Q) {
                 ctx.stroke();
                 if (mult === 1.0) {
                     ctx.setLineDash([]);
-                    ctx.lineWidth = 2;
                     ctx.strokeStyle = 'black';
-                    ctx.fillStyle = 'red';
-                    drawDot(vals, R.x, R.y, vals.dotRadius + 1);
+                    drawDot(vals, R.x, R.y, 'red', vals.dotRadius + 1, 2);
                     finished.negate = timestamp;
                 }
             } else if (!finished.done) {
@@ -344,8 +351,7 @@ async function addP(ctx, Q) {
         if (finished.done) {
             await resetGraph(ctx);
             ctx.save();
-            ctx.fillStyle = 'red';
-            drawDot(vals, R.x, R.y);
+            drawDot(vals, R.x, R.y, 'red');
             ctx.restore();
         } else {
             animationFrameInProgress = requestAnimationFrame(step);
