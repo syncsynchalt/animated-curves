@@ -17,6 +17,7 @@
     let createHiDPICanvas = function(parent, w, h) {
         const ratio = PIXEL_RATIO;
         const can = parent.appendChild(document.createElement('canvas'));
+        can._ratio = PIXEL_RATIO;
         can.width = w * ratio;
         can.height = h * ratio;
         can.style.width = w + 'px';
@@ -30,8 +31,7 @@
         const canvas = createHiDPICanvas(container, 500, 500);
         canvas.style.border = '1px solid grey';
         const ctx = canvas.getContext('2d');
-        draw.drawGrid(ctx);
-        draw.drawCurve(ctx);
+        draw.resetGraph(ctx);
 
         let n = 1;
         let Q = undefined;
@@ -45,7 +45,7 @@
         document.getElementById('reset').onclick = () => {
             n = 1;
             Q = undefined;
-            draw.reset(ctx);
+            draw.resetGraph(ctx);
             document.getElementById('np-desc').style.visibility = 'hidden';
         };
     }

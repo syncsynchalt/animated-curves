@@ -6,8 +6,6 @@ let expect = chai.expect;
 
 describe('curve library', () => {
 
-    // xxx more
-
     let range = (n) => {
         return Array.from({length: n}, (_, i) => {return i+1});
     };

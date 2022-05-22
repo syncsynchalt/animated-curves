@@ -1,8 +1,7 @@
 /**
  * Operations of curve
  *
- * Curve85 is the Montgomery curve y^2 = x^3 + 76x^2 + x
- * in the field Fp where p = 2^8-5 (251).
+ * Curve85 is the Montgomery curve y^2 = x^3 + 38x^2 + x in the field Fp where p = 61.
  */
 
 import * as field from './field.js';
@@ -19,7 +18,7 @@ const basePointX = 7;
  * Return the base point
  */
 function P() {
-    return {x: basePointX, y: Y(basePointX)[1]};
+    return {x: basePointX, y: Math.min(...Y(basePointX))};
 }
 
 /**
@@ -29,9 +28,6 @@ function P() {
  * @return {Number} X = x/z
  */
 function X(x, z) {
-    // if (z === 0) {
-    //     return 0;
-    // }
     return field.reduce(x * field.inverseOf(z));
 }
 

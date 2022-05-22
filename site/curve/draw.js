@@ -74,6 +74,9 @@ let drawAxisLines = (ctx, vals) => {
     ctx.fillText('p', ...pointToCtx(vals, -bodge, field.p - 0.5));
     ctx.fillText('p/2', ...pointToCtx(vals, -1.5*bodge, field.p/2 - 0.5));
     ctx.fillText('p', ...pointToCtx(vals, field.p - 0.5, -bodge));
+    [10, 20, 30, 40, 50].forEach((x) => {
+        ctx.fillText(x, ...pointToCtx(vals, x-1, -bodge));
+    });
 };
 
 let drawArrowHeads = (ctx, vals) => {
@@ -101,13 +104,29 @@ let drawArrowHeads = (ctx, vals) => {
     ctx.fill();
 };
 
-function reset(ctx) {
+let resetGraphState = null;
+
+function resetGraph(ctx) {
+    const canvas = ctx.canvas;
     if (animationFrameInProgress) {
         cancelAnimationFrame(animationFrameInProgress);
     }
-    ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
-    drawGrid(ctx);
-    drawCurve(ctx);
+    if (resetGraphState) {
+        let img = new Image();
+        img.addEventListener('load', () => {
+            const ratio = canvas._ratio || 1;
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.drawImage(img, 0, 0, img.width, img.height, 0, 0, canvas.width / ratio, canvas.height / ratio);
+        });
+        img.src = URL.createObjectURL(resetGraphState);
+    } else {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        drawGrid(ctx);
+        drawCurve(ctx);
+        canvas.toBlob((blob) => {
+            resetGraphState = blob;
+        }, 'image/png');
+    }
 }
 
 /**
@@ -163,7 +182,7 @@ let animationFrameInProgress;
  */
 function addP(ctx, Q) {
     if (animationFrameInProgress) {
-        reset(ctx);
+        resetGraph(ctx);
     }
     const vals = preCalcValues(ctx);
     let start, prev;
@@ -317,7 +336,7 @@ function addP(ctx, Q) {
         prev = timestamp;
 
         if (finished.done) {
-            reset(ctx);
+            resetGraph(ctx);
             ctx.save();
             ctx.fillStyle = 'red';
             drawDot(vals, R.x, R.y);
@@ -334,7 +353,7 @@ function addP(ctx, Q) {
 }
 
 export {
-    reset,
+    resetGraph,
     drawGrid,
     drawCurve,
     addP,
