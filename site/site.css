@@ -8,5 +8,6 @@
     color: red;
 }
 .point-np.calculating {
+    font-weight: inherit;
     color: inherit;
 }

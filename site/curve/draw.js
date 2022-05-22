@@ -160,10 +160,10 @@ let setAnimationFrame = (func) => {
  * @param x {Number} coordinate
  * @param y {Number} coordinate
  * @param color {String} fill style
- * @param radius {Number?} dot radius
+ * @param radiusAdj {Number?} adjustment to built-in dot radius
  * @param lineWidth {Number?} line width
  */
-function drawDot(vals, x, y, color, radius, lineWidth) {
+function drawDot(vals, x, y, color, radiusAdj, lineWidth) {
     const ctx = vals.ctx;
     ctx.beginPath();
     ctx.save();
@@ -171,7 +171,7 @@ function drawDot(vals, x, y, color, radius, lineWidth) {
     ctx.fillStyle = color;
     ctx.lineWidth = lineWidth || 1;
     ctx.moveTo(...pointToCtx(vals, x, y));
-    ctx.arc(...pointToCtx(vals, x, y), radius || vals.dotRadius, 0, TWO_PI);
+    ctx.arc(...pointToCtx(vals, x, y), vals.dotRadius + (radiusAdj || 0), 0, TWO_PI);
     ctx.stroke();
     ctx.fill();
     ctx.restore();
@@ -195,7 +195,7 @@ function drawCurve(ctx) {
     }
     ctx.fillStyle = 'black';
     let P = curve.P();
-    drawDot(vals, P.x, P.y, 'black', vals.dotRadius);
+    drawDot(vals, P.x, P.y, 'black');
     ctx.fillStyle = origFill;
 }
 
@@ -239,7 +239,7 @@ async function addP(ctx, Q, drawDoneCb) {
         tangent: 500,
         tanPause: 300,
         line: 500,
-        linePause: 300,
+        linePause: 500,
         negate: 1000,
         done: 1000,
     };
@@ -266,16 +266,16 @@ async function addP(ctx, Q, drawDoneCb) {
                 let mult = elapsed / duration.tangent;
                 mult = misc.easeInOut(mult);
                 let bounds = misc.lineBoxBounds(P, Q);
-                let tanLineForw = bounds[1] - Q.x;
-                let tanLineBack = Q.x - bounds[0];
+                let tanLineForw = bounds[1] - P.x;
+                let tanLineBack = P.x - bounds[0];
                 tanLineForw *= mult;
                 tanLineBack *= mult;
-                ctx.moveTo(...pointToCtx(vals, Q.x, Q.y));
-                ctx.lineTo(...pointToCtx(vals, Q.x + Math.abs(tanLineForw),
-                    Q.y + tanLineForw * slope));
-                ctx.moveTo(...pointToCtx(vals, Q.x, Q.y));
-                ctx.lineTo(...pointToCtx(vals, Q.x - Math.abs(tanLineBack),
-                    Q.y - tanLineBack * slope));
+                ctx.moveTo(...pointToCtx(vals, P.x, P.y));
+                ctx.lineTo(...pointToCtx(vals, P.x + Math.abs(tanLineForw),
+                    P.y + tanLineForw * slope));
+                ctx.moveTo(...pointToCtx(vals, P.x, P.y));
+                ctx.lineTo(...pointToCtx(vals, P.x - Math.abs(tanLineBack),
+                    P.y - tanLineBack * slope));
                 ctx.stroke();
                 drawDot(vals, P.x, P.y, 'black');
                 drawDot(vals, Q.x, Q.y, 'red');
@@ -305,7 +305,9 @@ async function addP(ctx, Q, drawDoneCb) {
                 let check = 10;
                 let segmentsLen = 0;
                 while (todoX > 0 && segmentsLen < cache.segmentBudget) {
-                    if (check-- < 0) break;
+                    if (check-- < 0) {
+                        break;
+                    }
                     ctx.beginPath();
                     ctx.moveTo(...pointToCtx(vals, cache.lineLastP.x, cache.lineLastP.y));
                     let next = misc.findWrapSegment(cache.lineLastP, slope, todoX,
@@ -334,7 +336,7 @@ async function addP(ctx, Q, drawDoneCb) {
                 drawDot(vals, Q.x, Q.y, 'red');
                 if (cache.lineXLeft <= EPS) {
                     finished.line = timestamp;
-                    drawDot(vals, negR.x, negR.y, 'orange');
+                    drawDot(vals, negR.x, negR.y, 'orange', +1, 1);
                 }
             } else if (!finished.linePause) {
                 let instate = markState('linePause', timestamp);
@@ -358,10 +360,10 @@ async function addP(ctx, Q, drawDoneCb) {
                 ctx.stroke();
                 ctx.setLineDash([]);
                 // overdraw to fix red line covering this dot
-                drawDot(vals, negR.x, negR.y, 'orange');
+                drawDot(vals, negR.x, negR.y, 'orange', +1, 1);
                 if (instate > duration.negate) {
                     ctx.strokeStyle = 'black';
-                    drawDot(vals, R.x, R.y, 'red', vals.dotRadius + 1, 2);
+                    drawDot(vals, R.x, R.y, 'red', +1, 2);
                     finished.negate = timestamp;
                 }
             } else if (!finished.callback) {
@@ -419,12 +421,12 @@ async function drawInfinity(ctx, P, Q, drawDoneCb) {
     let drawFullVertLine = (mult) => {
         ctx.beginPath();
         mult = misc.easeInOut(mult);
-        let lineUp = (field.p - Q.y) * mult;
-        let lineDn = (Q.y) * mult;
-        ctx.moveTo(...pointToCtx(vals, Q.x, Q.y));
-        ctx.lineTo(...pointToCtx(vals, Q.x, Q.y + lineUp));
-        ctx.moveTo(...pointToCtx(vals, Q.x, Q.y));
-        ctx.lineTo(...pointToCtx(vals, Q.x, Q.y - lineDn));
+        let lineUp = (field.p - P.y) * mult;
+        let lineDn = (P.y) * mult;
+        ctx.moveTo(...pointToCtx(vals, P.x, P.y));
+        ctx.lineTo(...pointToCtx(vals, P.x, P.y + lineUp));
+        ctx.moveTo(...pointToCtx(vals, P.x, P.y));
+        ctx.lineTo(...pointToCtx(vals, P.x, P.y - lineDn));
         ctx.stroke();
         drawDot(vals, P.x, P.y, 'black');
         drawDot(vals, Q.x, Q.y, 'red');
