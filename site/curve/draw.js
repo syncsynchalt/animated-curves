@@ -113,20 +113,22 @@ async function resetGraph(ctx) {
             cancelAnimationFrame(animationFrameInProgress);
         }
         if (resetGraphState) {
-            let img = new Image();
-            img.addEventListener('load', () => {
-                const ratio = canvas._ratio || 1;
-                ctx.clearRect(0, 0, canvas.width, canvas.height);
-                ctx.drawImage(img, 0, 0, img.width, img.height, 0, 0, canvas.width / ratio, canvas.height / ratio);
-                success({'usedCache': true});
-            });
-            img.src = URL.createObjectURL(resetGraphState);
+            const ratio = canvas._ratio || 1;
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            const img = resetGraphState;
+            ctx.drawImage(img, 0, 0, img.width, img.height,
+                0, 0, canvas.width / ratio, canvas.height / ratio);
+            success({'usedCache': true});
         } else {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             drawGrid(ctx);
             drawCurve(ctx);
             canvas.toBlob(blob => {
-                resetGraphState = blob;
+                let img = new Image();
+                img.addEventListener('load', () => {
+                    resetGraphState = img;
+                });
+                img.src = URL.createObjectURL(blob);
             }, 'image/png');
             success({'usedCache': false});
         }
