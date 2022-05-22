@@ -35,18 +35,45 @@
 
         let n = 1;
         let Q = undefined;
-        document.getElementById('add1').onclick = async () => {
+        document.getElementById('btn-add1').onclick = async () => {
             n++;
             Q = await draw.addP(ctx, Q);
             document.getElementById('n').textContent = n.toString();
             document.getElementById('np-desc').style.visibility = 'visible';
             document.getElementById('nP').textContent = `(${Q.x}, ${Q.y})`;
         };
-        document.getElementById('reset').onclick = async () => {
+        document.getElementById('btn-add10').onclick = async () => {
+            for (let i = 0; i < 10; i++) {
+                n++;
+                Q = await draw.addP(ctx, Q);
+            }
+            document.getElementById('n').textContent = n.toString();
+            document.getElementById('np-desc').style.visibility = 'visible';
+            document.getElementById('nP').textContent = `(${Q.x}, ${Q.y})`;
+        };
+        document.getElementById('btn-reset').onclick = async () => {
             n = 1;
             Q = undefined;
             await draw.resetGraph(ctx);
             document.getElementById('np-desc').style.visibility = 'hidden';
+        };
+        document.getElementById('btn-demo').onclick = async () => {
+            let next = async () => {
+                n++;
+                Q = await draw.addP(ctx, Q, () => {
+                    draw.inSeconds(1, () => {
+                        next();
+                    });
+                });
+                document.getElementById('n').textContent = n.toString();
+                document.getElementById('np-desc').style.visibility = 'visible';
+                document.getElementById('nP').textContent = `(${Q.x}, ${Q.y})`;
+            };
+            next();
+            n++;
+            document.getElementById('n').textContent = n.toString();
+            document.getElementById('np-desc').style.visibility = 'visible';
+            document.getElementById('nP').textContent = `(${Q.x}, ${Q.y})`;
         };
     }
 

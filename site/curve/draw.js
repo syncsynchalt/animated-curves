@@ -18,6 +18,14 @@ function preCalcValues(ctx) {
     };
 }
 
+let timeoutInFlight = null;
+function inSeconds(n, func) {
+    if (timeoutInFlight) {
+        clearTimeout(timeoutInFlight);
+    }
+    timeoutInFlight = setTimeout(func, n * 1000);
+}
+
 /**
  * Given an x,y point in the field Fp return the coordinates transformed for the JS Canvas context
  * (adjusted for top-left origin and half-pixel anti-aliasing)
@@ -104,18 +112,21 @@ let drawArrowHeads = (ctx, vals) => {
     ctx.fill();
 };
 
-let resetGraphState = null;
+let resetSaveState = null;
 
 async function resetGraph(ctx) {
+    if (animationFrameInProgress) {
+        cancelAnimationFrame(animationFrameInProgress);
+    }
+    if (timeoutInFlight) {
+        clearTimeout(timeoutInFlight);
+    }
     return new Promise(success => {
         const canvas = ctx.canvas;
-        if (animationFrameInProgress) {
-            cancelAnimationFrame(animationFrameInProgress);
-        }
-        if (resetGraphState) {
+        if (resetSaveState) {
             const ratio = canvas._ratio || 1;
             ctx.clearRect(0, 0, canvas.width, canvas.height);
-            const img = resetGraphState;
+            const img = resetSaveState;
             ctx.drawImage(img, 0, 0, img.width, img.height,
                 0, 0, canvas.width / ratio, canvas.height / ratio);
             success({'usedCache': true});
@@ -126,7 +137,7 @@ async function resetGraph(ctx) {
             canvas.toBlob(blob => {
                 let img = new Image();
                 img.addEventListener('load', () => {
-                    resetGraphState = img;
+                    resetSaveState = img;
                 });
                 img.src = URL.createObjectURL(blob);
             }, 'image/png');
@@ -198,8 +209,9 @@ let animationFrameInProgress;
 /**
  * @param ctx {CanvasRenderingContext2D}
  * @param Q {Point} the current point 'Q', to which 'P' will be added
+ * @param drawDoneCb {Function?} optional callback when done drawing
  */
-async function addP(ctx, Q) {
+async function addP(ctx, Q, drawDoneCb) {
     if (animationFrameInProgress) {
         await resetGraph(ctx);
     }
@@ -357,6 +369,9 @@ async function addP(ctx, Q) {
             ctx.save();
             drawDot(vals, R.x, R.y, 'red');
             ctx.restore();
+            if (drawDoneCb) {
+                drawDoneCb(R);
+            }
         } else {
             animationFrameInProgress = requestAnimationFrame(step);
         }
@@ -369,8 +384,7 @@ async function addP(ctx, Q) {
 }
 
 export {
+    inSeconds,
     resetGraph,
-    drawGrid,
-    drawCurve,
     addP,
 };
