@@ -33,57 +33,70 @@
         const ctx = canvas.getContext('2d');
         await draw.resetGraph(ctx);
 
+        let pointDesc = (p) => {
+            if (p === undefined) return '...';
+            if (p === null) return draw.INFINITY;
+            return `(${p.x}, ${p.y})`;
+        };
+
         let n = 1;
         let Q = undefined;
+        let demoTimeout;
         document.getElementById('btn-add1').onclick = async () => {
+            if (demoTimeout) clearTimeout(demoTimeout);
             n++;
-            Q = await draw.addP(ctx, Q);
+            Q = await draw.addP(ctx, Q, (R) => {
+                document.getElementById('np').textContent = pointDesc(R);
+            });
             document.getElementById('n').textContent = n.toString();
             document.getElementById('np-desc').style.visibility = 'visible';
-            document.getElementById('nP').textContent = Q ? `(${Q.x}, ${Q.y})` : draw.INFINITY;
+            document.getElementById('np').textContent = pointDesc();
         };
         document.getElementById('btn-add10').onclick = async () => {
+            if (demoTimeout) clearTimeout(demoTimeout);
             for (let i = 0; i < 10; i++) {
                 n++;
-                Q = await draw.addP(ctx, Q);
+                Q = await draw.addP(ctx, Q, (R) => {
+                    document.getElementById('np').textContent = pointDesc(R);
+                });
             }
             document.getElementById('n').textContent = n.toString();
             document.getElementById('np-desc').style.visibility = 'visible';
-            document.getElementById('nP').textContent = Q ? `(${Q.x}, ${Q.y})` : draw.INFINITY;
+            document.getElementById('np').textContent = pointDesc();
         };
         // xxx remove this
         document.getElementById('btn-add71').onclick = async () => {
+            if (demoTimeout) clearTimeout(demoTimeout);
             for (let i = 0; i < 71; i++) {
                 n++;
-                Q = await draw.addP(ctx, Q);
+                Q = await draw.addP(ctx, Q, (R) => {
+                    document.getElementById('np').textContent = pointDesc(R);
+                });
             }
             document.getElementById('n').textContent = n.toString();
             document.getElementById('np-desc').style.visibility = 'visible';
-            document.getElementById('nP').textContent = Q ? `(${Q.x}, ${Q.y})` : draw.INFINITY;
+            document.getElementById('np').textContent = pointDesc();
         };
         document.getElementById('btn-reset').onclick = async () => {
+            if (demoTimeout) clearTimeout(demoTimeout);
             n = 1;
             Q = undefined;
             await draw.resetGraph(ctx);
             document.getElementById('np-desc').style.visibility = 'hidden';
         };
         document.getElementById('btn-demo').onclick = async () => {
+            if (demoTimeout) clearTimeout(demoTimeout);
             let next = async () => {
                 n++;
-                Q = await draw.addP(ctx, Q, () => {
-                    draw.inSeconds(1, () => {
-                        next();
-                    });
+                Q = await draw.addP(ctx, Q, (R) => {
+                    document.getElementById('np').textContent = pointDesc(R);
+                    demoTimeout = setTimeout(() => { next() }, 1.5 * 1000);
                 });
                 document.getElementById('n').textContent = n.toString();
                 document.getElementById('np-desc').style.visibility = 'visible';
-                document.getElementById('nP').textContent = Q ? `(${Q.x}, ${Q.y})` : '&infini;';
+                document.getElementById('np').textContent = pointDesc();
             };
-            next();
-            n++;
-            document.getElementById('n').textContent = n.toString();
-            document.getElementById('np-desc').style.visibility = 'visible';
-            document.getElementById('nP').textContent = Q ? `(${Q.x}, ${Q.y})` : '&infini;';
+            await next();
         };
     }
 

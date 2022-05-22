@@ -19,14 +19,6 @@ function preCalcValues(ctx) {
     };
 }
 
-let timeoutInFlight = null;
-function inSeconds(n, func) {
-    if (timeoutInFlight) {
-        clearTimeout(timeoutInFlight);
-    }
-    timeoutInFlight = setTimeout(func, n * 1000);
-}
-
 /**
  * Given an x,y point in the field Fp return the coordinates transformed for the JS Canvas context
  * (adjusted for top-left origin and half-pixel anti-aliasing)
@@ -119,32 +111,27 @@ async function resetGraph(ctx) {
     if (animationFrameInProgress) {
         cancelAnimationFrame(animationFrameInProgress);
     }
-    if (timeoutInFlight) {
-        clearTimeout(timeoutInFlight);
+    const canvas = ctx.canvas;
+    if (resetSaveState) {
+        const ratio = canvas._ratio || 1;
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        const img = resetSaveState;
+        ctx.drawImage(img, 0, 0, img.width, img.height,
+            0, 0, canvas.width / ratio, canvas.height / ratio);
+        return {'usedCache': true};
+    } else {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        drawGrid(ctx);
+        drawCurve(ctx);
+        canvas.toBlob(blob => {
+            let img = new Image();
+            img.addEventListener('load', () => {
+                resetSaveState = img;
+            });
+            img.src = URL.createObjectURL(blob);
+        }, 'image/png');
+        return {'usedCache': false};
     }
-    return new Promise(success => {
-        const canvas = ctx.canvas;
-        if (resetSaveState) {
-            const ratio = canvas._ratio || 1;
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            const img = resetSaveState;
-            ctx.drawImage(img, 0, 0, img.width, img.height,
-                0, 0, canvas.width / ratio, canvas.height / ratio);
-            success({'usedCache': true});
-        } else {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            drawGrid(ctx);
-            drawCurve(ctx);
-            canvas.toBlob(blob => {
-                let img = new Image();
-                img.addEventListener('load', () => {
-                    resetSaveState = img;
-                });
-                img.src = URL.createObjectURL(blob);
-            }, 'image/png');
-            success({'usedCache': false});
-        }
-    });
 }
 
 /**
@@ -375,6 +362,10 @@ async function addP(ctx, Q, drawDoneCb) {
                     drawDot(vals, R.x, R.y, 'red', vals.dotRadius + 1, 2);
                     finished.negate = timestamp;
                 }
+            } else if (!finished.callback) {
+                markState('callback', timestamp);
+                if (drawDoneCb) drawDoneCb(R);
+                finished.callback = timestamp;
             } else if (!finished.done) {
                 let instate = markState('done', timestamp);
                 if (instate > duration.done) {
@@ -388,9 +379,6 @@ async function addP(ctx, Q, drawDoneCb) {
         if (finished.done) {
             await resetGraph(ctx);
             drawDot(vals, R.x, R.y, 'red');
-            if (drawDoneCb) {
-                drawDoneCb(R);
-            }
         } else {
             setAnimationFrame(() => { return requestAnimationFrame(step) });
         }
@@ -485,11 +473,15 @@ async function drawInfinity(ctx, P, Q, drawDoneCb) {
                 ctx.fillStyle = 'red';
                 const fontPx = 80;
                 ctx.font = `italic ${fontPx}px sans`;
-                const left = r*wide + (vals.w-r*wide-r*thin)/2 - 0.5 - fontPx/2;
-                const down = r*thin + (vals.h-r*wide-r*thin)/2 - 0.5 + 0.8*fontPx/2;
+                const left = r * wide + (vals.w - r * wide - r * thin) / 2 - 0.5 - fontPx / 2;
+                const down = r * thin + (vals.h - r * wide - r * thin) / 2 - 0.5 + 0.8 * fontPx / 2;
                 ctx.fillText(INFINITY, left, down);
                 ctx.strokeText(INFINITY, left, down);
                 finished.infinite = timestamp;
+            } else if (!finished.callback) {
+                markState('callback', timestamp);
+                if (drawDoneCb) drawDoneCb(R);
+                finished.callback = timestamp;
             } else if (!finished.done) {
                 let instate = markState('done', timestamp);
                 if (instate > duration.done) {
@@ -499,11 +491,7 @@ async function drawInfinity(ctx, P, Q, drawDoneCb) {
         }
         prev = timestamp;
 
-        if (finished.done) {
-            if (drawDoneCb) {
-                drawDoneCb(R);
-            }
-        } else {
+        if (!finished.done) {
             setAnimationFrame(() => { return requestAnimationFrame(step) });
         }
     }
@@ -513,7 +501,6 @@ async function drawInfinity(ctx, P, Q, drawDoneCb) {
 
 export {
     INFINITY,
-    inSeconds,
     resetGraph,
     addP,
 };
