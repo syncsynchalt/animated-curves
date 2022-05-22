@@ -28,7 +28,7 @@
 
     async function onload() {
         const container = document.getElementById('canvas-container');
-        const canvas = createHiDPICanvas(container, 500, 500);
+        const canvas = createHiDPICanvas(container, 500, 400);
         canvas.style.border = '1px solid grey';
         const ctx = canvas.getContext('2d');
         await draw.resetGraph(ctx);
@@ -41,62 +41,69 @@
 
         let n = 1;
         let Q = undefined;
-        let demoTimeout;
         document.getElementById('btn-add1').onclick = async () => {
-            if (demoTimeout) clearTimeout(demoTimeout);
+            draw.cancelDemo();
             n++;
             Q = await draw.addP(ctx, Q, (R) => {
+                document.getElementById('np').classList.remove('calculating');
                 document.getElementById('np').textContent = pointDesc(R);
             });
             document.getElementById('n').textContent = n.toString();
             document.getElementById('np-desc').style.visibility = 'visible';
+            document.getElementById('np').classList.add('calculating');
             document.getElementById('np').textContent = pointDesc();
         };
         document.getElementById('btn-add10').onclick = async () => {
-            if (demoTimeout) clearTimeout(demoTimeout);
+            draw.cancelDemo();
             for (let i = 0; i < 10; i++) {
                 n++;
                 Q = await draw.addP(ctx, Q, (R) => {
+                    document.getElementById('np').classList.remove('calculating');
                     document.getElementById('np').textContent = pointDesc(R);
                 });
             }
             document.getElementById('n').textContent = n.toString();
             document.getElementById('np-desc').style.visibility = 'visible';
+            document.getElementById('np').classList.add('calculating');
             document.getElementById('np').textContent = pointDesc();
         };
         // xxx remove this
         document.getElementById('btn-add71').onclick = async () => {
-            if (demoTimeout) clearTimeout(demoTimeout);
+            draw.cancelDemo();
             for (let i = 0; i < 71; i++) {
                 n++;
                 Q = await draw.addP(ctx, Q, (R) => {
+                    document.getElementById('np').classList.remove('calculating');
                     document.getElementById('np').textContent = pointDesc(R);
                 });
             }
             document.getElementById('n').textContent = n.toString();
             document.getElementById('np-desc').style.visibility = 'visible';
+            document.getElementById('np').classList.add('calculating');
             document.getElementById('np').textContent = pointDesc();
         };
         document.getElementById('btn-reset').onclick = async () => {
-            if (demoTimeout) clearTimeout(demoTimeout);
+            draw.cancelDemo();
             n = 1;
             Q = undefined;
             await draw.resetGraph(ctx);
             document.getElementById('np-desc').style.visibility = 'hidden';
         };
         document.getElementById('btn-demo').onclick = async () => {
-            if (demoTimeout) clearTimeout(demoTimeout);
-            let next = async () => {
+            draw.cancelDemo();
+            let updateCb = (R) => {
+                Q = R;
                 n++;
-                Q = await draw.addP(ctx, Q, (R) => {
-                    document.getElementById('np').textContent = pointDesc(R);
-                    demoTimeout = setTimeout(() => { next() }, 1.5 * 1000);
-                });
                 document.getElementById('n').textContent = n.toString();
                 document.getElementById('np-desc').style.visibility = 'visible';
+                document.getElementById('np').classList.add('calculating');
                 document.getElementById('np').textContent = pointDesc();
             };
-            await next();
+            let drawDoneCb = (R) => {
+                document.getElementById('np').classList.remove('calculating');
+                document.getElementById('np').textContent = pointDesc(R);
+            };
+            return draw.runDemo(ctx, updateCb, drawDoneCb, Q);
         };
     }
 

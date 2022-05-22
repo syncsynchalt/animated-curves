@@ -2,9 +2,12 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <title>Visualizing Elliptic Curves</title>
     <script src="curve/page.js"></script>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-0evHe/X+R7YkIZDRvuzKMRqM+OrBnVFBL6DOitfPri4tjfHxaWutUpFmBp4vmVor" crossorigin="anonymous">
+    <link href="site.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/css/bootstrap.min.css"
+          integrity="sha384-0evHe/X+R7YkIZDRvuzKMRqM+OrBnVFBL6DOitfPri4tjfHxaWutUpFmBp4vmVor"
+          rel="stylesheet" crossorigin="anonymous">
 </head>
 <body>
 <div class="container">
@@ -21,10 +24,12 @@
     <div id="canvas-container">
     </div>
 </div>
-<span>Base point (in black) is always (7, 4).</span>
+<span>Base point <span class="point-p">P</span>
+    is always <span class="point-p">(7, 4)</span>.</span>
 <br>
 <span id="np-desc" style="visibility: hidden">
-    Point <span id="n">1</span>P (in red) is <span id="np">(7, 4)</span>.
+    Point <span class="point-np"><span id="n">1</span>P</span> is
+    <span id="np" class="point-np">(7, 4)</span>.
 </span>
 </div>
 </body>

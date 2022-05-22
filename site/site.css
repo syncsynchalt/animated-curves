@@ -1,0 +1,12 @@
+.point-p {
+    font-weight: bold;
+    color: black;
+}
+
+.point-np {
+    font-weight: bold;
+    color: red;
+}
+.point-np.calculating {
+    color: inherit;
+}

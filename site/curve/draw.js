@@ -221,7 +221,9 @@ async function addP(ctx, Q, drawDoneCb) {
         const R = P;
         await resetGraph(ctx);
         drawDot(vals, P.x, P.y, 'red');
-        if (drawDoneCb) drawDoneCb(R);
+        if (drawDoneCb) {
+            setTimeout(() => { drawDoneCb(R) }, 0);
+        }
         return R;
     }
     const R = curve.pointAdd(P, Q);
@@ -499,8 +501,36 @@ async function drawInfinity(ctx, P, Q, drawDoneCb) {
     return R;
 }
 
+let demoTimeout = null;
+
+/**
+ * @param ctx
+ * @param updateCb {Function?} callback to run after each point is calculated (before animation)
+ * @param drawDoneCb {Function?} callback to run after animation is finished
+ * @param Q {Point?} optional starting point
+ */
+async function runDemo(ctx, updateCb, drawDoneCb, Q) {
+    let next = async () => {
+        Q = await addP(ctx, Q, (R) => {
+            if (drawDoneCb) drawDoneCb(R);
+            demoTimeout = setTimeout(() => { next() }, 1.5 * 1000);
+        });
+        if (updateCb) updateCb(Q);
+    };
+    await next();
+}
+
+function cancelDemo() {
+    if (demoTimeout) {
+        clearTimeout(demoTimeout);
+        demoTimeout = null;
+    }
+}
+
 export {
     INFINITY,
     resetGraph,
     addP,
+    runDemo,
+    cancelDemo,
 };
