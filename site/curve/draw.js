@@ -200,6 +200,14 @@ function drawCurve(ctx) {
     ctx.fillStyle = origFill;
 }
 
+function canvasIsScrolledIntoView(canvas) {
+    const rect = canvas.getBoundingClientRect();
+    const vh = window.innerHeight || document.documentElement.clientHeight;
+    return (rect.top >= 0 && rect.top <= vh) ||
+        (rect.bottom >= 0 && rect.bottom <= vh) ||
+        (rect.top < 0 && rect.bottom > 0);
+}
+
 let animationFrameInProgress;
 
 /**
@@ -384,8 +392,11 @@ async function addP(ctx, Q, drawDoneCb) {
         if (finished.done) {
             await resetGraph(ctx);
             drawDot(vals, R.x, R.y, 'red');
-        } else {
+        } else if (canvasIsScrolledIntoView(ctx.canvas)) {
             setAnimationFrame(() => { return requestAnimationFrame(step) });
+        } else {
+            await resetGraph(ctx);
+            if (drawDoneCb && !finished.callback) drawDoneCb(R);
         }
     }
     setAnimationFrame(() => { return requestAnimationFrame(step) });
