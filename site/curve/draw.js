@@ -373,6 +373,7 @@ async function addP(ctx, Q, drawDoneCb) {
                 drawDot(vals, negR.x, negR.y, 'orange', +1, 1);
                 if (instate > duration.negate) {
                     ctx.strokeStyle = 'black';
+                    drawDot(vals, Q.x, Q.y, 'orange');
                     drawDot(vals, R.x, R.y, 'red', +1, 2);
                     finished.negate = timestamp;
                 }
