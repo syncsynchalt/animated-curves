@@ -3,6 +3,9 @@ button {
     user-select: none;
     -webkit-user-select: none;
 }
+.btn {
+    margin: 2px 0;
+}
 
 .point-p {
     font-weight: bold;
@@ -16,4 +19,8 @@ button {
 .point-np.calculating {
     font-weight: inherit;
     color: inherit;
+}
+
+.hidden {
+    visibility: hidden;
 }

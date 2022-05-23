@@ -1,34 +1,10 @@
-
 (async () => {
-    let draw = await import('./draw.js');
-
-    const PIXEL_RATIO = (ctx) => {
-        // noinspection JSUnresolvedVariable
-        const dpr = window.devicePixelRatio || 1,
-            bsr = ctx.webkitBackingStorePixelRatio ||
-                ctx.mozBackingStorePixelRatio ||
-                ctx.msBackingStorePixelRatio ||
-                ctx.oBackingStorePixelRatio ||
-                ctx.backingStorePixelRatio || 1;
-        return dpr / bsr;
-    };
-
-    let createHiDPICanvas = function(parent, w, h) {
-        const can = parent.appendChild(document.createElement('canvas'));
-        const ctx = can.getContext('2d', {alpha: false});
-        const ratio = PIXEL_RATIO(ctx);
-        can._ratio = ratio;
-        can.width = w * ratio;
-        can.height = h * ratio;
-        can.style.width = w + 'px';
-        can.style.height = h + 'px';
-        ctx.scale(ratio, ratio);
-        return [can, ctx];
-    };
+    let draw = await import('./curve/draw.js');
+    let common = await import('./common.js');
 
     async function onload() {
-        const container = document.getElementById('canvas-container');
-        const [canvas, ctx] = createHiDPICanvas(container, 500, 400);
+        const container = document.getElementById('canvas-addp');
+        const [canvas, ctx] = common.createHiDPICanvas(container, 500, 400);
         canvas.style.border = '1px solid grey';
         await draw.resetGraph(ctx);
 
@@ -48,7 +24,7 @@
                 document.getElementById('np').textContent = pointDesc(R);
             });
             document.getElementById('n').textContent = n.toString();
-            document.getElementById('np-desc').style.visibility = 'visible';
+            document.getElementById('np-desc').classList.remove('hidden');
             document.getElementById('np').classList.add('calculating');
             document.getElementById('np').textContent = pointDesc();
         };
@@ -62,7 +38,7 @@
                 });
             }
             document.getElementById('n').textContent = n.toString();
-            document.getElementById('np-desc').style.visibility = 'visible';
+            document.getElementById('np-desc').classList.remove('hidden');
             document.getElementById('np').classList.add('calculating');
             document.getElementById('np').textContent = pointDesc();
         };
@@ -77,7 +53,7 @@
                 });
             }
             document.getElementById('n').textContent = n.toString();
-            document.getElementById('np-desc').style.visibility = 'visible';
+            document.getElementById('np-desc').classList.remove('hidden');
             document.getElementById('np').classList.add('calculating');
             document.getElementById('np').textContent = pointDesc();
         };
@@ -86,7 +62,7 @@
             n = 1;
             Q = undefined;
             await draw.resetGraph(ctx);
-            document.getElementById('np-desc').style.visibility = 'hidden';
+            document.getElementById('np-desc').classList.add('hidden');
         };
         document.getElementById('btn-demo').onclick = async () => {
             draw.cancelDemo();
@@ -94,7 +70,7 @@
                 Q = R;
                 n++;
                 document.getElementById('n').textContent = n.toString();
-                document.getElementById('np-desc').style.visibility = 'visible';
+                document.getElementById('np-desc').classList.remove('hidden');
                 document.getElementById('np').classList.add('calculating');
                 document.getElementById('np').textContent = pointDesc();
             };

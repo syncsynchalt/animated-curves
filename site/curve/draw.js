@@ -26,10 +26,19 @@ function preCalcValues(ctx) {
  * @param vals {Object} values from preCalcValues(ctx)
  * @param x {Number} between 0 and p
  * @param y {Number} between 0 and p
+ * @param halfPixel {Boolean?} if set, round all pixels to nearest .5 (true) or .0 (false)
  * @return {Number[2]} x,y values transformed for canvas context
  */
-function pointToCtx(vals, x, y) {
-    return [vals.marginWide+x*vals.wScale, vals.h - (vals.marginWide+y*vals.hScale)];
+function pointToCtx(vals, x, y, halfPixel) {
+    let v = [vals.marginWide + x*vals.wScale, vals.h - (vals.marginWide+y*vals.hScale)];
+    if (halfPixel) {
+        v[0] = ((v[0]+0.5) | 0) - 0.5;
+        v[1] = ((v[1]+0.5) | 0) - 0.5;
+    } else if (halfPixel === false) {
+        v[0] = ((v[0]+0.5) | 0);
+        v[1] = ((v[1]+0.5) | 0);
+    }
+    return v;
 }
 
 let drawGreyLines = (ctx, vals) => {
@@ -42,8 +51,8 @@ let drawGreyLines = (ctx, vals) => {
         if (y !== field.p) {
             ctx.setLineDash([2, 2]);
         }
-        ctx.moveTo(...pointToCtx(vals, 0, y));
-        ctx.lineTo(...pointToCtx(vals, field.p-1, y));
+        ctx.moveTo(...pointToCtx(vals, 0, y, true));
+        ctx.lineTo(...pointToCtx(vals, field.p-1, y, true));
         ctx.stroke();
     });
     for (let i = greyWidth; i < field.p; i += greyWidth) {
@@ -52,8 +61,8 @@ let drawGreyLines = (ctx, vals) => {
         if (i % 10 !== 0) {
             ctx.setLineDash([2, 2]);
         }
-        ctx.moveTo(...pointToCtx(vals, i, 0));
-        ctx.lineTo(...pointToCtx(vals, i, field.p));
+        ctx.moveTo(...pointToCtx(vals, i, 0, true));
+        ctx.lineTo(...pointToCtx(vals, i, field.p, true));
         ctx.stroke();
     }
 };
@@ -61,20 +70,19 @@ let drawGreyLines = (ctx, vals) => {
 let drawAxisLines = (ctx, vals) => {
     // draw the axis lines
     ctx.beginPath();
-    ctx.fillStyle = 'black';
     ctx.strokeStyle = 'black';
-    ctx.moveTo(...pointToCtx(vals, 0, 0));
-    ctx.lineTo(...pointToCtx(vals, field.p - 0.5, 0));
-    ctx.stroke();
-    ctx.moveTo(...pointToCtx(vals, 0, 0));
-    ctx.lineTo(...pointToCtx(vals, 0, field.p - 0.5));
+    ctx.moveTo(...pointToCtx(vals, 0, 0, true));
+    ctx.lineTo(...pointToCtx(vals, field.p, 0, true));
+    ctx.moveTo(...pointToCtx(vals, 0, 0, true));
+    ctx.lineTo(...pointToCtx(vals, 0, field.p, true));
     ctx.stroke();
     ctx.font = 'italic 12px serif';
+    ctx.fillStyle = 'black';
     const bodge = 1.6;
-    ctx.fillText('0', ...pointToCtx(vals, -bodge, -bodge));
-    ctx.fillText('p', ...pointToCtx(vals, -bodge, field.p - 0.5));
-    ctx.fillText('p/2', ...pointToCtx(vals, -1.5*bodge, field.p/2 - 0.5));
-    ctx.fillText('p', ...pointToCtx(vals, field.p - 0.5, -bodge));
+    ctx.fillText('0', ...pointToCtx(vals, -bodge, -bodge, false));
+    ctx.fillText('p', ...pointToCtx(vals, -bodge, field.p - 0.5, false));
+    ctx.fillText('p/2', ...pointToCtx(vals, -1.5*bodge, field.p/2 - 0.5, false));
+    ctx.fillText('p', ...pointToCtx(vals, field.p - 0.5, -bodge, false));
     [10, 20, 30, 40, 50].forEach(x => {
         ctx.fillText(x, ...pointToCtx(vals, x-1, -bodge));
     });
@@ -86,7 +94,7 @@ let drawArrowHeads = (ctx, vals) => {
     ctx.fillStyle = 'black';
     const arrLen = 10;
     const arrWid = 5;
-    const xHead = pointToCtx(vals, field.p, 0);
+    const xHead = pointToCtx(vals, field.p, 0, true);
     ctx.beginPath();
     ctx.moveTo(...xHead);
     ctx.lineTo(...[xHead[0]-arrLen, xHead[1]-arrWid]);
@@ -95,7 +103,7 @@ let drawArrowHeads = (ctx, vals) => {
     ctx.closePath();
     ctx.fill();
 
-    const yHead = pointToCtx(vals, 0, field.p);
+    const yHead = pointToCtx(vals, 0, field.p, true);
     ctx.beginPath();
     ctx.moveTo(...yHead);
     ctx.lineTo(...[yHead[0]-arrWid, yHead[1]+arrLen]);
@@ -491,8 +499,8 @@ async function drawInfinity(ctx, P, Q, drawDoneCb) {
                 ctx.fillStyle = 'red';
                 const fontPx = 80;
                 ctx.font = `italic ${fontPx}px sans`;
-                const left = r * wide + (vals.w - r * wide - r * thin) / 2 - 0.5 - fontPx / 2;
-                const down = r * thin + (vals.h - r * wide - r * thin) / 2 - 0.5 + 0.8 * fontPx / 2;
+                const left = r * wide + (vals.w - r * wide - r * thin) / 2 - fontPx / 2;
+                const down = r * thin + (vals.h - r * wide - r * thin) / 2 + 0.8 * fontPx / 2;
                 ctx.fillText(INFINITY, left, down);
                 ctx.strokeText(INFINITY, left, down);
                 finished.infinite = timestamp;

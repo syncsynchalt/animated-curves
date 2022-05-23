@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Visualizing Elliptic Curves</title>
-    <script src="curve/page.js"></script>
+    <script src="page.js"></script>
     <link href="site.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/css/bootstrap.min.css"
           integrity="sha384-0evHe/X+R7YkIZDRvuzKMRqM+OrBnVFBL6DOitfPri4tjfHxaWutUpFmBp4vmVor"
@@ -12,22 +12,23 @@
 <body>
 <div class="container">
 <span>
-    EC scalar multiplication on curve
-    y<sup>2</sup> = x<sup>3</sup> + 38x<sup>2</sup> + x over finite field &#x1D53D;<sub>61</sub> (p=61).
+    EC scalar multiplication on curve y<sup>2</sup> = x<sup>3</sup>
+    + 38x<sup>2</sup> + x over finite field &#x1D53D;<sub>61</sub>
+    (p=61).
 </span>
 <div>
-    <button class="btn btn-primary" id="btn-demo" style="margin: 2px 0">Play</button>
-    <button class="btn btn-primary" id="btn-add1" style="margin: 2px 0">+1</button>
-    <button class="btn btn-primary" id="btn-add10" style="margin: 2px 0">+10</button>
-    <button class="btn btn-primary" id="btn-add71" style="margin: 2px 0">+71</button>
-    <button class="btn btn-primary" id="btn-reset" style="margin: 2px 0">Reset</button>
-    <div id="canvas-container">
+    <button class="btn btn-primary" id="btn-demo">Play</button>
+    <button class="btn btn-primary" id="btn-add1">+1</button>
+    <button class="btn btn-primary" id="btn-add10">+10</button>
+    <button class="btn btn-primary" id="btn-add71">+71</button>
+    <button class="btn btn-primary" id="btn-reset">Reset</button>
+    <div id="canvas-addp">
     </div>
 </div>
 <span>Base point <span class="point-p">P</span>
     is <span class="point-p">(7, 4)</span>.</span>
 <br>
-<span id="np-desc" style="visibility: hidden">
+<span id="np-desc" class="hidden">
     Point <span class="point-np"><span id="n">1</span>P</span> is
     <span id="np" class="point-np">(7, 4)</span>.
 </span>
@@ -40,5 +41,6 @@
 <br><br><br><br><br><br><br>
 <br><br><br><br><br><br><br>
 <br><br><br><br><br><br><br>
+</div>
 </body>
 </html>
