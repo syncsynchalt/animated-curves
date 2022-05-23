@@ -120,7 +120,8 @@ async function resetGraph(ctx) {
             0, 0, canvas.width / ratio, canvas.height / ratio);
         return {'usedCache': true};
     } else {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.fillStyle = 'white';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
         drawGrid(ctx);
         drawCurve(ctx);
         canvas.toBlob(blob => {

@@ -139,8 +139,8 @@ function pow(n, e) {
  * @param n {Number} number to be tested
  * @returns {boolean} true if n is a square in Fp
  */
+const pHalf = Math.floor((p-1)/2);
 let eulersCriterion = (n) => {
-    const pHalf = Math.floor((p-1)/2);
     return pow(n, pHalf) === 1;
 };
 

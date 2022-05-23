@@ -1,3 +1,9 @@
+button {
+    touch-action: manipulation;
+    user-select: none;
+    -webkit-user-select: none;
+}
+
 .point-p {
     font-weight: bold;
     color: black;
