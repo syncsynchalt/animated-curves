@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Visualizing Elliptic Curves</title>
-    <script src="page.js"></script>
+    <script type="module" src="page.js"></script>
     <link href="site.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/css/bootstrap.min.css"
           integrity="sha384-0evHe/X+R7YkIZDRvuzKMRqM+OrBnVFBL6DOitfPri4tjfHxaWutUpFmBp4vmVor"
@@ -22,8 +22,8 @@
     <button class="btn btn-primary" id="btn-add10">+10</button>
     <button class="btn btn-primary" id="btn-add71">+71</button>
     <button class="btn btn-primary" id="btn-reset">Reset</button>
-    <div id="canvas-addp">
-    </div>
+    <canvas id="canvas-addp" width="500" height="400">
+    </canvas>
 </div>
 <span>Base point <span class="point-p">P</span>
     is <span class="point-p">(7, 4)</span>.</span>
