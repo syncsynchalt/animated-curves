@@ -42,17 +42,6 @@ import * as common from './common.js';
             }
             setPageStuff();
         };
-        // xxx remove this
-        common.byId('btn-add71').onclick = async () => {
-            draw.cancelDemo();
-            for (let i = 0; i < 71; i++) {
-                n++;
-                Q = await draw.addP(ctx, Q, (R) => {
-                    setPageStuff(R);
-                });
-            }
-            setPageStuff();
-        };
         common.byId('btn-reset').onclick = async () => {
             draw.cancelDemo();
             n = 1;
