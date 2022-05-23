@@ -2,35 +2,34 @@
 (async () => {
     let draw = await import('./draw.js');
 
-    const PIXEL_RATIO = (function() {
+    const PIXEL_RATIO = (ctx) => {
         // noinspection JSUnresolvedVariable
-        const ctx = document.createElement('canvas').getContext('2d'),
-            dpr = window.devicePixelRatio || 1,
+        const dpr = window.devicePixelRatio || 1,
             bsr = ctx.webkitBackingStorePixelRatio ||
                 ctx.mozBackingStorePixelRatio ||
                 ctx.msBackingStorePixelRatio ||
                 ctx.oBackingStorePixelRatio ||
                 ctx.backingStorePixelRatio || 1;
         return dpr / bsr;
-    })();
+    };
 
     let createHiDPICanvas = function(parent, w, h) {
-        const ratio = PIXEL_RATIO;
         const can = parent.appendChild(document.createElement('canvas'));
-        can._ratio = PIXEL_RATIO;
+        const ctx = can.getContext('2d', {alpha: false});
+        const ratio = PIXEL_RATIO(ctx);
+        can._ratio = ratio;
         can.width = w * ratio;
         can.height = h * ratio;
         can.style.width = w + 'px';
         can.style.height = h + 'px';
-        can.getContext('2d').setTransform(ratio, 0, 0, ratio, 0, 0);
-        return can;
+        ctx.scale(ratio, ratio);
+        return [can, ctx];
     };
 
     async function onload() {
         const container = document.getElementById('canvas-container');
-        const canvas = createHiDPICanvas(container, 500, 400);
+        const [canvas, ctx] = createHiDPICanvas(container, 500, 400);
         canvas.style.border = '1px solid grey';
-        const ctx = canvas.getContext('2d');
         await draw.resetGraph(ctx);
 
         let pointDesc = (p) => {

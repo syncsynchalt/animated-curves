@@ -165,8 +165,9 @@ let setAnimationFrame = (func) => {
  */
 function drawDot(vals, x, y, color, radiusAdj, lineWidth) {
     const ctx = vals.ctx;
-    ctx.beginPath();
     ctx.save();
+    ctx.beginPath();
+    ctx.setLineDash([]);
     ctx.strokeStyle = 'black';
     ctx.fillStyle = color;
     ctx.lineWidth = lineWidth || 1;
