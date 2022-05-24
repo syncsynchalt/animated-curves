@@ -26,7 +26,27 @@ function convertCanvasHiDPI(canvas) {
     return ctx;
 }
 
+function canvasIsScrolledIntoView(canvas) {
+    const rect = canvas.getBoundingClientRect();
+    const vh = window.innerHeight || document.documentElement.clientHeight;
+    return (rect.top >= 0 && rect.top <= vh) ||
+        (rect.bottom >= 0 && rect.bottom <= vh) ||
+        (rect.top < 0 && rect.bottom > 0);
+}
+
+/**
+ * Create an ease-in / ease-out effect.
+ * @param t {Number} number between 0 and 1
+ * @return the eased result, eased at the ends
+ */
+function easeInOut(t) {
+    let sq = t * t;
+    return sq / (2 * (sq - t) + 1);
+}
+
 export {
     byId,
-    convertCanvasHiDPI
+    convertCanvasHiDPI,
+    canvasIsScrolledIntoView,
+    easeInOut,
 };

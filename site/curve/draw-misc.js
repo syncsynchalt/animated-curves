@@ -112,18 +112,7 @@ function segmentLen(P, Q) {
 }
 
 
-/**
- * Create an ease-in / ease-out effect.
- * @param t {Number} number between 0 and 1
- * @return the eased result, eased at the ends
- */
-function easeInOut(t) {
-    let sq = t * t;
-    return sq / (2 * (sq - t) + 1);
-}
-
 export {
-    easeInOut,
     orderPointsByX,
     lineBoxBounds,
     getSlope,

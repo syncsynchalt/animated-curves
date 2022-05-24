@@ -1,3 +1,27 @@
+.center-block {
+    display: block;
+    margin: 0 auto;
+    text-align: center;
+}
+
+.math {
+    font-family: "Times New Roman", serif;
+    font-style: oblique;
+}
+
+.tt {
+    font-family: "Monaco", "Courier", monospace;
+}
+
+.smaller {
+    font-size: 0.9em;
+}
+
+.squish {
+    font-family: "Courier", monospace;
+    letter-spacing: -1.4px;
+}
+
 button {
     touch-action: manipulation;
     user-select: none;
@@ -15,10 +39,6 @@ button {
 .point-np {
     font-weight: bold;
     color: red;
-}
-.point-np.calculating {
-    font-weight: inherit;
-    color: inherit;
 }
 
 .hidden {

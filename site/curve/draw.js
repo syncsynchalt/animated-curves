@@ -1,14 +1,15 @@
 import * as curve from './curve.js';
 import * as field from './field.js';
 import * as misc from './draw-misc.js';
+import * as common from '../common.js';
 
 const TWO_PI = 2*Math.PI;
 const EPS = 0.0000001;
 const INFINITY = '\u221E';
 
 function preCalcValues(ctx) {
-    const marginWide = 29.5;
-    const marginThin = 14.5;
+    const marginWide = 25;
+    const marginThin = 14;
     const dotRadius = 3;
     const w = ctx.canvas.getBoundingClientRect().width;
     const h = ctx.canvas.getBoundingClientRect().height;
@@ -42,7 +43,6 @@ function pointToCtx(vals, x, y, halfPixel) {
 }
 
 let drawGreyLines = (ctx, vals) => {
-    // draw the grey lines
     const greyWidth = 5;
     ctx.strokeStyle = 'lightgrey';
     [field.p/2, field.p].forEach(y => {
@@ -68,7 +68,6 @@ let drawGreyLines = (ctx, vals) => {
 };
 
 let drawAxisLines = (ctx, vals) => {
-    // draw the axis lines
     ctx.beginPath();
     ctx.strokeStyle = 'black';
     ctx.moveTo(...pointToCtx(vals, 0, 0, true));
@@ -209,14 +208,6 @@ function drawCurve(ctx) {
     ctx.fillStyle = origFill;
 }
 
-function canvasIsScrolledIntoView(canvas) {
-    const rect = canvas.getBoundingClientRect();
-    const vh = window.innerHeight || document.documentElement.clientHeight;
-    return (rect.top >= 0 && rect.top <= vh) ||
-        (rect.bottom >= 0 && rect.bottom <= vh) ||
-        (rect.top < 0 && rect.bottom > 0);
-}
-
 let animationFrameInProgress;
 
 /**
@@ -272,7 +263,6 @@ async function addP(ctx, Q, drawDoneCb) {
         if (!start) {
             start = timestamp;
         }
-        let elapsed = timestamp - start;
         if (timestamp !== prev) {
             ctx.save();
             if (!finished['tangent']) {
@@ -281,8 +271,8 @@ async function addP(ctx, Q, drawDoneCb) {
                 ctx.lineWidth = 1;
                 ctx.strokeStyle = 'orange';
                 ctx.setLineDash([4, 4]);
-                let mult = elapsed / duration.tangent;
-                mult = misc.easeInOut(mult);
+                let mult = instate / duration.tangent;
+                mult = common.easeInOut(mult);
                 let bounds = misc.lineBoxBounds(P, Q);
                 let tanLineForw = bounds[1] - P.x;
                 let tanLineBack = P.x - bounds[0];
@@ -372,7 +362,7 @@ async function addP(ctx, Q, drawDoneCb) {
                 }
                 let mult = instate / duration.negate;
                 mult = Math.min(1, mult);
-                mult = misc.easeInOut(mult);
+                mult = common.easeInOut(mult);
                 ctx.moveTo(...pointToCtx(vals, negR.x, negR.y));
                 ctx.lineTo(...pointToCtx(vals, negR.x, negR.y - cache.negateLength * mult));
                 ctx.stroke();
@@ -402,7 +392,7 @@ async function addP(ctx, Q, drawDoneCb) {
         if (finished.done) {
             await resetGraph(ctx);
             drawDot(vals, R.x, R.y, 'red');
-        } else if (canvasIsScrolledIntoView(ctx.canvas)) {
+        } else if (common.canvasIsScrolledIntoView(ctx.canvas)) {
             setAnimationFrame(() => { return requestAnimationFrame(step) });
         } else {
             await resetGraph(ctx);
@@ -442,7 +432,7 @@ async function drawInfinity(ctx, P, Q, drawDoneCb) {
 
     let drawFullVertLine = (mult) => {
         ctx.beginPath();
-        mult = misc.easeInOut(mult);
+        mult = common.easeInOut(mult);
         let lineUp = (field.p - P.y) * mult;
         let lineDn = (P.y) * mult;
         ctx.moveTo(...pointToCtx(vals, P.x, P.y));

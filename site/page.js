@@ -1,12 +1,47 @@
+import * as draw25519 from './curve25519/draw.js';
 import * as draw from './curve/draw.js';
 import * as common from './common.js';
 
 (async () => {
 
+    let curve25519Setup = async () => {
+        const canvas = common.byId('canvas-curve25519');
+        const ctx = common.convertCanvasHiDPI(canvas);
+        await draw25519.resetGraph(ctx);
+
+        /** @param v {BigInt} */
+        let pointDesc = (v) => {
+            if (v === undefined) return '...';
+            return `${v.toString(16)}`;
+        };
+
+        let n = 1;
+        let Q = draw25519.P;
+        let setPageStuff = (R) => {
+            common.byId('n-255').textContent = n.toString();
+            common.byId('np-x-255').textContent = pointDesc(R?.x);
+            common.byId('np-y-255').textContent = pointDesc(R?.y);
+        };
+
+        const startDemo = () => {
+            draw25519.cancelDemo();
+            let drawDoneCb = (R) => { setPageStuff(R) };
+            let updateCb = (R) => { Q = R; n++; setPageStuff(R) };
+            return draw25519.runDemo(ctx, updateCb, drawDoneCb, Q);
+        };
+        common.byId('btn-play-255').onclick = async () => {
+            await startDemo();
+        };
+        common.byId('btn-stop-255').onclick = async () => {
+            draw25519.cancelDemo();
+        };
+
+        await startDemo();
+    };
+
     let addPSetup = async () => {
         const canvas = common.byId('canvas-addp');
         const ctx = common.convertCanvasHiDPI(canvas);
-        canvas.style.border = '1px solid grey';
         await draw.resetGraph(ctx);
 
         let pointDesc = (p) => {
@@ -58,6 +93,7 @@ import * as common from './common.js';
     };
 
     async function onload() {
+        await curve25519Setup();
         await addPSetup();
     }
 
