@@ -31,7 +31,7 @@ function preCalcValues(ctx) {
  * @return {Number[2]} x,y values transformed for canvas context
  */
 function pointToCtx(vals, x, y, halfPixel) {
-    let v = [vals.marginWide + x*vals.wScale, vals.h - (vals.marginWide+y*vals.hScale)];
+    let v = [vals.marginWide + x*vals.wScale, vals.h - (vals.marginWide + y*vals.hScale)];
     if (halfPixel) {
         v[0] = ((v[0]+0.5) | 0) - 0.5;
         v[1] = ((v[1]+0.5) | 0) - 0.5;
@@ -116,7 +116,7 @@ let resetSaveState = null;
 
 async function resetGraph(ctx) {
     if (animationFrameInProgress) {
-        cancelAnimationFrame(animationFrameInProgress);
+        setAnimationFrame(() => { return null });
     }
     const canvas = ctx.canvas;
     if (resetSaveState) {
@@ -169,18 +169,18 @@ let setAnimationFrame = (func) => {
  * @param y {Number} coordinate
  * @param color {String} fill style
  * @param radiusAdj {Number?} adjustment to built-in dot radius
- * @param lineWidth {Number?} line width
+ * @param lw {Number?} line width
  */
-function drawDot(vals, x, y, color, radiusAdj, lineWidth) {
+function drawDot(vals, x, y, color, radiusAdj, lw) {
     const ctx = vals.ctx;
     ctx.save();
     ctx.beginPath();
     ctx.setLineDash([]);
     ctx.strokeStyle = 'black';
     ctx.fillStyle = color;
-    ctx.lineWidth = lineWidth || 1;
-    ctx.moveTo(...pointToCtx(vals, x, y));
-    ctx.arc(...pointToCtx(vals, x, y), vals.dotRadius + (radiusAdj || 0), 0, TWO_PI);
+    ctx.lineWidth = lw || 1;
+    ctx.moveTo(...pointToCtx(vals, x, y, true));
+    ctx.arc(...pointToCtx(vals, x, y, true), vals.dotRadius + (radiusAdj || 0), 0, TWO_PI);
     ctx.stroke();
     ctx.fill();
     ctx.restore();
@@ -357,14 +357,14 @@ async function addP(ctx, Q, drawDoneCb) {
                 ctx.lineWidth = 2;
                 ctx.strokeStyle = 'red';
                 ctx.setLineDash([3, 2]);
-                if (!cache.negateLength) {
-                    cache.negateLength = curve.negate(R).y - R.y;
+                if (!cache.negLength) {
+                    cache.negLength = curve.negate(R).y - R.y;
                 }
                 let mult = instate / duration.negate;
                 mult = Math.min(1, mult);
                 mult = common.easeInOut(mult);
-                ctx.moveTo(...pointToCtx(vals, negR.x, negR.y));
-                ctx.lineTo(...pointToCtx(vals, negR.x, negR.y - cache.negateLength * mult));
+                ctx.moveTo(...pointToCtx(vals, negR.x, negR.y, true));
+                ctx.lineTo(...pointToCtx(vals, negR.x, negR.y - cache.negLength * mult, true));
                 ctx.stroke();
                 ctx.setLineDash([]);
                 // overdraw to fix red line covering this dot
@@ -377,7 +377,9 @@ async function addP(ctx, Q, drawDoneCb) {
                 }
             } else if (!finished.callback) {
                 markState('callback', timestamp);
-                if (drawDoneCb) drawDoneCb(R);
+                if (drawDoneCb) {
+                    cache.stopAnimation = drawDoneCb(R) === false;
+                }
                 finished.callback = timestamp;
             } else if (!finished.done) {
                 let instate = markState('done', timestamp);
@@ -392,11 +394,8 @@ async function addP(ctx, Q, drawDoneCb) {
         if (finished.done) {
             await resetGraph(ctx);
             drawDot(vals, R.x, R.y, 'red');
-        } else if (common.canvasIsScrolledIntoView(ctx.canvas)) {
+        } else if (!cache.stopAnimation) {
             setAnimationFrame(() => { return requestAnimationFrame(step) });
-        } else {
-            await resetGraph(ctx);
-            if (drawDoneCb && !finished.callback) drawDoneCb(R);
         }
     }
     setAnimationFrame(() => { return requestAnimationFrame(step) });
@@ -524,10 +523,20 @@ let demoTimeout = null;
  * @param Q {Point?} optional starting point
  */
 async function runDemo(ctx, updateCb, drawDoneCb, Q) {
+    await resetGraph(ctx);
     let next = async () => {
         Q = await addP(ctx, Q, (R) => {
             if (drawDoneCb) drawDoneCb(R);
-            demoTimeout = setTimeout(() => { next() }, 1.5 * 1000);
+            if (common.canvasIsScrolledIntoView(ctx.canvas)) {
+                demoTimeout = setTimeout(() => { next() }, 1.5 * 1000);
+                return true;
+            } else {
+                cancelDemo();
+                common.addPlayMask(ctx, () => {
+                    runDemo(ctx, updateCb, drawDoneCb, Q);
+                });
+                return false;
+            }
         });
         if (updateCb) updateCb(Q);
     };
@@ -539,6 +548,7 @@ function cancelDemo() {
         clearTimeout(demoTimeout);
         demoTimeout = null;
     }
+    setAnimationFrame(() => { return null });
 }
 
 export {

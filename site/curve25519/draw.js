@@ -42,6 +42,7 @@ function pointToCtx(vals, x, y, halfPixel) {
 }
 
 let drawAxisLines = (ctx, vals) => {
+    ctx.save();
     ctx.beginPath();
     ctx.strokeStyle = 'black';
     ctx.moveTo(...pointToCtx(vals, 0n, 0n, true));
@@ -49,10 +50,15 @@ let drawAxisLines = (ctx, vals) => {
     ctx.moveTo(...pointToCtx(vals, 0n, 0n, true));
     ctx.lineTo(...pointToCtx(vals, 0n, field.p, true));
     ctx.stroke();
+    ctx.restore();
+};
+
+let drawAxisLabels = (ctx, vals) => {
+    ctx.save();
+    ctx.beginPath();
     ctx.font = 'italic 12px serif';
     ctx.fillStyle = 'black';
     const bodge = 5n * 2n**247n;
-    ctx.save();
     ctx.textBaseline = 'middle';
     ctx.textAlign = 'center';
     ctx.fillText('p', ...pointToCtx(vals, -bodge, field.p, false));
@@ -126,6 +132,7 @@ function drawGrid(ctx) {
     ctx.lineWidth = 1;
 
     drawAxisLines(ctx, vals);
+    drawAxisLabels(ctx, vals);
     drawArrowHeads(ctx, vals);
 }
 
@@ -208,10 +215,8 @@ async function addP(ctx, Q, drawDoneCb) {
                 if (lastMidDot) {
                     // overdraw last orange dot
                     drawDot(vals, lastMidDot.x, lastMidDot.y, 'white', 0, 2, 'white');
+                    drawAxisLines(ctx, vals);
                 }
-                // keep overdraw from making weird circles
-                drawDot(vals, Q.x, Q.y, 'white', 2, 0, 'white');
-                drawDot(vals, Q.x, Q.y, 'grey', 0.5);
                 let mult = instate / duration.migrate;
                 mult = Math.min(1.0, mult);
                 mult = common.easeInOut(mult);
@@ -235,7 +240,7 @@ async function addP(ctx, Q, drawDoneCb) {
         prev = timestamp;
 
         if (finished.done) {
-            if (drawDoneCb) drawDoneCb(R);
+            drawDoneCb(R);
         } else {
             setAnimationFrame(() => { return requestAnimationFrame(step) });
         }
@@ -258,6 +263,13 @@ async function runDemo(ctx, updateCb, drawDoneCb, Q) {
             if (drawDoneCb) drawDoneCb(R);
             if (common.canvasIsScrolledIntoView(ctx.canvas)) {
                 demoTimeout = setTimeout(() => { next() }, .7 * 1000);
+                return true;
+            } else {
+                cancelDemo();
+                common.addPlayMask(ctx, () => {
+                    runDemo(ctx, updateCb, drawDoneCb, Q);
+                });
+                return false;
             }
         });
         if (updateCb) updateCb(Q);
@@ -270,10 +282,7 @@ function cancelDemo() {
         clearTimeout(demoTimeout);
         demoTimeout = null;
     }
-    if (animationFrameInProgress) {
-        cancelAnimationFrame(animationFrameInProgress);
-        setAnimationFrame(() => { return null });
-    }
+    setAnimationFrame(() => { return null });
 }
 
 const P = curve.P();

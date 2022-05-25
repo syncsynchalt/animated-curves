@@ -26,14 +26,12 @@ import * as common from './common.js';
         const startDemo = () => {
             draw25519.cancelDemo();
             let drawDoneCb = (R) => { setPageStuff(R) };
-            let updateCb = (R) => { Q = R; n++; setPageStuff(R) };
+            let updateCb = (R) => { Q = R; n++ };
             return draw25519.runDemo(ctx, updateCb, drawDoneCb, Q);
         };
-        common.byId('btn-play-255').onclick = async () => {
-            await startDemo();
-        };
-        common.byId('btn-stop-255').onclick = async () => {
+        canvas.onclick = async () => {
             draw25519.cancelDemo();
+            await common.addPlayMask(ctx, async () => { await startDemo() });
         };
 
         await startDemo();
@@ -56,40 +54,20 @@ import * as common from './common.js';
             common.byId('n').textContent = n.toString();
             common.byId('np').textContent = pointDesc(R);
             common.byId('np').classList.toggle('calculating', !R);
-            common.byId('np-desc').classList.toggle('hidden', n === 1);
         };
 
-        common.byId('btn-add1').onclick = async () => {
+        const startDemo = async () => {
             draw.cancelDemo();
-            n++;
-            Q = await draw.addP(ctx, Q, (R) => {
-                setPageStuff(R);
-            });
-            setPageStuff();
-        };
-        common.byId('btn-add10').onclick = async () => {
-            draw.cancelDemo();
-            for (let i = 0; i < 10; i++) {
-                n++;
-                Q = await draw.addP(ctx, Q, (R) => {
-                    setPageStuff(R);
-                });
-            }
-            setPageStuff();
-        };
-        common.byId('btn-reset').onclick = async () => {
-            draw.cancelDemo();
-            n = 1;
-            Q = undefined;
             await draw.resetGraph(ctx);
-            setPageStuff();
-        };
-        common.byId('btn-demo').onclick = async () => {
-            draw.cancelDemo();
             let drawDoneCb = (R) => { setPageStuff(R) };
-            let updateCb = (R) => { Q = R; n++; setPageStuff() };
+            let updateCb = (R) => { Q = R; n++ };
             return draw.runDemo(ctx, updateCb, drawDoneCb, Q);
         };
+        canvas.onclick = async () => {
+            draw.cancelDemo();
+            await common.addPlayMask(ctx, () => { startDemo() });
+        };
+        await common.addPlayMask(ctx, () => { startDemo() });
     };
 
     async function onload() {

@@ -5,6 +5,7 @@
     <title>Visualizing Elliptic Curves</title>
     <script type="module" src="page.js"></script>
     <link href="site.css" rel="stylesheet">
+    <!-- xxx todo grab only what we need -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/css/bootstrap.min.css"
           integrity="sha384-0evHe/X+R7YkIZDRvuzKMRqM+OrBnVFBL6DOitfPri4tjfHxaWutUpFmBp4vmVor"
           rel="stylesheet" crossorigin="anonymous">
@@ -14,22 +15,21 @@
 <h2>Consider the curve</h2>
 <div>
 <p>
-    Every fresh TLS 1.3 connection starts with a key exchange
+    Every TLS 1.3 session starts with a key exchange
     made via an elliptic curve. The most popular curve is
     Curve25519, and the exchange involves adding a "base point"
     <span class="math">P</span> to
-    itself over and over again. That operation looks like this:
+    itself over and over again:
 </p>
-<div>
-<button class="btn btn-primary" id="btn-play-255">Play</button>
-<button class="btn btn-primary" id="btn-stop-255">Stop</button>
-</div>
+<div class="illustration">
+<div class="ill-content">
+<strong>Curve25519 point addition</strong>
 <div>
     <canvas id="canvas-curve25519" width="500" height="250">
     </canvas>
 </div>
 <span id="np-255-desc">
-    Point <span class="point-255np"><span id="n-255">1</span>P</span> is:
+    <span class="point-255np"><span id="n-255">1</span>P</span>:
     <br>
     <span class="smaller"
     >&nbsp;&nbsp;x=<span class="squish"
@@ -41,8 +41,10 @@
     >0x<span id="np-y-255">20ae19a1b8a086b4e01edd2c7748d14c923d4d7e6d7c61b229e9c5a27eced3d9</span>
     </span></span>
 </span>
+</div>
+</div>
 <p>
-    The above animation shows the heart of the TLS 1.3 key exchange,
+    The above animation shows the heart of TLS 1.3 key exchange,
     but what's going on? Let's break it down into simple parts.
 </p>
 </div>
@@ -51,11 +53,11 @@
 <div>
 </div>
 
-<h2>Concept 2: Modular math</h2>
+<h2>Concept 2: Finite field math</h2>
 <div>
 </div>
 
-<h2>Concept 3: Elliptic curves <em>plus</em> modular math</h2>
+<h2>Concept 3: Elliptic curves <em>plus</em> finite fields</h2>
 <div>
 </div>
 
@@ -72,29 +74,21 @@
     y<sup>2</sup> = x<sup>3</sup> + 38x<sup>2</sup> + x
     </span>
 </p>
-<div>
-<span>
-    EC scalar multiplication on curve <span class="math">
-    y<sup>2</sup> = x<sup>3</sup> + 38x<sup>2</sup> + x</span>
-    over finite field <span class="math">&#x1D53D;<sub>61</sub>(p=61)</span>.
-</span>
-<div>
-    <button class="btn btn-primary" id="btn-demo">Play</button>
-    <button class="btn btn-primary" id="btn-add1">+1</button>
-    <button class="btn btn-primary" id="btn-add10">+10</button>
-    <button class="btn btn-primary" id="btn-reset">Reset</button>
-</div>
+<div class="illustration">
+<div class="ill-content">
+<strong>Curve61 point addition</strong>
 <div>
     <canvas id="canvas-addp" width="500" height="400">
     </canvas>
 </div>
-<span>Base point <span class="point-p">P</span>
-    is <span class="point-p">(7, 4)</span>.</span>
+<span>Base point <span class="point-p">P</span> is:
+    <span class="x-point-p">(7, 4)</span></span>
 <br>
-<span id="np-desc" class="hidden">
-    Point <span class="point-np"><span id="n">1</span>P</span> is
-    <span id="np" class="point-np">(7, 4)</span>.
+<span id="np-desc">
+    Point <span class="point-np"><span id="n">1</span>P</span> is:
+    <span id="np" class="x-point-np">(7, 4)</span>
 </span>
+</div>
 </div>
 
 </div> <!-- container -->

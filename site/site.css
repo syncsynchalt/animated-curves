@@ -1,3 +1,30 @@
+.illustration {
+    display: flex;
+    flex-direction: column;
+    align-content: center;
+    margin-bottom: 0.5em;
+}
+.ill-content {
+    width: min-content;
+    display: inline-block;
+    padding: 15px;
+    background-color: #a8caee;
+    border: 1px solid black;
+    border-radius: 10px;
+    box-shadow: 2px 2px 2px rgba(0, 0, 0, 0.5);
+    margin: 0 auto;
+}
+
+.illustration canvas {
+    touch-action: manipulation;
+    user-select: none;
+    -webkit-user-select: none;
+    background-color: white;
+    border-radius: 10px;
+    box-shadow: 2px 2px 2px rgba(0, 0, 0, 0.5);
+    cursor: pointer;
+}
+
 .center-block {
     display: block;
     margin: 0 auto;
@@ -7,10 +34,6 @@
 .math {
     font-family: "Times New Roman", serif;
     font-style: oblique;
-}
-
-.tt {
-    font-family: "Monaco", "Courier", monospace;
 }
 
 .smaller {
@@ -27,15 +50,11 @@ button {
     user-select: none;
     -webkit-user-select: none;
 }
-.btn {
-    margin: 2px 0;
-}
 
 .point-p {
     font-weight: bold;
     color: black;
 }
-
 .point-np {
     font-weight: bold;
     color: red;
