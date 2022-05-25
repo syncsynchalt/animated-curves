@@ -1,5 +1,6 @@
 import * as draw25519 from './curve25519/draw.js';
 import * as draw from './curve/draw.js';
+import * as sample from './ec-samples/sample-draw.js';
 import * as common from './common.js';
 
 (async () => {
@@ -31,6 +32,27 @@ import * as common from './common.js';
         };
         canvas.onclick = async () => {
             draw25519.cancelDemo();
+            await common.addPlayMask(ctx, async () => { await startDemo() });
+        };
+
+        await startDemo();
+    };
+
+    let ecSampleSetup = async () => {
+        const canvas = common.byId('canvas-ec-sample');
+        const ctx = common.convertCanvasHiDPI(canvas);
+
+        const startDemo = async () => {
+            let a = -1, b = -1;
+            return sample.runDemo(ctx, a, b, (newA, newB) => {
+                a = newA;
+                b = newB;
+                common.byId('ec-sample-a').textContent = a;
+                common.byId('ec-sample-b').textContent = b;
+            });
+        };
+        canvas.onclick = async () => {
+            sample.cancelDemo();
             await common.addPlayMask(ctx, async () => { await startDemo() });
         };
 
@@ -72,6 +94,7 @@ import * as common from './common.js';
 
     async function onload() {
         await curve25519Setup();
+        await ecSampleSetup();
         await addPSetup();
     }
 

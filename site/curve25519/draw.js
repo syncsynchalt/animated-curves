@@ -4,6 +4,7 @@ import * as common from '../common.js';
 
 const TWO_PI = 2*Math.PI;
 
+/** @param ctx {CanvasRenderingContext2D} */
 function preCalcValues(ctx) {
     const marginWide = 20;
     const marginThin = 10;
@@ -194,7 +195,7 @@ async function addP(ctx, Q, drawDoneCb) {
     const started = {};
     const finished = {};
     const duration = {
-        migrate: 700,
+        migrate: 500,
     };
     let lastMidDot;
 
@@ -262,7 +263,7 @@ async function runDemo(ctx, updateCb, drawDoneCb, Q) {
         Q = await addP(ctx, Q, (R) => {
             if (drawDoneCb) drawDoneCb(R);
             if (common.canvasIsScrolledIntoView(ctx.canvas)) {
-                demoTimeout = setTimeout(() => { next() }, .7 * 1000);
+                demoTimeout = setTimeout(() => { next() }, .5 * 1000);
                 return true;
             } else {
                 cancelDemo();

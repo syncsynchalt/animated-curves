@@ -7,6 +7,7 @@ const TWO_PI = 2*Math.PI;
 const EPS = 0.0000001;
 const INFINITY = '\u221E';
 
+/** @param ctx {CanvasRenderingContext2D} */
 function preCalcValues(ctx) {
     const marginWide = 25;
     const marginThin = 14;
