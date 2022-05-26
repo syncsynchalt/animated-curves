@@ -10,8 +10,8 @@ function preCalcValues(ctx) {
     const dotRadius = 2;
     const w = ctx.canvas.getBoundingClientRect().width;
     const h = ctx.canvas.getBoundingClientRect().height;
-    const yMin = -8, yMax = 8;
-    const xMin = -2, xMax = 4;
+    const yMin = -3, yMax = 3;
+    const xMin = -2, xMax = 3;
     const xSpan = xMax - xMin, ySpan = yMax - yMin;
     return {
         ctx, marginThin, marginWide, w, h, dotRadius,
@@ -84,13 +84,13 @@ function generateGraph(ctx, a, b) {
     let pX = [];
     let pY = [];
     let curHasData = false;
-    const stepVal = 0.08;
+    const stepVal = 0.04;
     for (let x = vals.xMin; x <= vals.xMax; x += stepVal) {
         let y = curve.yValPos(x, a, b);
 
         // detect discontinuities and fill in more fine-grained data
         if (!isNaN(y) !== curHasData) {
-            for (let xx = x-stepVal; xx < x; xx += stepVal / 5) {
+            for (let xx = x-stepVal; xx < x; xx += stepVal / 8) {
                 let yy = curve.yValPos(xx, a, b);
                 if (yy) {
                     pX.push(xx);
@@ -125,7 +125,7 @@ function drawGraph(ctx, vals, data) {
             const p = pointToCtx(vals, data.x[i], data.y[i]);
             if (lastPoint) {
                 ctx.lineTo(...p);
-            } else if (Math.abs(data.y[i]) < 1) {
+            } else if (data.y[i] < 1) {
                 // close the gap vertically
                 ctx.moveTo(...pointToCtx(vals, data.x[i], -data.y[i]));
                 ctx.lineTo(...p);
@@ -142,9 +142,6 @@ function drawGraph(ctx, vals, data) {
             lastPoint = null;
         }
     }
-    ctx.stroke();
-    ctx.beginPath();
-    lastPoint = null;
     for (let i = 0; i < data.x.length; i++) {
         if (!isNaN(data.y[i])) {
             const p = pointToCtx(vals, data.x[i], -data.y[i]);

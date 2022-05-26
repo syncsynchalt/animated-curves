@@ -301,7 +301,7 @@ async function addP(ctx, Q, drawDoneCb) {
                 if (!cache.lineLastP) {
                     let _x;
                     // noinspection JSUnusedAssignment
-                    [cache.lineLastP, _x] = misc.orderPointsByX(P, Q);
+                    [cache.lineLastP, _x] = common.orderPointsByX(P, Q);
                     cache.lineXLeft = misc.findTotalXLength(P, Q, negR);
                     cache.lineXPerMs = cache.lineXLeft / duration.line || 1;
                     cache.segmentBudget = 5;
@@ -359,7 +359,7 @@ async function addP(ctx, Q, drawDoneCb) {
                 ctx.strokeStyle = 'red';
                 ctx.setLineDash([3, 2]);
                 if (!cache.negLength) {
-                    cache.negLength = curve.negate(R).y - R.y;
+                    cache.negLength = negR.y - R.y;
                 }
                 let mult = instate / duration.negate;
                 mult = Math.min(1, mult);

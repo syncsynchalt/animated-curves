@@ -1,6 +1,7 @@
-import * as draw25519 from './curve25519/draw.js';
+import * as draw25519 from './curve25519/draw-25519.js';
 import * as draw from './curve/draw.js';
 import * as sample from './ec-samples/sample-draw.js';
+import * as real from './real-curve/real-draw.js';
 import * as common from './common.js';
 
 (async () => {
@@ -59,6 +60,23 @@ import * as common from './common.js';
         await startDemo();
     };
 
+    let realCurveSetup = async () => {
+        const canvas = common.byId('canvas-real-curve-1');
+        const ctx = common.convertCanvasHiDPI(canvas);
+        let n = 1;
+        let Q = null;
+        let startDemo = async () => {
+            let update = (nn, R) => { n = nn; Q = R };
+            await real.runDemo(ctx, n, Q, update);
+        };
+
+        canvas.onclick = async () => {
+            real.cancelDemo();
+            await common.addPlayMask(ctx, () => { startDemo() });
+        };
+        await common.addPlayMask(ctx, () => { startDemo() });
+    };
+
     let addPSetup = async () => {
         const canvas = common.byId('canvas-addp');
         const ctx = common.convertCanvasHiDPI(canvas);
@@ -95,6 +113,7 @@ import * as common from './common.js';
     async function onload() {
         await curve25519Setup();
         await ecSampleSetup();
+        await realCurveSetup();
         await addPSetup();
     }
 

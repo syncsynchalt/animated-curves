@@ -6,6 +6,33 @@
 const byId = (id) => { return document.getElementById(id) };
 
 /**
+ * Build a range of integers
+ * @param first {Number?} first number (default 1)
+ * @param last {Number} last number
+ * @return {Number[]}
+ */
+function range(first, last) {
+    if (last === undefined) {
+        last = first;
+        first = 1;
+    }
+    let result = [];
+    for (let i = first; i <= last; i++) {
+        result.push(i);
+    }
+    return result;
+}
+
+/**
+ * @param P {Point}
+ * @param Q {Point}
+ * @return {Point[2]}
+ */
+function orderPointsByX(P, Q) {
+    return P.x > Q.x ? [Q, P] : [P, Q];
+}
+
+/**
  * Convert a canvas element to high-DPI mode (if supported by device).
  *
  * @param canvas {HTMLCanvasElement} canvas element to convert
@@ -111,6 +138,8 @@ async function addPlayMask(ctx, playFunc) {
 
 export {
     byId,
+    range,
+    orderPointsByX,
     convertCanvasHiDPI,
     canvasIsScrolledIntoView,
     easeInOut,

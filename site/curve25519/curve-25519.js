@@ -15,7 +15,7 @@
  * @typedef BigPoint {{x: BigInt, y: BigInt}}
  */
 
-import { inverseOf, pow, reduce, sqrt } from './field.js';
+import { inverseOf, pow, reduce, sqrt } from './field-25519.js';
 
 const curveB = 1n;
 const curveA = 486662n;

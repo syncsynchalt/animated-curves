@@ -23,7 +23,7 @@
 </p>
 <div class="illustration">
 <div class="ill-content">
-<strong>Curve25519 point addition</strong>
+<span class="ill-title">Curve25519 point multiplication</span>
 <div>
     <canvas id="canvas-curve25519" width="500" height="250">
     </canvas>
@@ -53,7 +53,7 @@
 <div>
 <div class="illustration">
 <div class="ill-content">
-<strong>Example curves</strong>
+<span class="ill-title">Examples of elliptic curves</span>
 <div>
 <canvas id="canvas-ec-sample" width="500" height="300">
 </canvas>
@@ -62,6 +62,32 @@
     y<sup>2</sup> =
     x<sup>3</sup> + <span id="ec-sample-a">a</span>x
     + <span id="ec-sample-b">b</span></span></div>
+</div>
+</div>
+<h4>Point addition</h4>
+<p>
+    The elliptic curves we're going to start with are expressed in this form:
+    <div class="text-center">
+        <span class="math">y<sup>2</sup> = x<sup>3</sup> + Ax + B</span>
+    </div>
+<p>
+    An operation we'll perform on these curves is called "point addition".  This lets you
+    "add" two points on the curve, to yield a third point on the curve. This is done by:
+    <ul>
+    <li>drawing a line between the two points,
+    <br>(or if you're adding a point to itself, making a line tangent to the curve at that
+    point)</li>
+    <li>finding where that line intersects the curve,</li>
+    <li>and finally finding the point opposite the x-axis from that intersection.</li>
+    </ul>
+<p>Adding a point to itself multiple times gives us "scalar multiplication":
+    <span class="math">P+P = 2P, P+P+P = 3P, ...</span>
+<div class="illustration">
+<div class="ill-content">
+<span class="ill-title">Point Addition</span>
+<canvas id="canvas-real-curve-1" height="400" width="500">
+</canvas>
+<div><span id="xxx"></span></div>
 </div>
 </div>
 </div>

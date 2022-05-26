@@ -1,5 +1,5 @@
-import * as curve from './curve.js';
-import * as field from './field.js';
+import * as curve from './curve-25519.js';
+import * as field from './field-25519.js';
 import * as common from '../common.js';
 
 const TWO_PI = 2*Math.PI;

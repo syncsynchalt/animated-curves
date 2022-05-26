@@ -1,4 +1,4 @@
-import * as curve from '../curve.js';
+import * as curve from '../curve-25519.js';
 import * as chai from 'chai';
 
 let expect = chai.expect;

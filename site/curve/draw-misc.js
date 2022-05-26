@@ -1,14 +1,11 @@
 import * as field from './field.js';
 import * as curve from './curve.js';
+import * as common from '../common.js';
 
 let xAtY = (P, m, y) => {
     let c = P.y - m * P.x;
     return (y - c) / m;
 };
-
-function orderPointsByX(P, Q) {
-    return P.x > Q.x ? [Q, P] : [P, Q];
-}
 
 /**
  * Return the x bounds of a line drawn through P and Q, in Fp
@@ -17,7 +14,7 @@ function orderPointsByX(P, Q) {
  * @return {Number[2]} x values of start and end of a line between P and Q
  */
 function lineBoxBounds(P, Q) {
-    [P, Q] = orderPointsByX(P, Q);
+    [P, Q] = common.orderPointsByX(P, Q);
     let lbound, hbound;
     const slope = getSlope(P, Q);
     let left = P.y - P.x * slope;
@@ -64,7 +61,7 @@ function getSlope(P, Q) {
  * @return {Number} distance in x coordinates which the line will travel after wraparounds in Fp.
  */
 function findTotalXLength(P, Q, negR) {
-    [P, Q] = orderPointsByX(P, Q);
+    [P, Q] = common.orderPointsByX(P, Q);
     const slope = getSlope(P, Q);
     for (let xp = 1; xp < 100000; xp++) {
         if (field.reduce(P.x + xp) === negR.x && field.reduce(P.y + (xp*slope)) === negR.y) {
@@ -113,7 +110,6 @@ function segmentLen(P, Q) {
 
 
 export {
-    orderPointsByX,
     lineBoxBounds,
     getSlope,
     findTotalXLength,
