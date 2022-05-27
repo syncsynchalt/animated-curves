@@ -1,3 +1,7 @@
+div.container {
+    max-width: 500px;
+}
+
 .illustration {
     display: flex;
     flex-direction: column;
@@ -57,11 +61,12 @@ button {
 }
 
 .point-p {
-    font-weight: bold;
+    font-weight: 600;
     color: black;
 }
 .point-np {
-    color: red;
+    font-weight: 600;
+    /*color: red;*/
 }
 
 .hidden {

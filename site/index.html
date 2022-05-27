@@ -66,13 +66,14 @@
 </div>
 <h4>Point addition</h4>
 <p>
-    The elliptic curves we're going to start with are expressed in this form:
+    The elliptic curves we're going to start with are in this form:
     <div class="text-center">
         <span class="math">y<sup>2</sup> = x<sup>3</sup> + Ax + B</span>
     </div>
+<br>
 <p>
-    An operation we'll perform on these curves is called "point addition".  This lets you
-    "add" two points on the curve, to yield a third point on the curve. This is done by:
+    An operation we'll perform on these curves is called <em>point addition</em>.  This lets you
+    <em>add</em> two points on the curve, to yield a third point on the curve. This is done by:
     <ul>
     <li>drawing a line between the two points,
     <br>(or if you're adding a point to itself, making a line tangent to the curve at that
@@ -84,12 +85,24 @@
     <span class="math">P+P = 2P, P+P+P = 3P, ...</span>
 <div class="illustration">
 <div class="ill-content">
-<span class="ill-title">Point Addition</span>
+<span class="ill-title">Point addition</span>
 <canvas id="canvas-real-curve-1" height="400" width="500">
 </canvas>
 <div class="text-center"><span id="real-curve-1"></span></div>
 </div>
 </div>
+
+<p>
+    Point addition has two useful properties, which we'll make use of later in the document.
+<ul>
+    <li><strong>commutative</strong>: adding points in any order gives the same result:
+        <div class="text-center"><span class="math">P + Q = Q + P</span></div></li>
+    <li><strong>associative</strong>: any grouping of addition gives the same result:
+        <div class="text-center"><span class="math">P+P+P+P+P = (P+P+P)+(P+P) = 3P+2P = 5P</span></div>
+        <div class="text-center"><span class="math">P+P+P+P+P = (P)+(P+P+P+P) = 1P+4P = 5P</span></div>
+    </li>
+</ul>
+
 </div>
 
 <h2>Concept 2: Finite field math</h2>
@@ -115,7 +128,7 @@
 </p>
 <div class="illustration">
 <div class="ill-content">
-<strong>Curve61 point addition</strong>
+<span class="ill-title">Curve61 point addition</span>
 <div>
     <canvas id="canvas-addp" width="500" height="400">
     </canvas>
