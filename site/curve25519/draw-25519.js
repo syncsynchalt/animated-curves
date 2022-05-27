@@ -155,7 +155,6 @@ function drawDot(vals, x, y, color,
     ctx.strokeStyle = strokeStyle || 'black';
     ctx.fillStyle = color;
     ctx.lineWidth = lineWidth !== undefined ? lineWidth : 1;
-    ctx.moveTo(...pointToCtx(vals, x, y));
     ctx.arc(...pointToCtx(vals, x, y), vals.dotRadius + (radiusAdj || 0), 0, TWO_PI);
     if (lineWidth !== 0) {
         ctx.stroke();
@@ -209,6 +208,7 @@ async function addP(ctx, Q, drawDoneCb) {
             start = timestamp;
         }
         if (timestamp !== prev) {
+            ctx.beginPath();
             ctx.save();
             if (!finished['migrate']) {
                 let instate = markState('migrate', timestamp);

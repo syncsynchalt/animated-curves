@@ -180,9 +180,10 @@ function drawDot(vals, x, y, color, radiusAdj, lw) {
     ctx.strokeStyle = 'black';
     ctx.fillStyle = color;
     ctx.lineWidth = lw || 1;
-    ctx.moveTo(...pointToCtx(vals, x, y, true));
     ctx.arc(...pointToCtx(vals, x, y, true), vals.dotRadius + (radiusAdj || 0), 0, TWO_PI);
-    ctx.stroke();
+    if (lw !== 0) {
+        ctx.stroke();
+    }
     ctx.fill();
     ctx.restore();
 }
@@ -265,6 +266,7 @@ async function addP(ctx, Q, drawDoneCb) {
             start = timestamp;
         }
         if (timestamp !== prev) {
+            ctx.beginPath();
             ctx.save();
             if (!finished['tangent']) {
                 let instate = markState('tangent', timestamp);
@@ -448,6 +450,8 @@ async function drawInfinity(ctx, P, Q, drawDoneCb) {
             start = timestamp;
         }
         if (timestamp !== prev) {
+            ctx.beginPath();
+            ctx.save();
             if (!finished['tangent']) {
                 let instate = markState('tangent', timestamp);
                 ctx.strokeStyle = 'orange';
@@ -504,6 +508,7 @@ async function drawInfinity(ctx, P, Q, drawDoneCb) {
                     finished.done = timestamp;
                 }
             }
+            ctx.restore();
         }
         prev = timestamp;
 

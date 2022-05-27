@@ -119,7 +119,7 @@ function drawGraph(ctx, vals, data) {
     let lastPoint = null;
     ctx.beginPath();
     ctx.strokeStyle = 'blue';
-    ctx.lineWidth = 1.5;
+    ctx.lineWidth = 2;
     for (let i = data.x.length - 1; i >= 0; i--) {
         if (!isNaN(data.y[i])) {
             const p = pointToCtx(vals, data.x[i], data.y[i]);
@@ -283,6 +283,7 @@ function morphGraph(ctx, data1, data2, drawDoneCb) {
             start = timestamp;
         }
         if (timestamp !== prev) {
+            ctx.beginPath();
             ctx.save();
             if (!finished['draw1']) {
                 markState('drawA', timestamp);

@@ -1,12 +1,13 @@
 let curveA = -11;
 let curveB = 13;
-let baseX = 0.6;
+let baseX = 0.58;
 
-/** Used for curve-finding */
-function setCurveParams(a, b, p) {
-    curveA = a;
-    curveB = b;
-    baseX = p;
+/**
+ * Look up the curve params
+ * @return {{a: Number, b: Number, P: Point}}
+ */
+function params() {
+    return {a: curveA, b: curveB, P: P()};
 }
 
 /**
@@ -75,7 +76,7 @@ function slope(P, Q) {
 }
 
 export {
-    setCurveParams,
+    params,
     y,
     P,
     add,

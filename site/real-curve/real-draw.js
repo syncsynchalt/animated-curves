@@ -2,7 +2,8 @@ import * as curve from './real-curve.js';
 import * as common from '../common.js';
 const TWO_PI = 2 * Math.PI;
 
-let dimensions = {xMin: -4, xMax: 9, yMin: -21, yMax: 21};
+let dimensions = {xMin: -4, xMax: 9, yMin: -24, yMax: 24};
+const curveColor = '#33f';
 
 /** @param ctx {CanvasRenderingContext2D} */
 function preCalcValues(ctx) {
@@ -59,10 +60,12 @@ function drawDot(vals, x, y, color, radiusAdj, lw) {
     ctx.fillStyle = color;
     ctx.lineWidth = lw || 1;
     const p = pointToCtx(vals, x, y, true);
-    ctx.moveTo(...p);
     ctx.arc(...p, vals.dotRadius + (radiusAdj || 0), 0, TWO_PI);
-    ctx.stroke();
+    if (lw !== 0) {
+        ctx.stroke();
+    }
     ctx.fill();
+    ctx.beginPath();
     ctx.restore();
     return p;
 }
@@ -88,9 +91,9 @@ function plotPoint(vals, n, nP) {
         yAdj = -4;
     } else {
         ctx.textBaseline = 'top';
-        yAdj = +4;
+        yAdj = +6;
     }
-    ctx.fillText(`${n === 1 ? '' : n}P`, p[0]+4, p[1]+yAdj);
+    ctx.fillText(`${n === 1 ? '' : n}P`, p[0]+2, p[1]+yAdj);
     ctx.restore();
 }
 
@@ -112,7 +115,7 @@ function drawAxes(ctx, vals) {
         ctx.moveTo(p[0], p[1]-2);
         ctx.lineTo(p[0], p[1]+2);
     }
-    for (let i = Math.floor(vals.yMin); i <= vals.yMax; i++) {
+    for (let i = Math.ceil(vals.yMax - vals.yMax % 5); i > vals.yMin; i -= 5) {
         const p = pointToCtx(vals, 0, i, true);
         ctx.moveTo(p[0]-2, p[1]);
         ctx.lineTo(p[0]+2, p[1]);
@@ -156,11 +159,11 @@ function drawCurve(ctx) {
     ctx.fillRect(0, 0, canvas.width, canvas.height);
     drawAxes(ctx, vals);
     let lastPoint = null;
+    ctx.save();
     ctx.beginPath();
-    ctx.strokeStyle = 'blue';
-    ctx.lineWidth = 1.5;
+    ctx.strokeStyle = curveColor;
+    ctx.lineWidth = 2;
     for (let i = xs.length - 1; i >= 0; i--) {
-        // xxx here
         if (!isNaN(ys[i])) {
             const p = pointToCtx(vals, xs[i], ys[i]);
             if (lastPoint) {
@@ -204,6 +207,7 @@ function drawCurve(ctx) {
         });
         img.src = URL.createObjectURL(blob);
     }, 'image/png');
+    ctx.restore();
     return {'usedCache': false};
 }
 
@@ -321,6 +325,7 @@ async function addP(ctx, n, Q, drawDoneCb) {
             start = timestamp;
         }
         if (timestamp !== prev) {
+            ctx.beginPath();
             ctx.save();
             if (!finished['tangent']) {
                 let instate = markState('tangent', timestamp);
@@ -342,7 +347,7 @@ async function addP(ctx, n, Q, drawDoneCb) {
                 ctx.lineTo(...pointToCtx(vals, P.x - Math.abs(tanLineBack),
                     P.y - tanLineBack * slope));
                 ctx.stroke();
-                drawDot(vals, P.x, P.y, 'blue');
+                drawDot(vals, P.x, P.y, curveColor);
                 drawDot(vals, Q.x, Q.y, 'orange');
                 if (instate > duration.tangent) {
                     finished.tangent = timestamp;
@@ -363,7 +368,8 @@ async function addP(ctx, n, Q, drawDoneCb) {
                 ctx.moveTo(...pointToCtx(vals, P.x, P.y));
                 const dest = {x: P.x + mult * (negR.x - P.x), y: P.y + mult * (negR.y - P.y)};
                 ctx.lineTo(...pointToCtx(vals, dest.x, dest.y));
-                drawDot(vals, P.x, P.y, 'blue');
+                ctx.stroke();
+                drawDot(vals, P.x, P.y, curveColor);
                 drawDot(vals, Q.x, Q.y, 'orange');
                 if (instate >= duration.line) {
                     finished.line = timestamp;
@@ -380,14 +386,14 @@ async function addP(ctx, n, Q, drawDoneCb) {
                 ctx.lineWidth = 2;
                 ctx.strokeStyle = 'red';
                 ctx.setLineDash([3, 2]);
-                if (!cache.negLength) {
-                    cache.negLength = negR.y - R.y;
+                if (!cache.negLeg) {
+                    cache.negLeg = negR.y - R.y;
                 }
                 let mult = instate / duration.negate;
                 mult = Math.min(1, mult);
                 mult = common.easeInOut(mult);
                 ctx.moveTo(...pointToCtx(vals, negR.x, negR.y, true));
-                ctx.lineTo(...pointToCtx(vals, negR.x, negR.y - cache.negLength * mult, true));
+                ctx.lineTo(...pointToCtx(vals, negR.x, negR.y - cache.negLeg * mult, true));
                 ctx.stroke();
                 ctx.setLineDash([]);
                 // overdraw to fix red line covering this dot
@@ -409,8 +415,6 @@ async function addP(ctx, n, Q, drawDoneCb) {
         prev = timestamp;
 
         if (finished.done) {
-            // await drawCurve(ctx);
-            // drawDot(vals, R.x, R.y, 'red');
             if (drawDoneCb) drawDoneCb(n+1, R);
         } else {
             setAnimationFrame(() => { return requestAnimationFrame(step) });

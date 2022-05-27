@@ -2,6 +2,7 @@ import * as draw25519 from './curve25519/draw-25519.js';
 import * as draw from './curve/draw.js';
 import * as sample from './ec-samples/sample-draw.js';
 import * as real from './real-curve/real-draw.js';
+import * as realCurve from './real-curve/real-curve.js';
 import * as common from './common.js';
 
 (async () => {
@@ -75,6 +76,10 @@ import * as common from './common.js';
             await common.addPlayMask(ctx, () => { startDemo() });
         };
         await common.addPlayMask(ctx, () => { startDemo() });
+        const params = realCurve.params();
+        common.byId('real-curve-1').innerHTML = `<span class="math">
+            y<sup>2</sup> = x<sup>3</sup> + ${params.a}x + ${params.b}</span>
+            with <span class="math">P=(${params.P.x.toFixed(2)},${params.P.y.toFixed(2)})</span>`;
     };
 
     let addPSetup = async () => {
