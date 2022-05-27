@@ -68,11 +68,11 @@ import * as common from './common.js';
         let Q = null;
         let startDemo = async () => {
             let update = (nn, R) => { n = nn; Q = R };
-            await real.runDemo(ctx, n, Q, update);
+            await real.runAddDemo(ctx, n, Q, update);
         };
 
         canvas.onclick = async () => {
-            real.cancelDemo();
+            real.cancelAddDemo(ctx);
             await common.addPlayMask(ctx, () => { startDemo() });
         };
         await common.addPlayMask(ctx, () => { startDemo() });

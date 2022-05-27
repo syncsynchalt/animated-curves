@@ -123,7 +123,6 @@ function drawAxes(ctx, vals) {
     ctx.stroke();
 }
 
-let drawGraphSaveState = null;
 /**
  * Draw the curve
  * @param ctx {CanvasRenderingContext2D}
@@ -131,9 +130,9 @@ let drawGraphSaveState = null;
 function drawCurve(ctx) {
     const canvas = ctx.canvas;
     const vals = preCalcValues(ctx);
-    if (drawGraphSaveState) {
+    if (ctx['_drawGraphSaveState']) {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
-        const img = drawGraphSaveState;
+        const img = ctx['_drawGraphSaveState'];
         ctx.drawImage(img, 0, 0, img.width, img.height, 0, 0, vals.w, vals.h);
         return {'usedCache': true};
     }
@@ -203,7 +202,7 @@ function drawCurve(ctx) {
     canvas.toBlob(blob => {
         let img = new Image();
         img.addEventListener('load', () => {
-            drawGraphSaveState = img;
+            ctx['_drawGraphSaveState'] = img;
         });
         img.src = URL.createObjectURL(blob);
     }, 'image/png');
@@ -231,23 +230,28 @@ function plotNPs(ctx, vals, ...nVals) {
     });
 }
 
-let animationFrameInProgress = null;
-let setAnimationFrame = (func) => {
-    if (animationFrameInProgress) {
-        cancelAnimationFrame(animationFrameInProgress);
+/**
+ * @param ctx {CanvasRenderingContext2D}
+ * @param func {Function}
+ */
+let setAnimationFrame = (ctx, func) => {
+    if (ctx['_animationFrame']) {
+        cancelAnimationFrame(ctx['_animationFrame']);
     }
-    animationFrameInProgress = func();
+    ctx['_animationFrame'] = func();
 };
 
-let demoTimeout = null;
-function cancelDemo() {
-    if (demoTimeout) {
-        clearTimeout(demoTimeout);
-        demoTimeout = null;
+/**
+ * @param ctx {CanvasRenderingContext2D}
+ */
+function cancelAddDemo(ctx) {
+    if (ctx['_demoTimeout']) {
+        clearTimeout(ctx['_demoTimeout']);
+        ctx['_demoTimeout'] = null;
     }
-    if (animationFrameInProgress) {
-        cancelAnimationFrame(animationFrameInProgress);
-        setAnimationFrame(() => { return null });
+    if (ctx['_animationFrame']) {
+        cancelAnimationFrame(ctx['_animationFrame']);
+        setAnimationFrame(ctx, () => { return null });
     }
 }
 
@@ -417,10 +421,10 @@ async function addP(ctx, n, Q, drawDoneCb) {
         if (finished.done) {
             if (drawDoneCb) drawDoneCb(n+1, R);
         } else {
-            setAnimationFrame(() => { return requestAnimationFrame(step) });
+            setAnimationFrame(ctx, () => { return requestAnimationFrame(step) });
         }
     }
-    setAnimationFrame(() => { return requestAnimationFrame(step) });
+    setAnimationFrame(ctx, () => { return requestAnimationFrame(step) });
     return R;
 }
 
@@ -431,8 +435,8 @@ async function addP(ctx, n, Q, drawDoneCb) {
  * @param updateCb {Function?} called when n is updated
  * @param drawDoneCb {Function?} called when each animation is finished
  */
-async function runDemo(ctx, n, Q, updateCb, drawDoneCb) {
-    cancelDemo();
+async function runAddDemo(ctx, n, Q, updateCb, drawDoneCb) {
+    cancelAddDemo(ctx);
     const vals = preCalcValues(ctx);
     Q = Q || curve.P();
     let next = async () => {
@@ -441,11 +445,11 @@ async function runDemo(ctx, n, Q, updateCb, drawDoneCb) {
         Q = await addP(ctx, n, Q, (n, R) => {
             if (drawDoneCb) drawDoneCb(n, R);
             if (common.canvasIsScrolledIntoView(ctx.canvas)) {
-                demoTimeout = setTimeout(next, .5 * 1000);
+                ctx['_demoTimeout'] = setTimeout(next, .5 * 1000);
             } else {
-                cancelDemo();
+                cancelAddDemo(ctx);
                 common.addPlayMask(ctx, () => {
-                    runDemo(ctx, n, Q, updateCb, drawDoneCb);
+                    runAddDemo(ctx, n, Q, updateCb, drawDoneCb);
                 });
             }
         });
@@ -463,6 +467,6 @@ async function runDemo(ctx, n, Q, updateCb, drawDoneCb) {
 export {
     drawCurve,
     plotNPs,
-    cancelDemo,
-    runDemo,
+    cancelAddDemo,
+    runAddDemo,
 };
