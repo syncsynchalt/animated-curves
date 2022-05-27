@@ -244,7 +244,7 @@ let setAnimationFrame = (ctx, func) => {
 /**
  * @param ctx {CanvasRenderingContext2D}
  */
-function cancelAddDemo(ctx) {
+function cancelDemo(ctx) {
     if (ctx['_demoTimeout']) {
         clearTimeout(ctx['_demoTimeout']);
         ctx['_demoTimeout'] = null;
@@ -269,23 +269,16 @@ function lineBoxBounds(vals, P, Q) {
     };
 
     [P, Q] = common.orderPointsByX(P, Q);
-    let lbound, hbound;
     const slope = curve.slope(P, Q);
-    let left = P.y - P.x * slope;
-    if (left >= vals.xMin && left <= vals.xMax) {
-        lbound = vals.xMin;
-    } else if (left < vals.xMin) {
-        lbound = xAtY(P, slope, vals.yMin);
-    } else {
-        lbound = xAtY(P, slope, vals.yMax);
+    let [lbound, hbound] = [xAtY(P, slope, vals.yMin), xAtY(P, slope, vals.yMax)];
+    let left = vals.xMin;
+    let right = vals.xMax;
+    if (lbound > hbound) [lbound, hbound] = [hbound, lbound];
+    if (left > lbound) {
+        lbound = left;
     }
-    let right = P.y + (vals.xMax - P.x) * slope;
-    if (right >= vals.xMin && right <= vals.xMax) {
-        hbound = vals.xMax;
-    } else if (right < vals.xMin) {
-        hbound = xAtY(P, slope, vals.yMin);
-    } else {
-        hbound = xAtY(P, slope, vals.yMax);
+    if (right < hbound) {
+        hbound = right;
     }
     return [lbound, hbound];
 }
@@ -293,16 +286,17 @@ function lineBoxBounds(vals, P, Q) {
 /**
  * Animate addition of P to the point Q to yield R.
  * @param ctx {CanvasRenderingContext2D}
- * @param n {Number} current n for point Q
- * @param Q {Point} previous point nP
+ * @param nP {Number} mult number of P for labeling of R
+ * @param P {Point}
+ * @param nQ {Number} mult number of Q for labeling of R
+ * @param Q {Point}
  * @param drawDoneCb {Function} called when animation is complete
  * @return {Point} R such that P + Q = -R
  */
-async function addP(ctx, n, Q, drawDoneCb) {
+async function addPoints(ctx, nP, P, nQ, Q, drawDoneCb) {
     const vals = preCalcValues(ctx);
     let start, prev;
 
-    const P = curve.P();
     const R = curve.add(P, Q);
     const negR = curve.negate(R);
     const slope = curve.slope(P, Q);
@@ -345,13 +339,13 @@ async function addP(ctx, n, Q, drawDoneCb) {
                 tanLineForw *= mult;
                 tanLineBack *= mult;
                 ctx.moveTo(...pointToCtx(vals, P.x, P.y));
-                ctx.lineTo(...pointToCtx(vals, P.x + Math.abs(tanLineForw),
+                ctx.lineTo(...pointToCtx(vals, P.x + tanLineForw,
                     P.y + tanLineForw * slope));
                 ctx.moveTo(...pointToCtx(vals, P.x, P.y));
-                ctx.lineTo(...pointToCtx(vals, P.x - Math.abs(tanLineBack),
+                ctx.lineTo(...pointToCtx(vals, P.x - tanLineBack,
                     P.y - tanLineBack * slope));
                 ctx.stroke();
-                drawDot(vals, P.x, P.y, curveColor);
+                drawDot(vals, P.x, P.y, 'orange');
                 drawDot(vals, Q.x, Q.y, 'orange');
                 if (instate > duration.tangent) {
                     finished.tangent = timestamp;
@@ -373,7 +367,7 @@ async function addP(ctx, n, Q, drawDoneCb) {
                 const dest = {x: P.x + mult * (negR.x - P.x), y: P.y + mult * (negR.y - P.y)};
                 ctx.lineTo(...pointToCtx(vals, dest.x, dest.y));
                 ctx.stroke();
-                drawDot(vals, P.x, P.y, curveColor);
+                drawDot(vals, P.x, P.y, 'orange');
                 drawDot(vals, Q.x, Q.y, 'orange');
                 if (instate >= duration.line) {
                     finished.line = timestamp;
@@ -403,9 +397,9 @@ async function addP(ctx, n, Q, drawDoneCb) {
                 // overdraw to fix red line covering this dot
                 drawDot(vals, negR.x, negR.y, 'red');
                 if (instate > duration.negate) {
-                    ctx.strokeStyle = 'black';
-                    drawDot(vals, Q.x, Q.y, 'orange');
-                    plotNPs(ctx, vals, n+1);
+                    plotNPs(ctx, vals, nP+nQ);
+                    drawDot(vals, negR.x, negR.y, 'black');
+                    drawDot(vals, R.x, R.y, 'red');
                     finished.negate = timestamp;
                 }
             } else if (!finished.done) {
@@ -419,7 +413,7 @@ async function addP(ctx, n, Q, drawDoneCb) {
         prev = timestamp;
 
         if (finished.done) {
-            if (drawDoneCb) drawDoneCb(n+1, R);
+            if (drawDoneCb) drawDoneCb(nP+nQ, R);
         } else {
             setAnimationFrame(ctx, () => { return requestAnimationFrame(step) });
         }
@@ -429,6 +423,7 @@ async function addP(ctx, n, Q, drawDoneCb) {
 }
 
 /**
+ * Run the "add points" demo on the given canvas.
  * @param ctx {CanvasRenderingContext2D}
  * @param n {Number} the current scalar multiplication we're displaying
  * @param Q {Point} the point nP that we're currently on
@@ -436,20 +431,21 @@ async function addP(ctx, n, Q, drawDoneCb) {
  * @param drawDoneCb {Function?} called when each animation is finished
  */
 async function runAddDemo(ctx, n, Q, updateCb, drawDoneCb) {
-    cancelAddDemo(ctx);
+    cancelDemo(ctx);
     const vals = preCalcValues(ctx);
+    const P = curve.P();
     Q = Q || curve.P();
     let next = async () => {
         await drawCurve(ctx);
         plotNPs(ctx, vals, ...common.range(1, n));
-        Q = await addP(ctx, n, Q, (n, R) => {
-            if (drawDoneCb) drawDoneCb(n, R);
+        Q = await addPoints(ctx, 1, P, n, Q, (nR, R) => {
+            if (drawDoneCb) drawDoneCb(nR, R);
             if (common.canvasIsScrolledIntoView(ctx.canvas)) {
                 ctx['_demoTimeout'] = setTimeout(next, .5 * 1000);
             } else {
-                cancelAddDemo(ctx);
+                cancelDemo(ctx);
                 common.addPlayMask(ctx, () => {
-                    runAddDemo(ctx, n, Q, updateCb, drawDoneCb);
+                    runAddDemo(ctx, nR, R, updateCb, drawDoneCb);
                 });
             }
         });
@@ -464,9 +460,54 @@ async function runAddDemo(ctx, n, Q, updateCb, drawDoneCb) {
     await next();
 }
 
+/**
+ * Run the "associative and commutative" demo on the given canvas.
+ * @param ctx {CanvasRenderingContext2D}
+ * @param updateCb {Function?} called when n is updated
+ * @param drawDoneCb {Function?} called when each animation is finished
+ */
+async function runAssocDemo(ctx, updateCb, drawDoneCb) {
+    cancelDemo(ctx);
+    const vals = preCalcValues(ctx);
+
+    let points = [null];
+    const P = curve.P();
+    let Q = null;
+    for (let i = 1; i <= 8; i++) {
+        Q = curve.add(P, Q);
+        points.push(Q);
+    }
+
+    let next = async () => {
+        await drawCurve(ctx);
+        plotNPs(ctx, vals, ...common.range(1, 8));
+        let nU = Math.ceil(Math.random() * 7);
+        let nV = nU;
+        while (nV === nU) {
+            nV = Math.ceil(Math.random() * (8 - nU));
+        }
+        const U = points[nU];
+        const V = points[nV];
+        const R = await addPoints(ctx, nU, U, nV, V, (nR, R) => {
+            if (drawDoneCb) drawDoneCb(nR, R);
+            if (common.canvasIsScrolledIntoView(ctx.canvas)) {
+                ctx['_demoTimeout'] = setTimeout(next, .8 * 1000);
+            } else {
+                cancelDemo(ctx);
+                common.addPlayMask(ctx, () => {
+                    runAssocDemo(ctx, updateCb, drawDoneCb);
+                });
+            }
+        });
+        if (updateCb) updateCb(nU, U, nV, V, nU + nV, R);
+    };
+    await next();
+}
+
 export {
     drawCurve,
     plotNPs,
-    cancelAddDemo,
+    cancelDemo,
     runAddDemo,
+    runAssocDemo,
 };

@@ -61,26 +61,49 @@ import * as common from './common.js';
         await startDemo();
     };
 
-    let realCurveSetup = async () => {
-        const canvas = common.byId('canvas-real-curve-1');
+    let realAddSetup = async () => {
+        const canvas = common.byId('canvas-real-add');
         const ctx = common.convertCanvasHiDPI(canvas);
         let n = 1;
         let Q = null;
         let startDemo = async () => {
-            let update = (nn, R) => { n = nn; Q = R };
+            let update = (nR, R) => { n = nR; Q = R };
             await real.runAddDemo(ctx, n, Q, update);
         };
 
         canvas.onclick = async () => {
-            real.cancelAddDemo(ctx);
+            real.cancelDemo(ctx);
             await common.addPlayMask(ctx, () => { startDemo() });
         };
         await common.addPlayMask(ctx, () => { startDemo() });
         const params = realCurve.params();
-        common.byId('real-curve-1').innerHTML = `<span class="math">
+        common.byId('real-add-desc').innerHTML = `<span class="math">
             y<sup>2</sup> = x<sup>3</sup> + ${params.a}x + ${params.b}</span>
             with <span class="math">P=(${params.P.x.toFixed(2)},${params.P.y.toFixed(2)})</span>`;
     };
+
+    let realAssocSetup = async () => {
+        const canvas = common.byId('canvas-real-assoc');
+        const ctx = common.convertCanvasHiDPI(canvas);
+        let startDemo = async () => {
+            let update = (nP, _P, nQ, _Q, nR) => {
+                let n = (n) => { return n === 1 ? '' : n };
+                common.byId('real-assoc-desc').innerHTML = `
+                    <div class="text-center">
+                    <span class="math">${n(nP)}P + ${n(nQ)}P = ${n(nR)}R</span>
+                    </div>
+                `;
+            };
+            await real.runAssocDemo(ctx, update);
+        };
+
+        canvas.onclick = async () => {
+            real.cancelDemo(ctx);
+            await common.addPlayMask(ctx, () => { startDemo() });
+        };
+        await common.addPlayMask(ctx, () => { startDemo() });
+    };
+
 
     let addPSetup = async () => {
         const canvas = common.byId('canvas-addp');
@@ -118,7 +141,8 @@ import * as common from './common.js';
     async function onload() {
         await curve25519Setup();
         await ecSampleSetup();
-        await realCurveSetup();
+        await realAddSetup();
+        await realAssocSetup();
         await addPSetup();
     }
 
