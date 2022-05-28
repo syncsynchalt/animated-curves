@@ -136,6 +136,42 @@ async function addPlayMask(ctx, playFunc) {
     ctx.restore();
 }
 
+/**
+ * Choose the best direction to write a label for a point (based on amount of clear (white) pixels).
+ * @param ctx {CanvasRenderingContext2D}
+ * @param x {Number} x-coordinate (in canvas context)
+ * @param y {Number} y-coordinate (in canvas context)
+ * @param sampleWidth {Number?} the sample box size (default 20)
+ * @param sampleMargin {Number?} the number of pixels to skip before taking sample (default 2)
+ * @return {Number[2]} -1/+1 for left-right, then -1/+1 for up-down
+ */
+function pickLabelDirection(ctx, x, y, sampleWidth, sampleMargin) {
+    // noinspection JSUnresolvedVariable
+    const ratio = ctx.canvas._ratio || 1;
+    let bestDirCount = 0;
+    let bestDir = [0, 0];
+    const margin = sampleMargin || 2;
+    sampleWidth = sampleWidth || 20;
+    [1, -1].forEach(lr => {
+        [-1, 1].forEach(ud => {
+            let data = ctx.getImageData(ratio * (x + lr*margin), ratio * (y + ud*margin),
+                ratio * (lr*sampleWidth), ratio * (ud*sampleWidth));
+            const d = data.data;
+            let whiteCount = 0;
+            for (let i = 0; i < d.length; i += 4) {
+                if (d[i] === 255 && d[i+1] === 255 && d[i+2] === 255) {
+                    whiteCount++;
+                }
+            }
+            if (whiteCount > bestDirCount) {
+                bestDirCount = whiteCount;
+                bestDir = [lr, ud];
+            }
+        });
+    });
+    return bestDir;
+}
+
 export {
     byId,
     range,
@@ -144,4 +180,5 @@ export {
     canvasIsScrolledIntoView,
     easeInOut,
     addPlayMask,
+    pickLabelDirection,
 };

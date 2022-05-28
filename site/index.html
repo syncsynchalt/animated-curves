@@ -49,7 +49,14 @@
 </p>
 </div>
 
-<h2>Concept 1: Elliptic curves</h2>
+<h2>Concept 1: Adding points</h2>
+<p>
+    The elliptic curves we're going to start with are in this form:
+<div class="text-center">
+<span class="math">y<sup>2</sup> = x<sup>3</sup> + Ax + B</span>
+</div>
+<br>
+
 <div>
 <div class="illustration">
 <div class="ill-content">
@@ -64,25 +71,28 @@
     + <span id="ec-sample-b">b</span></span></div>
 </div>
 </div>
-<h4>Point addition</h4>
+
 <p>
-    The elliptic curves we're going to start with are in this form:
-    <div class="text-center">
-        <span class="math">y<sup>2</sup> = x<sup>3</sup> + Ax + B</span>
-    </div>
-<br>
-<p>
-    An operation we'll perform on these curves is called <em>point addition</em>.  This lets you
-    <em>add</em> two points on the curve, to yield a third point on the curve. This is done by:
+    Let's define <strong>point addition</strong>: a way to combine two points on an elliptic
+    curve to yield a third point (also on the curve).
+<figure>
+    <figcaption>Point addition:</figcaption>
     <ul>
-    <li>drawing a line between the two points,
-    <br>(or if you're adding a point to itself, making a line tangent to the curve at that
-    point)</li>
-    <li>finding where that line intersects the curve,</li>
-    <li>and finally finding the point opposite the x-axis from that intersection.</li>
+    <li>draw a line between the two points
+    (or if you're adding a point to itself, make a line tangent to the curve at that
+    point),</li>
+    <li>find where that line intersects the curve,</li>
+    <li>and finally find the point opposite the x-axis from that intersection.</li>
     </ul>
-<p>Adding a point to itself multiple times gives us "scalar multiplication":
-    <span class="math">P+P = 2P, P+P+P = 3P, ...</span>
+</figure>
+<p>As a shorthand for adding a point to itself multiple times, let's also introduce
+    <strong>scalar multiplication</strong>:
+<ul class="no-bullet">
+    <li><span class="math">P+P = 2P</span></li>
+    <li><span class="math">P+P+P = 3P</span></li>
+    <li><span class="math">P+P+P+P = 4P</span></li>
+    <li>... and so on.</li>
+</ul>
 <div class="illustration">
 <div class="ill-content">
 <span class="ill-title">Point addition</span>
@@ -103,7 +113,8 @@
     </li>
 </ul>
 <p>
-    See the figure below, which demonstrates this by adding points in random order to get the expected results.
+    See the figure below, which demonstrates the commutative and associative properties by adding points in random order.
+    Addition of points always results in the point we'd expect.
 </p>
 
 <div class="illustration">

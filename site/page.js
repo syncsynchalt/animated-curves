@@ -90,7 +90,7 @@ import * as common from './common.js';
                 let n = (n) => { return n === 1 ? '' : n };
                 common.byId('real-assoc-desc').innerHTML = `
                     <div class="text-center">
-                    <span class="math">${n(nP)}P + ${n(nQ)}P = ${n(nR)}R</span>
+                    <span class="math">${n(nP)}P + ${n(nQ)}P = ${n(nR)}P</span>
                     </div>
                 `;
             };

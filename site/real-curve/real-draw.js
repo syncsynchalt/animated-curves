@@ -75,25 +75,21 @@ function drawDot(vals, x, y, color, radiusAdj, lw) {
  * @param vals {Object} return from cacheVals
  * @param n {Number} scalar multiplier
  * @param nP {Point} point to plot
+ * @param color {String} point color
  */
-function plotPoint(vals, n, nP) {
+function plotPoint(vals, n, nP, color) {
     const ctx = vals.ctx;
     ctx.save();
-    const p = drawDot(vals, nP.x, nP.y, 'black');
-    const tangentSlope = curve.slope(nP, nP);
+    const p = drawDot(vals, nP.x, nP.y, color);
+    // use a cache to keep the point label locations stable
+    ctx._pointDirCache = ctx._pointDirCache || {};
+    const dir = ctx._pointDirCache[n] || common.pickLabelDirection(ctx, p[0], p[1]);
+    ctx._pointDirCache[n] = dir;
     ctx.fillStyle = 'black';
     ctx.font = '14px sans';
-    ctx.textAlign = 'left';
-    let yDecile = Math.ceil(10 * (nP.y - vals.yMin) / vals.ySpan);
-    let yAdj;
-    if (yDecile === 6 || (tangentSlope < 0 && yDecile !== 5)) {
-        ctx.textBaseline = 'bottom';
-        yAdj = -4;
-    } else {
-        ctx.textBaseline = 'top';
-        yAdj = +6;
-    }
-    ctx.fillText(`${n === 1 ? '' : n}P`, p[0]+2, p[1]+yAdj);
+    ctx.textAlign = dir[0] === -1 ? 'right' : 'left';
+    ctx.textBaseline = dir[1] === -1 ? 'bottom' : 'top';
+    ctx.fillText(`${n === 1 ? '' : n}P`, p[0]+2*dir[0], p[1]+4*dir[1]);
     ctx.restore();
 }
 
@@ -214,9 +210,10 @@ function drawCurve(ctx) {
  * Plot the nP values on the curve for the given n's
  * @param ctx {CanvasRenderingContext2D}
  * @param vals {Object} result from preCalcValues()
+ * @param color {String}
  * @param nVals {Array[Number]}
  */
-function plotNPs(ctx, vals, ...nVals) {
+function plotNPs(ctx, vals, color, ...nVals) {
     let P = curve.P();
     let Q = curve.P();
     let n = 1;
@@ -226,7 +223,7 @@ function plotNPs(ctx, vals, ...nVals) {
             Q = curve.add(P, Q);
             n++;
         }
-        plotPoint(vals, nToPlot, Q);
+        plotPoint(vals, nToPlot, Q, color);
     });
 }
 
@@ -309,7 +306,6 @@ async function addPoints(ctx, nP, P, nQ, Q, drawDoneCb) {
         line: 500,
         linePause: 500,
         negate: 1000,
-        done: 1000,
     };
     const cache = {};
 
@@ -397,24 +393,22 @@ async function addPoints(ctx, nP, P, nQ, Q, drawDoneCb) {
                 // overdraw to fix red line covering this dot
                 drawDot(vals, negR.x, negR.y, 'red');
                 if (instate > duration.negate) {
-                    plotNPs(ctx, vals, nP+nQ);
                     drawDot(vals, negR.x, negR.y, 'black');
                     drawDot(vals, R.x, R.y, 'red');
                     finished.negate = timestamp;
                 }
+            } else if (!finished.callback) {
+                markState('callback', timestamp);
+                if (drawDoneCb) drawDoneCb(nP+nQ, R);
+                finished.callback = timestamp;
             } else if (!finished.done) {
-                let instate = markState('done', timestamp);
-                if (instate > duration.done) {
-                    finished.done = timestamp;
-                }
+                markState('done', timestamp);
             }
             ctx.restore();
         }
         prev = timestamp;
 
-        if (finished.done) {
-            if (drawDoneCb) drawDoneCb(nP+nQ, R);
-        } else {
+        if (!finished.done) {
             setAnimationFrame(ctx, () => { return requestAnimationFrame(step) });
         }
     }
@@ -432,28 +426,31 @@ async function addPoints(ctx, nP, P, nQ, Q, drawDoneCb) {
  */
 async function runAddDemo(ctx, n, Q, updateCb, drawDoneCb) {
     cancelDemo(ctx);
+    const wrapAfter = 8;
     const vals = preCalcValues(ctx);
     const P = curve.P();
     Q = Q || curve.P();
     let next = async () => {
         await drawCurve(ctx);
-        plotNPs(ctx, vals, ...common.range(1, n));
-        Q = await addPoints(ctx, 1, P, n, Q, (nR, R) => {
-            if (drawDoneCb) drawDoneCb(nR, R);
-            if (common.canvasIsScrolledIntoView(ctx.canvas)) {
-                ctx['_demoTimeout'] = setTimeout(next, .5 * 1000);
-            } else {
-                cancelDemo(ctx);
-                common.addPlayMask(ctx, () => {
-                    runAddDemo(ctx, nR, R, updateCb, drawDoneCb);
-                });
-            }
-        });
-        n++;
-        const wrapAt = 8;
-        if (n >= wrapAt) {
+        plotNPs(ctx, vals, 'black', ...common.range(1, n));
+        if (n >= wrapAfter) {
             n = 1;
             Q = curve.P();
+            ctx['_demoTimeout'] = setTimeout(next, 1.5 * 1000);
+        } else {
+            Q = await addPoints(ctx, 1, P, n, Q, (nR, R) => {
+                plotNPs(ctx, vals, 'red', nR);
+                if (drawDoneCb) drawDoneCb(nR, R);
+                if (common.canvasIsScrolledIntoView(ctx.canvas)) {
+                    ctx['_demoTimeout'] = setTimeout(next, 1.5 * 1000);
+                } else {
+                    cancelDemo(ctx);
+                    common.addPlayMask(ctx, () => {
+                        runAddDemo(ctx, nR, R, updateCb, drawDoneCb);
+                    });
+                }
+            });
+            n++;
         }
         if (updateCb) updateCb(n, Q);
     };
@@ -478,10 +475,14 @@ async function runAssocDemo(ctx, updateCb, drawDoneCb) {
         points.push(Q);
     }
 
+    let lastNU = 0;
     let next = async () => {
         await drawCurve(ctx);
-        plotNPs(ctx, vals, ...common.range(1, 8));
-        let nU = Math.ceil(Math.random() * 7);
+        plotNPs(ctx, vals, 'black', ...common.range(1, 8));
+        let nU = lastNU;
+        while (nU === lastNU) {
+            nU = Math.ceil(Math.random() * 7);
+        }
         let nV = nU;
         while (nV === nU) {
             nV = Math.ceil(Math.random() * (8 - nU));
@@ -491,7 +492,7 @@ async function runAssocDemo(ctx, updateCb, drawDoneCb) {
         const R = await addPoints(ctx, nU, U, nV, V, (nR, R) => {
             if (drawDoneCb) drawDoneCb(nR, R);
             if (common.canvasIsScrolledIntoView(ctx.canvas)) {
-                ctx['_demoTimeout'] = setTimeout(next, .8 * 1000);
+                ctx['_demoTimeout'] = setTimeout(next, 1.8 * 1000);
             } else {
                 cancelDemo(ctx);
                 common.addPlayMask(ctx, () => {

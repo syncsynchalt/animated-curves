@@ -1,5 +1,5 @@
 div.container {
-    max-width: 500px;
+    max-width: 600px;
 }
 
 .illustration {
@@ -41,8 +41,10 @@ div.container {
 }
 
 .math {
-    font-family: "Times New Roman", serif;
-    font-style: oblique;
+    font-style: italic;
+    font-family: STIXGeneral, 'DejaVu Serif', 'DejaVu Sans', Times,
+    'Lucida Sans Unicode', OpenSymbol, 'Standard Symbols L', serif;
+    line-height: 1.2;
 }
 
 .smaller {
@@ -71,4 +73,8 @@ button {
 
 .hidden {
     visibility: hidden;
+}
+
+ul.no-bullet {
+    list-style-type: none;
 }
