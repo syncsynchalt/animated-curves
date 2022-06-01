@@ -177,6 +177,23 @@ function mutateGraph(state) {
 }
 
 /**
+ * Write the equation of the graph.
+ * @param ctx {CanvasRenderingContext2D}
+ * @param curveData {GraphData}
+ */
+function writeEquation(ctx, curveData) {
+    ctx.save();
+    ctx.font = common.mathFont('1.2em');
+    ctx.textBaseline = 'top';
+    ctx.textAlign = 'left';
+    ctx.fillStyle = 'black';
+    let sign = (x) => {return x >= 0 ? '+' : '-'};
+    const a = curveData.a, b = curveData.b;
+    ctx.fillText(`y² = x³ ${sign(a)} ${Math.abs(a)}x ${sign(b)} ${Math.abs(b)}`, 20, 12);
+    ctx.restore();
+}
+
+/**
  * Fill in any missing points in two GraphData sets until they have matching point arrays.
  *
  * This function assumes missing data is never on the ends of the arrays.
@@ -337,6 +354,7 @@ async function runDemo(ctx, a, b, updateCb) {
         let d2 = generateGraph(ctx, state.a, state.b);
         morphGraph(ctx, d1, d2, async () => {
             d1 = d2;
+            writeEquation(ctx, d1);
             if (common.canvasIsScrolledIntoView(ctx.canvas)) {
                 demoTimeout = setTimeout(step, 2.0 * 1000);
             } else {

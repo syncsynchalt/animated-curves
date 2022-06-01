@@ -6,15 +6,16 @@ const TWO_PI = 2*Math.PI;
 
 /** @param ctx {CanvasRenderingContext2D} */
 function preCalcValues(ctx) {
-    const marginWide = 20;
+    const labelSpace = 36;
+    const marginWide = 16;
     const marginThin = 10;
     const dotRadius = 2.5;
     const w = ctx.canvas.getBoundingClientRect().width;
     const h = ctx.canvas.getBoundingClientRect().height;
     const fieldW = BigInt(ctx.canvas.getBoundingClientRect().width - marginWide - marginThin);
-    const fieldH = BigInt(ctx.canvas.getBoundingClientRect().height - marginWide - marginThin);
+    const fieldH = BigInt(ctx.canvas.getBoundingClientRect().height - marginThin - marginWide - labelSpace);
     return {
-        ctx, marginWide, marginThin, w, h, fieldW, fieldH, dotRadius
+        ctx, labelSpace, marginWide, marginThin, w, h, fieldW, fieldH, dotRadius
     };
 }
 
@@ -31,7 +32,7 @@ function preCalcValues(ctx) {
 function pointToCtx(vals, x, y, halfPixel) {
     const xRat = Number((vals.fieldW * x) / field.p);
     const yRat = Number((vals.fieldH * y) / field.p);
-    let v = [vals.marginWide + xRat, vals.h - (vals.marginWide + yRat)];
+    let v = [vals.marginWide + xRat, vals.h - vals.labelSpace - vals.marginWide - yRat];
     if (halfPixel) {
         v[0] = ((v[0]+0.5) | 0) - 0.5;
         v[1] = ((v[1]+0.5) | 0) - 0.5;
@@ -69,7 +70,6 @@ let drawAxisLabels = (ctx, vals) => {
 };
 
 let drawArrowHeads = (ctx, vals) => {
-    // draw the arrows
     ctx.strokeStyle = 'black';
     ctx.fillStyle = 'black';
     const arrLen = 10;
@@ -93,34 +93,18 @@ let drawArrowHeads = (ctx, vals) => {
     ctx.fill();
 };
 
-let resetSaveState = null;
-
-async function resetGraph(ctx) {
+async function resetGraph(ctx, vals) {
+    if (!vals) {
+        vals = preCalcValues(ctx);
+    }
     if (animationFrameInProgress) {
-        cancelAnimationFrame(animationFrameInProgress);
         setAnimationFrame(() => { return null });
     }
     const canvas = ctx.canvas;
-    if (resetSaveState) {
-        const ratio = canvas._ratio || 1;
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        const img = resetSaveState;
-        ctx.drawImage(img, 0, 0, img.width, img.height,
-            0, 0, canvas.width / ratio, canvas.height / ratio);
-        return {'usedCache': true};
-    } else {
-        ctx.fillStyle = 'white';
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
-        drawGrid(ctx);
-        canvas.toBlob(blob => {
-            let img = new Image();
-            img.addEventListener('load', () => {
-                resetSaveState = img;
-            });
-            img.src = URL.createObjectURL(blob);
-        }, 'image/png');
-        return {'usedCache': false};
-    }
+    const ratio = canvas._ratio || 1;
+    ctx.fillStyle = 'white';
+    ctx.fillRect(0, 0, canvas.width / ratio, canvas.height / ratio - vals.labelSpace);
+    drawGrid(ctx);
 }
 
 /**
@@ -164,6 +148,48 @@ function drawDot(vals, x, y, color,
 }
 
 /**
+ * Label the point NP.
+ * @param ctx {CanvasRenderingContext2D}
+ * @param vals {Object}
+ * @param n {Number}
+ * @param x {BigInt}
+ * @param y {BigInt}
+ */
+function labelPoint(ctx, vals, n, x, y) {
+    const p = pointToCtx(vals, x, y);
+    // use a cache to keep the point label locations stable
+    ctx['_pointDirCache'] = ctx['_pointDirCache'] || {};
+    const dir = ctx['_pointDirCache'][n] || common.pickLabelDirection(ctx, p[0], p[1]);
+    ctx['_pointDirCache'][n] = dir;
+    ctx.fillStyle = 'black';
+    ctx.font = '14px sans';
+    ctx.textAlign = dir[0] === -1 ? 'right' : 'left';
+    ctx.textBaseline = dir[1] === -1 ? 'bottom' : 'top';
+    ctx.fillText(`${n === 1 ? '' : n}P`, p[0]+2*dir[0], p[1]+4*dir[1]);
+    ctx.restore();
+}
+
+/**
+ * Write the coordinates of the resulting point on the graph.
+ * @param ctx {CanvasRenderingContext2D}
+ * @param vals {Object}
+ * @param x {BigInt}
+ * @param y {BigInt}
+ */
+function writeCoordinates(ctx, vals, x, y) {
+    ctx.save();
+    ctx.fillStyle = 'white';
+    ctx.fillRect(0, vals.h - vals.labelSpace, vals.w, vals.labelSpace);
+    ctx.font = '10px monospace';
+    ctx.textBaseline = 'bottom';
+    ctx.textAlign = 'left';
+    ctx.fillStyle = 'black';
+    ctx.fillText(`x=0x${x.toString(16)}`, 42, vals.h - 20);
+    ctx.fillText(`y=0x${y.toString(16)}`, 42, vals.h - 6);
+    ctx.restore();
+}
+
+/**
  * @param func {Function} function to set or clear animation frame value
  */
 let setAnimationFrame = (func) => {
@@ -177,12 +203,13 @@ let animationFrameInProgress;
 
 /**
  * @param ctx {CanvasRenderingContext2D}
+ * @param n {Number} the NP of current point 'Q'
  * @param Q {BigPoint} the current point 'Q', to which 'P' will be added
  * @param drawDoneCb {Function?} optional callback when done drawing
  */
-async function addP(ctx, Q, drawDoneCb) {
-    await resetGraph(ctx);
+async function addP(ctx, n, Q, drawDoneCb) {
     const vals = preCalcValues(ctx);
+    await resetGraph(ctx, vals);
     let start, prev;
 
     const P = curve.P();
@@ -234,6 +261,8 @@ async function addP(ctx, Q, drawDoneCb) {
             } else if (!finished.done) {
                 markState('done', timestamp);
                 drawDot(vals, R.x, R.y, 'red', 0.5);
+                labelPoint(ctx, vals, n+1, R.x, R.y);
+                writeCoordinates(ctx, vals, R.x, R.y);
                 finished.done = timestamp;
             }
             ctx.restore();
@@ -241,7 +270,7 @@ async function addP(ctx, Q, drawDoneCb) {
         prev = timestamp;
 
         if (finished.done) {
-            drawDoneCb(R);
+            drawDoneCb(n+1, R);
         } else {
             setAnimationFrame(() => { return requestAnimationFrame(step) });
         }
@@ -256,11 +285,18 @@ let demoTimeout = null;
  * @param ctx
  * @param updateCb {Function?} callback to run after each point is calculated (before animation)
  * @param drawDoneCb {Function?} callback to run after animation is finished
+ * @param n {Number?} optional starting number
  * @param Q {BigPoint?} optional starting point
  */
-async function runDemo(ctx, updateCb, drawDoneCb, Q) {
+async function runDemo(ctx, updateCb, drawDoneCb, n, Q) {
+    ctx.save();
+    ctx.fillStyle = 'white';
+    ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+    ctx.restore();
     let next = async () => {
-        Q = await addP(ctx, Q, (R) => {
+        Q = await addP(ctx, n, Q, (nR, R) => {
+            n = nR;
+            Q = R;
             if (drawDoneCb) drawDoneCb(R);
             if (common.canvasIsScrolledIntoView(ctx.canvas)) {
                 demoTimeout = setTimeout(() => { next() }, .5 * 1000);
@@ -268,7 +304,7 @@ async function runDemo(ctx, updateCb, drawDoneCb, Q) {
             } else {
                 cancelDemo();
                 common.addPlayMask(ctx, () => {
-                    runDemo(ctx, updateCb, drawDoneCb, Q);
+                    runDemo(ctx, updateCb, drawDoneCb, n, Q);
                 });
                 return false;
             }
@@ -290,8 +326,6 @@ const P = curve.P();
 
 export {
     P,
-    resetGraph,
-    addP,
     runDemo,
     cancelDemo,
 };

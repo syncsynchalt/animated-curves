@@ -6,22 +6,22 @@ div.container {
     display: flex;
     flex-direction: column;
     align-content: center;
-    margin-bottom: 1em;
 }
-.ill-content {
+
+.illustration .ill-content {
     width: min-content;
-    display: inline-block;
     padding: 15px;
-    background-color: #a8caee;
-    border: 1px solid black;
+    background-color: antiquewhite;
+    border: 1px solid #666;
     border-radius: 10px;
-    box-shadow: 2px 2px 2px rgba(0, 0, 0, 0.5);
+    box-shadow: 2px 2px 2px rgba(0, 0, 0, 0.3);
     margin: 0 auto;
 }
-.ill-title {
-    display: inline-block;
-    font-weight: bold;
-    margin-bottom: 0.5em;
+
+.illustration figcaption {
+    margin: .4em auto;
+    font-style: italic;
+    font-family: Didot, serif;
 }
 
 .illustration canvas {
@@ -30,7 +30,7 @@ div.container {
     -webkit-user-select: none;
     background-color: white;
     border-radius: 10px;
-    box-shadow: 2px 2px 2px rgba(0, 0, 0, 0.5);
+    box-shadow: 1px 1px 3px rgba(0, 0, 0, 0.3);
     cursor: pointer;
 }
 
@@ -68,7 +68,6 @@ button {
 }
 .point-np {
     font-weight: 600;
-    /*color: red;*/
 }
 
 .hidden {

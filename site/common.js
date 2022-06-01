@@ -23,6 +23,14 @@ function range(first, last) {
     return result;
 }
 
+function mathFont(size) {
+    if (!size) {
+        size = '1em';
+    }
+    return `oblique ${size} STIXGeneral, "DejaVu Serif", "DejaVu Sans", Times, ` +
+        '"Lucida Sans Unicode", OpenSymbol, "Standard Symbols L", serif';
+}
+
 /**
  * @param P {Point}
  * @param Q {Point}
@@ -50,6 +58,10 @@ function convertCanvasHiDPI(canvas) {
     canvas.style.width = w + 'px';
     canvas.style.height = h + 'px';
     ctx.scale(ratio, ratio);
+    ctx.save();
+    ctx.fillStyle = 'white';
+    ctx.fillRect(0, 0, w, h);
+    ctx.restore();
     return ctx;
 }
 
@@ -175,6 +187,7 @@ function pickLabelDirection(ctx, x, y, sampleWidth, sampleMargin) {
 export {
     byId,
     range,
+    mathFont,
     orderPointsByX,
     convertCanvasHiDPI,
     canvasIsScrolledIntoView,

@@ -281,6 +281,17 @@ function lineBoxBounds(vals, P, Q) {
 }
 
 /**
+ * Check if number is between two other numbers.
+ * @param a {Number}
+ * @param b {Number}
+ * @param c {Number}
+ * @return {Boolean} true if b is between a and c (inclusive)
+ */
+function between(a, b, c) {
+    return b >= Math.min(a, c) && b <= Math.max(a, c);
+}
+
+/**
  * Animate addition of P to the point Q to yield R.
  * @param ctx {CanvasRenderingContext2D}
  * @param nP {Number} mult number of P for labeling of R
@@ -297,6 +308,7 @@ async function addPoints(ctx, nP, P, nQ, Q, drawDoneCb) {
     const R = curve.add(P, Q);
     const negR = curve.negate(R);
     const slope = curve.slope(P, Q);
+    const startPoint = between(P.x, Q.x, R.x) ? P : Q;
 
     const started = {};
     const finished = {};
@@ -330,16 +342,16 @@ async function addPoints(ctx, nP, P, nQ, Q, drawDoneCb) {
                 let mult = instate / duration.tangent;
                 mult = common.easeInOut(mult);
                 let bounds = lineBoxBounds(vals, P, Q);
-                let tanLineForw = bounds[1] - P.x;
-                let tanLineBack = P.x - bounds[0];
+                let tanLineForw = bounds[1] - startPoint.x;
+                let tanLineBack = startPoint.x - bounds[0];
                 tanLineForw *= mult;
                 tanLineBack *= mult;
-                ctx.moveTo(...pointToCtx(vals, P.x, P.y));
-                ctx.lineTo(...pointToCtx(vals, P.x + tanLineForw,
-                    P.y + tanLineForw * slope));
-                ctx.moveTo(...pointToCtx(vals, P.x, P.y));
-                ctx.lineTo(...pointToCtx(vals, P.x - tanLineBack,
-                    P.y - tanLineBack * slope));
+                ctx.moveTo(...pointToCtx(vals, startPoint.x, startPoint.y));
+                ctx.lineTo(...pointToCtx(vals, startPoint.x + tanLineForw,
+                    startPoint.y + tanLineForw * slope));
+                ctx.moveTo(...pointToCtx(vals, startPoint.x, startPoint.y));
+                ctx.lineTo(...pointToCtx(vals, startPoint.x - tanLineBack,
+                    startPoint.y - tanLineBack * slope));
                 ctx.stroke();
                 drawDot(vals, P.x, P.y, 'orange');
                 drawDot(vals, Q.x, Q.y, 'orange');
@@ -359,8 +371,9 @@ async function addPoints(ctx, nP, P, nQ, Q, drawDoneCb) {
                 let mult = instate / duration.line;
                 mult = Math.min(1.0, mult);
                 mult = common.easeInOut(mult);
-                ctx.moveTo(...pointToCtx(vals, P.x, P.y));
-                const dest = {x: P.x + mult * (negR.x - P.x), y: P.y + mult * (negR.y - P.y)};
+                ctx.moveTo(...pointToCtx(vals, startPoint.x, startPoint.y));
+                const dest = {x: startPoint.x + mult * (negR.x - startPoint.x),
+                    y: startPoint.y + mult * (negR.y - startPoint.y)};
                 ctx.lineTo(...pointToCtx(vals, dest.x, dest.y));
                 ctx.stroke();
                 drawDot(vals, P.x, P.y, 'orange');
@@ -458,6 +471,25 @@ async function runAddDemo(ctx, n, Q, updateCb, drawDoneCb) {
 }
 
 /**
+ * Write the equation for P + Q = R on the graph
+ * @param ctx {CanvasRenderingContext2D}
+ * @param vals {Object} result from preCalcValues()
+ * @param np {Number}
+ * @param nr {Number}
+ * @param nq {Number}
+ */
+function writeAssocEquation(ctx, vals, np, nq, nr) {
+    ctx.save();
+    ctx.font = common.mathFont('1.2em');
+    ctx.textBaseline = 'bottom';
+    ctx.textAlign = 'center';
+    ctx.fillStyle = 'black';
+    let s = (n) => { return n === 1 ? '' : n };
+    ctx.fillText(`${s(np)}P + ${s(nq)}P = ${s(nr)}P`, vals.w/2, vals.h-12);
+    ctx.restore();
+}
+
+/**
  * Run the "associative and commutative" demo on the given canvas.
  * @param ctx {CanvasRenderingContext2D}
  * @param updateCb {Function?} called when n is updated
@@ -475,18 +507,18 @@ async function runAssocDemo(ctx, updateCb, drawDoneCb) {
         points.push(Q);
     }
 
-    let lastNU = 0;
+    let lastPoints = [0, 0];
     let next = async () => {
         await drawCurve(ctx);
         plotNPs(ctx, vals, 'black', ...common.range(1, 8));
-        let nU = lastNU;
-        while (nU === lastNU) {
+        let nU, nV;
+        do {
             nU = Math.ceil(Math.random() * 7);
         }
-        let nV = nU;
-        while (nV === nU) {
-            nV = Math.ceil(Math.random() * (8 - nU));
-        }
+        while (lastPoints.includes(nU));
+        nV = Math.ceil(Math.random() * (8 - nU));
+        lastPoints = [nU, nV];
+        writeAssocEquation(ctx, vals, nU, nV, nU + nV);
         const U = points[nU];
         const V = points[nV];
         const R = await addPoints(ctx, nU, U, nV, V, (nR, R) => {

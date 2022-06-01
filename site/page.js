@@ -2,7 +2,6 @@ import * as draw25519 from './curve25519/draw-25519.js';
 import * as draw from './curve/draw.js';
 import * as sample from './ec-samples/sample-draw.js';
 import * as real from './real-curve/real-draw.js';
-import * as realCurve from './real-curve/real-curve.js';
 import * as common from './common.js';
 
 (async () => {
@@ -10,27 +9,14 @@ import * as common from './common.js';
     let curve25519Setup = async () => {
         const canvas = common.byId('canvas-curve25519');
         const ctx = common.convertCanvasHiDPI(canvas);
-        await draw25519.resetGraph(ctx);
-
-        /** @param v {BigInt} */
-        let pointDesc = (v) => {
-            if (v === undefined) return '...';
-            return `${v.toString(16)}`;
-        };
 
         let n = 1;
         let Q = draw25519.P;
-        let setPageStuff = (R) => {
-            common.byId('n-255').textContent = n.toString();
-            common.byId('np-x-255').textContent = pointDesc(R?.x);
-            common.byId('np-y-255').textContent = pointDesc(R?.y);
-        };
 
         const startDemo = () => {
             draw25519.cancelDemo();
-            let drawDoneCb = (R) => { setPageStuff(R) };
-            let updateCb = (R) => { Q = R; n++ };
-            return draw25519.runDemo(ctx, updateCb, drawDoneCb, Q);
+            let updateCb = (R) => { n++; Q = R };
+            return draw25519.runDemo(ctx, updateCb, () => {}, n, Q);
         };
         canvas.onclick = async () => {
             draw25519.cancelDemo();
@@ -44,14 +30,9 @@ import * as common from './common.js';
         const canvas = common.byId('canvas-ec-sample');
         const ctx = common.convertCanvasHiDPI(canvas);
 
+        let a = -1, b = -1;
         const startDemo = async () => {
-            let a = -1, b = -1;
-            return sample.runDemo(ctx, a, b, (newA, newB) => {
-                a = newA;
-                b = newB;
-                common.byId('ec-sample-a').textContent = a;
-                common.byId('ec-sample-b').textContent = b;
-            });
+            return sample.runDemo(ctx, a, b, (newA, newB) => { [a, b] = [newA, newB] });
         };
         canvas.onclick = async () => {
             sample.cancelDemo();
@@ -76,25 +57,13 @@ import * as common from './common.js';
             await common.addPlayMask(ctx, () => { startDemo() });
         };
         await common.addPlayMask(ctx, () => { startDemo() });
-        const params = realCurve.params();
-        common.byId('real-add-desc').innerHTML = `<span class="math">
-            y<sup>2</sup> = x<sup>3</sup> + ${params.a}x + ${params.b}</span>
-            with <span class="math">P=(${params.P.x.toFixed(2)},${params.P.y.toFixed(2)})</span>`;
     };
 
     let realAssocSetup = async () => {
         const canvas = common.byId('canvas-real-assoc');
         const ctx = common.convertCanvasHiDPI(canvas);
         let startDemo = async () => {
-            let update = (nP, _P, nQ, _Q, nR) => {
-                let n = (n) => { return n === 1 ? '' : n };
-                common.byId('real-assoc-desc').innerHTML = `
-                    <div class="text-center">
-                    <span class="math">${n(nP)}P + ${n(nQ)}P = ${n(nR)}P</span>
-                    </div>
-                `;
-            };
-            await real.runAssocDemo(ctx, update);
+            await real.runAssocDemo(ctx);
         };
 
         canvas.onclick = async () => {

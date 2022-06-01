@@ -21,28 +21,15 @@
     <span class="math">P</span> to
     itself over and over again:
 </p>
-<div class="illustration">
+<figure class="illustration">
 <div class="ill-content">
-<span class="ill-title">Curve25519 point multiplication</span>
 <div>
-    <canvas id="canvas-curve25519" width="500" height="250">
+    <canvas id="canvas-curve25519" width="500" height="300">
     </canvas>
 </div>
-<span id="np-255-desc">
-    <span class="point-255np"><span id="n-255">1</span>P</span>:
-    <br>
-    <span class="smaller"
-    >&nbsp;&nbsp;x=<span class="squish"
-    >0x<span id="np-x-255">9</span>
-    </span></span>
-    <br>
-    <span class="smaller"
-    >&nbsp;&nbsp;y=<span class="squish"
-    >0x<span id="np-y-255">20ae19a1b8a086b4e01edd2c7748d14c923d4d7e6d7c61b229e9c5a27eced3d9</span>
-    </span></span>
-</span>
 </div>
-</div>
+    <figcaption>Fig. 1: Curve25519 point multiplication</figcaption>
+</figure>
 <p>
     We're looking at the heart of TLS 1.3 key exchange,
     but what's going on? Let's break it down into simple parts.
@@ -51,26 +38,19 @@
 
 <h2>Concept 1: Adding points</h2>
 <p>
-    The elliptic curves we're going to start with are in this form:
-<div class="text-center">
-<span class="math">y<sup>2</sup> = x<sup>3</sup> + Ax + B</span>
-</div>
+    The elliptic curves we're going to start with are in this form: <span class="math">y<sup>2</sup> = x<sup>3</sup> + Ax + B</span>
 <br>
 
 <div>
-<div class="illustration">
+<figure class="illustration">
 <div class="ill-content">
-<span class="ill-title">Examples of elliptic curves</span>
 <div>
 <canvas id="canvas-ec-sample" width="500" height="300">
 </canvas>
 </div>
-<div class="text-center"><span class="math text-center">
-    y<sup>2</sup> =
-    x<sup>3</sup> + <span id="ec-sample-a">a</span>x
-    + <span id="ec-sample-b">b</span></span></div>
 </div>
-</div>
+    <figcaption>Fig. 2: Examples of elliptic curves</figcaption>
+</figure>
 
 <p>
     Let's define <strong>point addition</strong>: a way to combine two points on an elliptic
@@ -93,17 +73,16 @@
     <li><span class="math">P+P+P+P = 4P</span></li>
     <li>... and so on.</li>
 </ul>
-<div class="illustration">
+<figure class="illustration">
 <div class="ill-content">
-<span class="ill-title">Point addition</span>
 <canvas id="canvas-real-add" height="400" width="500">
 </canvas>
-<div class="text-center"><span id="real-add-desc"></span></div>
 </div>
-</div>
+    <figcaption>Fig. 3: Point addition</figcaption>
+</figure>
 
 <p>
-    Point addition has two useful properties, which we'll make use of later in the document.
+    Point addition has two useful properties, which we'll make use of later:
 <ul>
     <li><strong>commutative</strong>: adding points in any order gives the same result:
         <div class="text-center"><span class="math">P + Q = Q + P</span></div></li>
@@ -112,18 +91,15 @@
         <div class="text-center"><span class="math">P+P+P+P+P = (P)+(P+P+P+P) = 1P+4P = 5P</span></div>
     </li>
 </ul>
-<p>
-    See the figure below, which demonstrates the commutative and associative properties by adding points in random order.
-    Addition of points always results in the point we'd expect.
-</p>
+<p>See the figure below, which adds points together in random order.
+    The result is always the expected number.</p>
 
-<div class="illustration">
+<figure class="illustration">
 <div class="ill-content">
-<span class="ill-title">Associative and commutative</span>
 <canvas id="canvas-real-assoc" width="500" height="400"></canvas>
-<div class="text-center"><span id="real-assoc-desc"></span></div>
 </div>
-</div>
+    <figcaption>Fig. 4: Point addition is associative and commutative</figcaption>
+</figure>
 </div>
 
 <h2>Concept 2: Finite field math</h2>
@@ -147,9 +123,8 @@
     y<sup>2</sup> = x<sup>3</sup> + 38x<sup>2</sup> + x
     </span>
 </p>
-<div class="illustration">
+<figure class="illustration">
 <div class="ill-content">
-<span class="ill-title">Curve61 point addition</span>
 <div>
     <canvas id="canvas-addp" width="500" height="400">
     </canvas>
@@ -162,7 +137,8 @@
     <span id="np" class="x-point-np">(7, 4)</span>
 </span>
 </div>
-</div>
+    <figcaption>Curve61 point addition</figcaption>
+</figure>
 
 </div> <!-- container -->
 </body>
