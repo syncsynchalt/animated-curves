@@ -107,7 +107,7 @@ function writeLabel(ctx, vals, label) {
     ctx.font = common.mathFont('18px', false);
     ctx.textAlign = 'center';
     ctx.textBaseline = 'top';
-    ctx.fillText(label, vals.w / 2, 8);
+    ctx.fillText(label, vals.w / 2, 6);
     ctx.restore();
 }
 
@@ -246,7 +246,7 @@ function runDivDemo(ctx, doneCb) {
     let a, b;
     let refresh = () => {
         a = Math.ceil(Math.random() * (fmath.p-1));
-        b = fmath.multInverse(a);
+        b = fmath.inverseOf(a);
     };
     let cycle = () => {
         refresh();
@@ -254,7 +254,7 @@ function runDivDemo(ctx, doneCb) {
             `= ${fmath.reduce(a*b)}, therefore ${a}${INV_STR} is ${b}`);
         mult(ctx, a, b, (c) => {
             if (doneCb) doneCb(a, b, c);
-            setTimeout(cycle, 2000);
+            setTimeout(cycle, 3000);
         });
     };
     cycle();
@@ -282,7 +282,7 @@ function runSqrtDemo(ctx, doneCb) {
             `= ${fmath.reduce(b*b)}, therefore ${b} is a square root of ${a}`);
         mult(ctx, b, b, () => {
             if (doneCb) doneCb(a, b);
-            setTimeout(cycle, 2000);
+            setTimeout(cycle, 3000);
         });
     };
     cycle();

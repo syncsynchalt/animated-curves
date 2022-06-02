@@ -94,6 +94,13 @@ import * as field from './field-math/field-draw.js';
     };
 
 
+    let curveSetup = async () => {
+        const canvas = common.byId('canvas-curve61-static');
+        const ctx = common.convertCanvasHiDPI(canvas);
+        await draw.resetGraph(ctx);
+    };
+
+
     let addPSetup = async () => {
         const canvas = common.byId('canvas-addp');
         const ctx = common.convertCanvasHiDPI(canvas);
@@ -133,6 +140,7 @@ import * as field from './field-math/field-draw.js';
         await realAddSetup();
         await realAssocSetup();
         await fieldSetup();
+        await curveSetup();
         await addPSetup();
     }
 

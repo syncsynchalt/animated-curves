@@ -150,7 +150,8 @@ let eulersCriterion = (n) => {
  * @returns {Number[2]} pair of roots [r,-r] mod p
  */
 let rootsFor = (r) => {
-    return [r, p-r];
+    let rt = [r, p-r];
+    return rt.sort((a, b) => { return a - b });
 };
 
 /**

@@ -5,9 +5,9 @@ const expect = chai.expect;
 
 describe('field math library', () => {
     it ('can compute inverses', () => {
-        expect(fmath.multInverse(0)).to.equal(Infinity, 0);
+        expect(fmath.inverseOf(0)).to.equal(Infinity, 0);
         for (let i = 1; i < fmath.p; i++) {
-            let j = fmath.multInverse(i);
+            let j = fmath.inverseOf(i);
             expect(j).to.be.lessThan(fmath.p, `${i}`);
             expect(j).to.be.greaterThan(0, `${i}`);
             expect(j*i % 23).to.equal(1, `${i}`);
@@ -16,14 +16,14 @@ describe('field math library', () => {
 
     it ('can handle out-of-range inverses', () => {
         for (let i = 24; i < fmath.p * 2; i++) {
-            let j = fmath.multInverse(i);
+            let j = fmath.inverseOf(i);
             expect(j).to.be.lessThan(fmath.p, `${i}`);
             expect(j).to.be.greaterThan(0, `${i}`);
             expect(fmath.reduce(j*i)).to.equal(1, `${i}`);
         }
 
         for (let i = -22; i < 0; i++) {
-            let j = fmath.multInverse(i);
+            let j = fmath.inverseOf(i);
             expect(j).to.be.lessThan(fmath.p, `${i}`);
             expect(j).to.be.greaterThan(0, `${i}`);
             expect(fmath.reduce(j*i)).to.equal(1, `${i}`);

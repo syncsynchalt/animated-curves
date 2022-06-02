@@ -15,7 +15,7 @@ const inverses = [];
  * @param n {Number}
  * @return {Number} the inverse n_inv such that n*n_inv % p = 1
  */
-function multInverse(n) {
+function inverseOf(n) {
     if (inverses.length === 0) {
         inverses.push(Infinity);
         for (let i = 1; i < p; i++) {
@@ -66,6 +66,6 @@ function sqrt(n) {
 export {
     p,
     reduce,
-    multInverse,
+    inverseOf,
     sqrt,
 };
