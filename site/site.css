@@ -82,6 +82,7 @@ canvas.numline {
     display: block;
     margin: 1em auto;
     border: 1px solid black;
+    box-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
     border-radius: 1em;
 }
 
