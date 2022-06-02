@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en" ontouchmove>
+<head>
+    <meta charset="UTF-8">
+    <title>Square roots table</title>
+    <link href="site.css" rel="stylesheet">
+    <!-- xxx todo grab only what we need -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/css/bootstrap.min.css"
+          integrity="sha384-0evHe/X+R7YkIZDRvuzKMRqM+OrBnVFBL6DOitfPri4tjfHxaWutUpFmBp4vmVor"
+          rel="stylesheet" crossorigin="anonymous">
+    <script>
+    </script>
+</head>
+<body>
+<div class="container">
+<h2 class="text-center">Square Roots in <span class="fat-fp">Fp</span></h2>
+<table id="sqrt-table" class="table table-hover table-bordered table-sm">
+    <thead>
+    <tr>
+        <th class="text-center fst-italic">n</th>
+        <th class="text-center fst-italic">root<sub>0</sub></th>
+        <th class="text-center fst-italic">root<sub>1</sub></th>
+    </tr>
+    </thead>
+    <tbody id="sqrt-table-body">
+    </tbody>
+</table>
+</div>
+
+<script type="module">
+    import * as fmath from './field-math/field-math.js';
+    import * as common from './common.js';
+
+    function selectElement(el) {
+        const sel = window.getSelection();
+        const range = document.createRange();
+        range.selectNodeContents(el);
+        sel.removeAllRanges();
+        sel.addRange(range);
+    }
+
+    document.copyPasteClick = (el, data) => {
+        navigator.clipboard.writeText(data);
+        selectElement(el.firstElementChild);
+    }
+
+    let tags = document.getElementsByClassName('fat-fp');
+    for (let t of tags) t.innerHTML = '<span class="math">&#x1D53D;<sub>p</sub></span>';
+
+    const tb = common.byId('sqrt-table-body');
+    for (let i = 0; i < fmath.p; i++) {
+        const tr = document.createElement('tr');
+        const sqrt = fmath.sqrt(i);
+        if (sqrt) {
+            tr.innerHTML = `
+            <td class="text-center">${i}</td>
+            <td class="text-center copy-action" onclick="copyPasteClick(this, '${sqrt}')">
+                <span>${sqrt[0]}</span>
+            </td>
+            <td class="text-center copy-action" onclick="copyPasteClick(this, '${sqrt}')">
+                <span>${sqrt[1]}</span>
+            </td>
+            `;
+        } else {
+            tr.innerHTML = `
+            <td class="text-center">${i}</td>
+            <td class="text-center" colspan=2>
+                <span>none</span>
+            </td>
+            `;
+        }
+        tb.appendChild(tr);
+    }
+</script>

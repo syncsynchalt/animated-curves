@@ -77,3 +77,37 @@ button {
 ul.no-bullet {
     list-style-type: none;
 }
+
+canvas.numline {
+    display: block;
+    margin: 1em auto;
+    border: 1px solid black;
+    border-radius: 1em;
+}
+
+.copy-action {
+    cursor: pointer;
+    position: relative;
+}
+.copy-action * {
+    min-width: 3em;
+}
+.copy-action:after {
+    position: absolute;
+    right: 10px;
+    color: #999;
+    content: "⎘";
+}
+.copy-action:active * {
+    position: relative;
+    top: 1px;
+}
+
+.inv-table td {
+    font-family: monospace;
+    min-width: 2em;
+}
+
+.pb1 {
+    padding-bottom: 1em;
+}

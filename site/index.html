@@ -65,8 +65,8 @@
     <li>and finally find the point opposite the x-axis from that intersection.</li>
     </ul>
 </figure>
-<p>As a shorthand for adding a point to itself multiple times, let's also introduce
-    <strong>scalar multiplication</strong>:
+<p>Let's also introduce this shorthand for adding a point to itself multiple times (also called
+    <strong>scalar multiplication</strong>):
 <ul class="no-bullet">
     <li><span class="math">P+P = 2P</span></li>
     <li><span class="math">P+P+P = 3P</span></li>
@@ -78,11 +78,11 @@
 <canvas id="canvas-real-add" height="400" width="500">
 </canvas>
 </div>
-    <figcaption>Fig. 3: Point addition</figcaption>
+    <figcaption>Fig. 3: Repeated addition of a point P</figcaption>
 </figure>
 
 <p>
-    Point addition has two useful properties, which we'll make use of later:
+    Point addition has two useful properties which we'll need later:
 <ul>
     <li><strong>commutative</strong>: adding points in any order gives the same result:
         <div class="text-center"><span class="math">P + Q = Q + P</span></div></li>
@@ -104,6 +104,67 @@
 
 <h2>Concept 2: Finite field math</h2>
 <div>
+<p>Next let's introduce a new set of math operations, the operations of the finite field
+    <span class="fat-fp">Fp</span>.
+
+<p>In this section we'll use the finite field with order <span class="math">p = 23</span>.
+    That means that all operations will be done with the numbers 0 through 22 (one less than the prime number 23):
+<div class="math text-center pb1">
+<span class="fat-fp">Fp</span> = { 0, 1, 2, 3, ..., 20, 21, 22 }
+</div>
+
+<h4>Addition and subtraction</h4>
+<p>
+Adding and subtracting in finite fields is pretty simple. Values of 23 and over will "wrap around" to zero, and values less
+than zero will wrap around to 22:
+<canvas class="numline" id="canvas-field-add-sub" width="500" height="80"></canvas>
+
+<p>(You might also know this as "modulo 23", or as the remainder after dividing a number by 23).
+
+<h4>Multiplication</h4>
+<p>
+Multiplication is also straightforward. The result is taken modulo 23, or to put it another way, the result is
+the remainder after dividing by 23:
+
+<canvas class="numline" id="canvas-field-mult" width="500" height="80"></canvas>
+
+<h4>Division (multiplicative inverse)</h4>
+<p>
+The operation that we'll use for division is where things become interesting. Let's start by thinking of division by
+    <span class="math">n</span> in terms of this equation:
+<div class="text-center">
+<div class=math>n / n = 1</div>
+Or if we expand the terms:
+<div class=math>n &times; (1 / n) = 1</div>
+Let's use a slightly different notation which is easier to write about:
+<div class=math>n &times; n<sup>-1</sup> = 1</div>
+</div>
+<p>
+    In those terms, we can imagine that dividing by <span class="math">n</span> is the same as multiplying
+    by whatever number <span class="math">n<sup>-1</sup></span> multiplied by <span class="math">n</span> equals 1.
+    In the finite field multiplication that we've defined above, this is a positive integer number.
+    There's exactly one solution to this problem for each non-zero integer in <span class="fat-fp">Fp</span>:
+<canvas class="numline" id="canvas-field-div" width="500" height="80"></canvas>
+
+<p>
+For convenience, the inverse for each number in <span class="fat-fp">Fp</span> is provided <a target="_blank" href="inverse.html">in a table</a>.
+
+<h4>Square root</h4>
+<p>
+    Our last operation to define is taking a square root.
+    Similar to division, we'll define the square root as the number in <span class="fat-fp">Fp</span>
+    which satisfies this equation:
+<div class="math text-center">
+    sqrt(n) &times; sqrt(n) = n
+</div>
+In real numbers, there are two solutions to this problem (positive and negative).
+Similarly in <span class="fat-fp">Fp</span> there are two solutions
+(which when added together equal zero in <span class="fat-fp">Fp</span>):
+
+<canvas class="numline" id="canvas-field-sqrt" width="500" height="80"></canvas>
+
+<p>
+For convenience, the square roots for each number in <span class="fat-fp">Fp</span> is provided <a target="_blank" href="sqrt.html">in a table</a>.
 </div>
 
 <h2>Concept 3: Elliptic curves <em>plus</em> finite fields</h2>
@@ -141,5 +202,12 @@
 </figure>
 
 </div> <!-- container -->
+
+<script>
+    const fs = document.getElementsByClassName('fat-fp')
+    for (let f of fs) {
+        f.innerHTML = '<span class="math">&#x1D53D;<sub>p</sub></span>';
+    }
+</script>
 </body>
 </html>

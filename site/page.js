@@ -3,6 +3,7 @@ import * as draw from './curve/draw.js';
 import * as sample from './ec-samples/sample-draw.js';
 import * as real from './real-curve/real-draw.js';
 import * as common from './common.js';
+import * as field from './field-math/field-draw.js';
 
 (async () => {
 
@@ -74,6 +75,25 @@ import * as common from './common.js';
     };
 
 
+    let fieldSetup = async () => {
+        let canvas = common.byId('canvas-field-add-sub');
+        let ctx = common.convertCanvasHiDPI(canvas);
+        await field.runAddSubDemo(ctx);
+
+        canvas = common.byId('canvas-field-mult');
+        ctx = common.convertCanvasHiDPI(canvas);
+        await field.runMultDemo(ctx);
+
+        canvas = common.byId('canvas-field-div');
+        ctx = common.convertCanvasHiDPI(canvas);
+        await field.runDivDemo(ctx);
+
+        canvas = common.byId('canvas-field-sqrt');
+        ctx = common.convertCanvasHiDPI(canvas);
+        await field.runSqrtDemo(ctx);
+    };
+
+
     let addPSetup = async () => {
         const canvas = common.byId('canvas-addp');
         const ctx = common.convertCanvasHiDPI(canvas);
@@ -112,6 +132,7 @@ import * as common from './common.js';
         await ecSampleSetup();
         await realAddSetup();
         await realAssocSetup();
+        await fieldSetup();
         await addPSetup();
     }
 
