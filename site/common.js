@@ -23,11 +23,17 @@ function range(first, last) {
     return result;
 }
 
-function mathFont(size) {
-    if (!size) {
-        size = '1em';
-    }
-    return `oblique ${size} STIXGeneral, "DejaVu Serif", "DejaVu Sans", Times, ` +
+/**
+ * Return a good font for displaying math equations.
+ * @param size {Number|String} CSS-ready size such as '1em' or '14px'
+ * @param oblique {Boolean?} Whether to set the font to italics (default true)
+ * @return {string}
+ */
+function mathFont(size, oblique) {
+    size = size || '1em';
+    const style = oblique === false ? '' : 'oblique';
+
+    return `${style} ${size} STIXGeneral, "DejaVu Serif", "DejaVu Sans", Times, ` +
         '"Lucida Sans Unicode", OpenSymbol, "Standard Symbols L", serif';
 }
 

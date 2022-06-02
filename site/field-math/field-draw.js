@@ -88,8 +88,6 @@ function drawGraph(ctx) {
         }
     }
     const pt = xToCtx(vals, fmath.p-EPS, true);
-    ctx.moveTo(pt[0], pt[1]-5);
-    ctx.lineTo(pt[0], pt[1]+5);
     ctx.fillText(`${fmath.p}`, pt[0], pt[1]+10);
     ctx.stroke();
     ctx.restore();
@@ -106,11 +104,10 @@ function writeLabel(ctx, vals, label) {
     ctx.fillStyle = 'white';
     ctx.fillRect(0, 0, vals.w, vals.labelHeight);
     ctx.fillStyle = 'black';
-    // ctx.font = common.mathFont('14px');
-    ctx.font = '18px sans';
+    ctx.font = common.mathFont('18px', false);
     ctx.textAlign = 'center';
     ctx.textBaseline = 'top';
-    ctx.fillText(label, vals.w / 2, 5);
+    ctx.fillText(label, vals.w / 2, 8);
     ctx.restore();
 }
 
@@ -246,14 +243,17 @@ function runMultDemo(ctx, doneCb) {
  */
 function runDivDemo(ctx, doneCb) {
     const vals = preCalcValues(ctx);
-    let a = Math.ceil(Math.random() * (fmath.p-1));
+    let a, b;
+    let refresh = () => {
+        a = Math.ceil(Math.random() * (fmath.p-1));
+        b = fmath.multInverse(a);
+    };
     let cycle = () => {
-        let b = fmath.multInverse(a);
-        writeLabel(ctx, vals,
-            `${a} ${TIMES_STR} ${b} = ${a*b} % ${fmath.p} = ${fmath.reduce(a*b)}, therefore ${a}${INV_STR} is ${b}`);
+        refresh();
+        writeLabel(ctx, vals, `${a} ${TIMES_STR} ${b} = ${a*b} % ${fmath.p} ` +
+            `= ${fmath.reduce(a*b)}, therefore ${a}${INV_STR} is ${b}`);
         mult(ctx, a, b, (c) => {
             if (doneCb) doneCb(a, b, c);
-            a = Math.ceil(Math.random() * (fmath.p));
             setTimeout(cycle, 2000);
         });
     };
@@ -279,7 +279,7 @@ function runSqrtDemo(ctx, doneCb) {
     let cycle = () => {
         refresh();
         writeLabel(ctx, vals, `${b} ${TIMES_STR} ${b} = ${b*b} % ${fmath.p} ` +
-            `= ${fmath.reduce(b*b)}, therefore ${b} is a sqrt(${a})`);
+            `= ${fmath.reduce(b*b)}, therefore ${b} is a square root of ${a}`);
         mult(ctx, b, b, () => {
             if (doneCb) doneCb(a, b);
             setTimeout(cycle, 2000);
