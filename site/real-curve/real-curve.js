@@ -3,14 +3,6 @@ let curveB = 13;
 let baseX = 0.58;
 
 /**
- * Look up the curve params
- * @return {{a: Number, b: Number, P: Point}}
- */
-function params() {
-    return {a: curveA, b: curveB, P: P()};
-}
-
-/**
  * @return {Point} base point
  */
 function P() {
@@ -76,7 +68,6 @@ function slope(P, Q) {
 }
 
 export {
-    params,
     y,
     P,
     add,

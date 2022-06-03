@@ -4,11 +4,10 @@ import * as sample from './ec-samples/sample-draw.js';
 import * as real from './real-curve/real-draw.js';
 import * as common from './common.js';
 import * as field from './field-math/field-draw.js';
-import {startVisibleCanvases} from './common.js';
 
 (async () => {
 
-    let setupScrollListener = () => {
+    function setupScrollListener() {
         let ticking = false;
         function scrollEvent() {
             ticking = false;
@@ -20,10 +19,9 @@ import {startVisibleCanvases} from './common.js';
                 requestAnimationFrame(scrollEvent);
             }
         });
-    };
+    }
 
-
-    let curve25519Setup = async () => {
+    async function curve25519Setup() {
         const canvas = common.byId('canvas-curve25519');
         const ctx = common.convertCanvasHiDPI(canvas);
 
@@ -34,9 +32,9 @@ import {startVisibleCanvases} from './common.js';
             return draw25519.runDemo(ctx, updateCb, () => {}, n, Q);
         };
         await common.addPlayPause(ctx, startDemo, common.cancelAnimation);
-    };
+    }
 
-    let ecSampleSetup = async () => {
+    async function ecSampleSetup() {
         const canvas = common.byId('canvas-ec-sample');
         const ctx = common.convertCanvasHiDPI(canvas);
 
@@ -45,9 +43,9 @@ import {startVisibleCanvases} from './common.js';
             return sample.runDemo(ctx, a, b, (newA, newB) => { [a, b] = [newA, newB] });
         };
         await common.addPlayPause(ctx, startDemo, common.cancelAnimation);
-    };
+    }
 
-    let realAddSetup = async () => {
+    async function realAddSetup() {
         const canvas = common.byId('canvas-real-add');
         const ctx = common.convertCanvasHiDPI(canvas);
         let n = 1;
@@ -57,19 +55,18 @@ import {startVisibleCanvases} from './common.js';
             await real.runAddDemo(ctx, n, Q, update);
         };
         await common.addPlayPause(ctx, startDemo, common.cancelAnimation);
-    };
+    }
 
-    let realAssocSetup = async () => {
+    async function realAssocSetup() {
         const canvas = common.byId('canvas-real-assoc');
         const ctx = common.convertCanvasHiDPI(canvas);
         let startDemo = async () => {
             await real.runAssocDemo(ctx);
         };
         await common.addPlayPause(ctx, startDemo, common.cancelAnimation);
-    };
+    }
 
-
-    let fieldSetup = async () => {
+    async function fieldSetup() {
         let canvas = common.byId('canvas-field-add-sub');
         let ctx = common.convertCanvasHiDPI(canvas);
         await common.addPlayPause(ctx, field.runAddSubDemo, common.cancelAnimation);
@@ -85,17 +82,15 @@ import {startVisibleCanvases} from './common.js';
         canvas = common.byId('canvas-field-sqrt');
         ctx = common.convertCanvasHiDPI(canvas);
         await common.addPlayPause(ctx, field.runSqrtDemo, common.cancelAnimation);
-    };
+    }
 
-
-    let curveSetup = async () => {
+    async function curveSetup() {
         const canvas = common.byId('canvas-curve61-static');
         const ctx = common.convertCanvasHiDPI(canvas);
         await draw.resetGraph(ctx);
-    };
+    }
 
-
-    let addPSetup = async () => {
+    async function addPSetup() {
         const canvas = common.byId('canvas-addp');
         const ctx = common.convertCanvasHiDPI(canvas);
 
@@ -119,9 +114,12 @@ import {startVisibleCanvases} from './common.js';
             return draw.runDemo(ctx, updateCb, drawDoneCb, Q);
         };
         await common.addPlayPause(ctx, startDemo, common.cancelAnimation);
-    };
+    }
 
     async function onload() {
+        while (!window.requestAnimationFrame) {
+            alert('No support for requestAnimationFrame detected!');
+        }
         setupScrollListener();
         await curve25519Setup();
         await ecSampleSetup();
@@ -130,7 +128,7 @@ import {startVisibleCanvases} from './common.js';
         await fieldSetup();
         await curveSetup();
         await addPSetup();
-        startVisibleCanvases();
+        common.startVisibleCanvases();
     }
 
     if (document.readyState === 'complete') {
