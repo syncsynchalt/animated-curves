@@ -26,14 +26,11 @@ function range(first, last) {
 /**
  * Return a good font for displaying math equations.
  * @param size {Number|String} CSS-ready size such as '1em' or '14px'
- * @param oblique {Boolean?} Whether to set the font to italics (default true)
  * @return {string}
  */
-function mathFont(size, oblique) {
+function mathFont(size) {
     size = size || '1em';
-    const style = oblique === false ? '' : 'oblique';
-
-    return `${style} ${size} STIXGeneral, "DejaVu Serif", "DejaVu Sans", Times, ` +
+    return `${size} STIXGeneral, "DejaVu Serif", "DejaVu Sans", Times, ` +
         '"Lucida Sans Unicode", OpenSymbol, "Standard Symbols L", serif';
 }
 
@@ -162,6 +159,17 @@ async function addPlayPause(ctx, playFunc, stopFunc) {
     await addPausedMask(ctx);
 }
 
+function cancelAnimation(ctx) {
+    if (ctx['_timeout']) {
+        clearTimeout(ctx['_timeout']);
+        ctx['_timeout'] = null;
+    }
+    if (ctx['_frame']) {
+        cancelAnimationFrame(ctx['_frame']);
+        ctx['_frame'] = null;
+    }
+}
+
 /**
  * Choose the best direction to write a label for a point (based on amount of clear (white) pixels).
  * @param ctx {CanvasRenderingContext2D}
@@ -229,6 +237,7 @@ export {
     canvasIsScrolledIntoView,
     easeInOut,
     addPlayPause,
+    cancelAnimation,
     pickLabelDirection,
     startVisibleCanvases,
 };

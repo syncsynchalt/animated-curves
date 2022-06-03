@@ -25,12 +25,15 @@ div.container {
 }
 
 .illustration canvas {
-    touch-action: manipulation;
-    user-select: none;
-    -webkit-user-select: none;
     background-color: white;
     border-radius: 10px;
     box-shadow: 1px 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+canvas.animated {
+    touch-action: manipulation;
+    user-select: none;
+    -webkit-user-select: none;
     cursor: pointer;
 }
 

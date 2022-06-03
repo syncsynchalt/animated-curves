@@ -183,7 +183,7 @@ function mutateGraph(state) {
  */
 function writeEquation(ctx, curveData) {
     ctx.save();
-    ctx.font = common.mathFont('1.2em', false);
+    ctx.font = common.mathFont('1.2em');
     ctx.textBaseline = 'top';
     ctx.textAlign = 'left';
     ctx.fillStyle = 'black';
@@ -260,14 +260,6 @@ function appendMorphData(morphMult, data, x, yA, yB) {
     }
 }
 
-let animationFrameInProgress = null;
-let setAnimationFrame = (func) => {
-    if (animationFrameInProgress) {
-        cancelAnimationFrame(animationFrameInProgress);
-    }
-    animationFrameInProgress = func();
-};
-
 /**
  * Draw a morph from one graph dataset to another
  * @param ctx {CanvasRenderingContext2D}
@@ -331,13 +323,12 @@ function morphGraph(ctx, data1, data2, drawDoneCb) {
         if (finished.done) {
             drawDoneCb();
         } else {
-            setAnimationFrame(() => { return requestAnimationFrame(step) });
+            ctx['_frame'] = requestAnimationFrame(step);
         }
     }
-    setAnimationFrame(() => { return requestAnimationFrame(step) });
+    ctx['_frame'] = requestAnimationFrame(step);
 }
 
-let demoTimeout = null;
 /**
  * Run the demo.
  * @param ctx {CanvasRenderingContext2D}
@@ -356,7 +347,7 @@ async function runDemo(ctx, a, b, updateCb) {
             d1 = d2;
             writeEquation(ctx, d1);
             if (common.canvasIsScrolledIntoView(ctx.canvas)) {
-                demoTimeout = setTimeout(step, 2.0 * 1000);
+                ctx['_timeout'] = setTimeout(step, 2.0 * 1000);
             } else {
                 ctx.canvas.click();
             }
@@ -365,17 +356,8 @@ async function runDemo(ctx, a, b, updateCb) {
     await step();
 }
 
-function cancelDemo() {
-    if (demoTimeout) {
-        clearTimeout(demoTimeout);
-        demoTimeout = null;
-    }
-    setAnimationFrame(() => { return null });
-}
-
 export {
     annealGraphData,
     mutateGraph,
     runDemo,
-    cancelDemo,
 };

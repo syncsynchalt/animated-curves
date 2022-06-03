@@ -116,9 +116,6 @@ let drawArrowHeads = (ctx, vals) => {
 let resetSaveState = null;
 
 async function resetGraph(ctx) {
-    if (animationFrameInProgress) {
-        setAnimationFrame(() => { return null });
-    }
     const canvas = ctx.canvas;
     if (resetSaveState) {
         const ratio = canvas._ratio || 1;
@@ -156,13 +153,6 @@ function drawGrid(ctx) {
     drawAxisLines(ctx, vals);
     drawArrowHeads(ctx, vals);
 }
-
-let setAnimationFrame = (func) => {
-    if (animationFrameInProgress) {
-        cancelAnimationFrame(animationFrameInProgress);
-    }
-    animationFrameInProgress = func();
-};
 
 /**
  * @param vals {Object} return from cacheVals
@@ -210,17 +200,12 @@ function drawCurve(ctx) {
     ctx.fillStyle = origFill;
 }
 
-let animationFrameInProgress;
-
 /**
  * @param ctx {CanvasRenderingContext2D}
  * @param Q {Point} the current point 'Q', to which 'P' will be added
  * @param drawDoneCb {Function?} optional callback when done drawing
  */
 async function addP(ctx, Q, drawDoneCb) {
-    if (animationFrameInProgress) {
-        await resetGraph(ctx);
-    }
     const vals = preCalcValues(ctx);
     let start, prev;
 
@@ -398,10 +383,10 @@ async function addP(ctx, Q, drawDoneCb) {
             await resetGraph(ctx);
             drawDot(vals, R.x, R.y, 'red');
         } else if (!cache.stopAnimation) {
-            setAnimationFrame(() => { return requestAnimationFrame(step) });
+            ctx['_frame'] = requestAnimationFrame(step);
         }
     }
-    setAnimationFrame(() => { return requestAnimationFrame(step) });
+    ctx['_frame'] = requestAnimationFrame(step);
     return R;
 }
 
@@ -513,14 +498,12 @@ async function drawInfinity(ctx, P, Q, drawDoneCb) {
         prev = timestamp;
 
         if (!finished.done) {
-            setAnimationFrame(() => { return requestAnimationFrame(step) });
+            ctx['_frame'] = requestAnimationFrame(step);
         }
     }
-    setAnimationFrame(() => { return requestAnimationFrame(step) });
+    ctx['_frame'] = requestAnimationFrame(step);
     return R;
 }
-
-let demoTimeout = null;
 
 /**
  * @param ctx
@@ -534,7 +517,7 @@ async function runDemo(ctx, updateCb, drawDoneCb, Q) {
         Q = await addP(ctx, Q, (R) => {
             if (drawDoneCb) drawDoneCb(R);
             if (common.canvasIsScrolledIntoView(ctx.canvas)) {
-                demoTimeout = setTimeout(() => { next() }, 1.5 * 1000);
+                ctx['_timeout'] = setTimeout(() => { next() }, 1.5 * 1000);
                 return true;
             } else {
                 ctx.canvas.click();
@@ -546,18 +529,9 @@ async function runDemo(ctx, updateCb, drawDoneCb, Q) {
     await next();
 }
 
-function cancelDemo() {
-    if (demoTimeout) {
-        clearTimeout(demoTimeout);
-        demoTimeout = null;
-    }
-    setAnimationFrame(() => { return null });
-}
-
 export {
     INFINITY,
     resetGraph,
     addP,
     runDemo,
-    cancelDemo,
 };

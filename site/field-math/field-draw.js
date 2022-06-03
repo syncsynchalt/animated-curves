@@ -104,7 +104,7 @@ function writeLabel(ctx, vals, label) {
     ctx.fillStyle = 'white';
     ctx.fillRect(0, 0, vals.w, vals.labelHeight);
     ctx.fillStyle = 'black';
-    ctx.font = common.mathFont('18px', false);
+    ctx.font = common.mathFont('18px');
     ctx.textAlign = 'center';
     ctx.textBaseline = 'top';
     ctx.fillText(label, vals.w / 2, 6);
@@ -304,21 +304,9 @@ function runSqrtDemo(ctx, doneCb) {
     cycle();
 }
 
-function cancelDemo(ctx) {
-    if (ctx['_timeout']) {
-        clearTimeout(ctx['_timeout']);
-        ctx['_timeout'] = null;
-    }
-    if (ctx['_frame']) {
-        cancelAnimationFrame(ctx['_frame']);
-        ctx['_frame'] = null;
-    }
-}
-
 export {
     runAddSubDemo,
     runMultDemo,
     runDivDemo,
     runSqrtDemo,
-    cancelDemo,
 };

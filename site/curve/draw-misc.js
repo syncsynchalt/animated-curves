@@ -108,7 +108,6 @@ function segmentLen(P, Q) {
     return Math.sqrt((P.x - Q.x)**2 + (P.y - Q.y)**2);
 }
 
-
 export {
     lineBoxBounds,
     getSlope,

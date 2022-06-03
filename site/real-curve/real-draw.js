@@ -228,31 +228,6 @@ function plotNPs(ctx, vals, color, ...nVals) {
 }
 
 /**
- * @param ctx {CanvasRenderingContext2D}
- * @param func {Function}
- */
-let setAnimationFrame = (ctx, func) => {
-    if (ctx['_animationFrame']) {
-        cancelAnimationFrame(ctx['_animationFrame']);
-    }
-    ctx['_animationFrame'] = func();
-};
-
-/**
- * @param ctx {CanvasRenderingContext2D}
- */
-function cancelDemo(ctx) {
-    if (ctx['_demoTimeout']) {
-        clearTimeout(ctx['_demoTimeout']);
-        ctx['_demoTimeout'] = null;
-    }
-    if (ctx['_animationFrame']) {
-        cancelAnimationFrame(ctx['_animationFrame']);
-        setAnimationFrame(ctx, () => { return null });
-    }
-}
-
-/**
  * Return the x bounds of a line drawn through P and Q
  * @param vals {Object} result from preCalcValues()
  * @param P {Point}
@@ -422,10 +397,10 @@ async function addPoints(ctx, nP, P, nQ, Q, drawDoneCb) {
         prev = timestamp;
 
         if (!finished.done) {
-            setAnimationFrame(ctx, () => { return requestAnimationFrame(step) });
+            ctx['_frame'] = requestAnimationFrame(step);
         }
     }
-    setAnimationFrame(ctx, () => { return requestAnimationFrame(step) });
+    ctx['_frame'] = requestAnimationFrame(step);
     return R;
 }
 
@@ -438,7 +413,6 @@ async function addPoints(ctx, nP, P, nQ, Q, drawDoneCb) {
  * @param drawDoneCb {Function?} called when each animation is finished
  */
 async function runAddDemo(ctx, n, Q, updateCb, drawDoneCb) {
-    cancelDemo(ctx);
     const wrapAfter = 8;
     const vals = preCalcValues(ctx);
     const P = curve.P();
@@ -449,13 +423,13 @@ async function runAddDemo(ctx, n, Q, updateCb, drawDoneCb) {
         if (n >= wrapAfter) {
             n = 1;
             Q = curve.P();
-            ctx['_demoTimeout'] = setTimeout(next, 1.5 * 1000);
+            ctx['_timeout'] = setTimeout(next, 1.5 * 1000);
         } else {
             Q = await addPoints(ctx, 1, P, n, Q, (nR, R) => {
                 plotNPs(ctx, vals, 'red', nR);
                 if (drawDoneCb) drawDoneCb(nR, R);
                 if (common.canvasIsScrolledIntoView(ctx.canvas)) {
-                    ctx['_demoTimeout'] = setTimeout(next, 1.5 * 1000);
+                    ctx['_timeout'] = setTimeout(next, 1.5 * 1000);
                 } else {
                     ctx.canvas.click();
                 }
@@ -493,7 +467,6 @@ function writeAssocEquation(ctx, vals, np, nq, nr) {
  * @param drawDoneCb {Function?} called when each animation is finished
  */
 async function runAssocDemo(ctx, updateCb, drawDoneCb) {
-    cancelDemo(ctx);
     const vals = preCalcValues(ctx);
 
     let points = [null];
@@ -521,7 +494,7 @@ async function runAssocDemo(ctx, updateCb, drawDoneCb) {
         const R = await addPoints(ctx, nU, U, nV, V, (nR, R) => {
             if (drawDoneCb) drawDoneCb(nR, R);
             if (common.canvasIsScrolledIntoView(ctx.canvas)) {
-                ctx['_demoTimeout'] = setTimeout(next, 1.8 * 1000);
+                ctx['_timeout'] = setTimeout(next, 1.8 * 1000);
             } else {
                 ctx.canvas.click();
             }
@@ -534,7 +507,6 @@ async function runAssocDemo(ctx, updateCb, drawDoneCb) {
 export {
     drawCurve,
     plotNPs,
-    cancelDemo,
     runAddDemo,
     runAssocDemo,
 };

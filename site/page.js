@@ -10,12 +10,10 @@ import {startVisibleCanvases} from './common.js';
 
     let setupScrollListener = () => {
         let ticking = false;
-
         function scrollEvent() {
             ticking = false;
             common.startVisibleCanvases();
         }
-
         document.addEventListener('scroll', () => {
             if (!ticking) {
                 ticking = true;
@@ -32,11 +30,10 @@ import {startVisibleCanvases} from './common.js';
         let n = 1;
         let Q = draw25519.P;
         const startDemo = () => {
-            draw25519.cancelDemo();
             let updateCb = (R) => { n++; Q = R };
             return draw25519.runDemo(ctx, updateCb, () => {}, n, Q);
         };
-        await common.addPlayPause(ctx, startDemo, draw25519.cancelDemo);
+        await common.addPlayPause(ctx, startDemo, common.cancelAnimation);
     };
 
     let ecSampleSetup = async () => {
@@ -47,7 +44,7 @@ import {startVisibleCanvases} from './common.js';
         const startDemo = async () => {
             return sample.runDemo(ctx, a, b, (newA, newB) => { [a, b] = [newA, newB] });
         };
-        await common.addPlayPause(ctx, startDemo, sample.cancelDemo);
+        await common.addPlayPause(ctx, startDemo, common.cancelAnimation);
     };
 
     let realAddSetup = async () => {
@@ -59,7 +56,7 @@ import {startVisibleCanvases} from './common.js';
             let update = (nR, R) => { n = nR; Q = R };
             await real.runAddDemo(ctx, n, Q, update);
         };
-        await common.addPlayPause(ctx, startDemo, real.cancelDemo);
+        await common.addPlayPause(ctx, startDemo, common.cancelAnimation);
     };
 
     let realAssocSetup = async () => {
@@ -68,26 +65,26 @@ import {startVisibleCanvases} from './common.js';
         let startDemo = async () => {
             await real.runAssocDemo(ctx);
         };
-        await common.addPlayPause(ctx, startDemo, real.cancelDemo);
+        await common.addPlayPause(ctx, startDemo, common.cancelAnimation);
     };
 
 
     let fieldSetup = async () => {
         let canvas = common.byId('canvas-field-add-sub');
         let ctx = common.convertCanvasHiDPI(canvas);
-        await common.addPlayPause(ctx, field.runAddSubDemo, field.cancelDemo);
+        await common.addPlayPause(ctx, field.runAddSubDemo, common.cancelAnimation);
 
         canvas = common.byId('canvas-field-mult');
         ctx = common.convertCanvasHiDPI(canvas);
-        await common.addPlayPause(ctx, field.runMultDemo, field.cancelDemo);
+        await common.addPlayPause(ctx, field.runMultDemo, common.cancelAnimation);
 
         canvas = common.byId('canvas-field-div');
         ctx = common.convertCanvasHiDPI(canvas);
-        await common.addPlayPause(ctx, field.runDivDemo, field.cancelDemo);
+        await common.addPlayPause(ctx, field.runDivDemo, common.cancelAnimation);
 
         canvas = common.byId('canvas-field-sqrt');
         ctx = common.convertCanvasHiDPI(canvas);
-        await common.addPlayPause(ctx, field.runSqrtDemo, field.cancelDemo);
+        await common.addPlayPause(ctx, field.runSqrtDemo, common.cancelAnimation);
     };
 
 
@@ -117,13 +114,11 @@ import {startVisibleCanvases} from './common.js';
         };
 
         const startDemo = async () => {
-            draw.cancelDemo();
-            await draw.resetGraph(ctx);
             let drawDoneCb = (R) => { setPageStuff(R) };
             let updateCb = (R) => { Q = R; n++ };
             return draw.runDemo(ctx, updateCb, drawDoneCb, Q);
         };
-        await common.addPlayPause(ctx, startDemo, draw.cancelDemo);
+        await common.addPlayPause(ctx, startDemo, common.cancelAnimation);
     };
 
     async function onload() {

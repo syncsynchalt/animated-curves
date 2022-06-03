@@ -98,9 +98,6 @@ async function resetGraph(ctx, vals) {
     if (!vals) {
         vals = preCalcValues(ctx);
     }
-    if (animationFrameInProgress) {
-        setAnimationFrame(() => { return null });
-    }
     const canvas = ctx.canvas;
     const ratio = vals.ratio;
     ctx.fillStyle = 'white';
@@ -197,18 +194,6 @@ function writeCoordinates(ctx, vals, x, y) {
 }
 
 /**
- * @param func {Function} function to set or clear animation frame value
- */
-let setAnimationFrame = (func) => {
-    if (animationFrameInProgress) {
-        cancelAnimationFrame(animationFrameInProgress);
-    }
-    animationFrameInProgress = func();
-};
-
-let animationFrameInProgress;
-
-/**
  * @param ctx {CanvasRenderingContext2D}
  * @param n {Number} the NP of current point 'Q'
  * @param Q {BigPoint} the current point 'Q', to which 'P' will be added
@@ -281,14 +266,12 @@ async function addP(ctx, n, Q, drawDoneCb) {
         if (finished.done) {
             drawDoneCb(n+1, R);
         } else {
-            setAnimationFrame(() => { return requestAnimationFrame(step) });
+            ctx['_frame'] = requestAnimationFrame(step);
         }
     }
-    setAnimationFrame(() => { return requestAnimationFrame(step) });
+    ctx['_frame'] = requestAnimationFrame(step);
     return R;
 }
-
-let demoTimeout = null;
 
 /**
  * @param ctx
@@ -308,7 +291,7 @@ async function runDemo(ctx, updateCb, drawDoneCb, n, Q) {
             Q = R;
             if (drawDoneCb) drawDoneCb(R);
             if (common.canvasIsScrolledIntoView(ctx.canvas)) {
-                demoTimeout = setTimeout(() => { next() }, .5 * 1000);
+                ctx['_timeout'] = setTimeout(() => { next() }, .5 * 1000);
                 return true;
             } else {
                 ctx.canvas.click();
@@ -320,18 +303,9 @@ async function runDemo(ctx, updateCb, drawDoneCb, n, Q) {
     await next();
 }
 
-function cancelDemo() {
-    if (demoTimeout) {
-        clearTimeout(demoTimeout);
-        demoTimeout = null;
-    }
-    setAnimationFrame(() => { return null });
-}
-
 const P = curve.P();
 
 export {
     P,
     runDemo,
-    cancelDemo,
 };
