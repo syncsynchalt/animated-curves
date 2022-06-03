@@ -89,18 +89,8 @@ function easeInOut(t) {
     return sq / (2 * (sq - t) + 1);
 }
 
-/**
- * Mask the canvas with a "Play" button, and attach a clickable play function.
- * @param ctx {CanvasRenderingContext2D}
- * @param playFunc {Function}
- */
-async function addPlayMask(ctx, playFunc) {
+async function addPausedMask(ctx) {
     const canvas = ctx.canvas;
-    if (canvas._hasPlayMask) {
-        return;
-    }
-    canvas._hasPlayMask = true;
-    const origOnClick = canvas.onclick;
     const ratio = canvas._ratio || 1;
     const brightness = 0.96;
 
@@ -132,13 +122,6 @@ async function addPlayMask(ctx, playFunc) {
         await p;
     }
 
-    canvas.onclick = (e) => {
-        canvas._hasPlayMask = false;
-        e.stopPropagation();
-        canvas.onclick = origOnClick;
-        playFunc(canvas);
-    };
-
     ctx.save();
     ctx.beginPath();
     const w = canvas.width / ratio, h = canvas.height / ratio;
@@ -152,6 +135,30 @@ async function addPlayMask(ctx, playFunc) {
     ctx.strokeStyle = 'rgba(0, 0, 0, 0.3)';
     ctx.stroke();
     ctx.restore();
+}
+
+/**
+ * Add a click action that plays/pauses the animation.
+ * @param ctx {CanvasRenderingContext2D}
+ * @param playFunc {Function}
+ * @param stopFunc {Function}
+ */
+async function addPlayPause(ctx, playFunc, stopFunc) {
+    ctx.canvas.onclick = (e) => {
+        if (e) {
+            e.stopPropagation();
+        }
+        if (ctx.canvas['data-paused']) {
+            ctx.canvas['data-paused'] = false;
+            playFunc(ctx);
+        } else {
+            ctx.canvas['data-paused'] = true;
+            stopFunc(ctx);
+            addPausedMask(ctx);
+        }
+    };
+    ctx.canvas['data-paused'] = true;
+    await addPausedMask(ctx);
 }
 
 /**
@@ -198,6 +205,6 @@ export {
     convertCanvasHiDPI,
     canvasIsScrolledIntoView,
     easeInOut,
-    addPlayMask,
+    addPlayPause,
     pickLabelDirection,
 };

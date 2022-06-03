@@ -358,10 +358,7 @@ async function runDemo(ctx, a, b, updateCb) {
             if (common.canvasIsScrolledIntoView(ctx.canvas)) {
                 demoTimeout = setTimeout(step, 2.0 * 1000);
             } else {
-                cancelDemo();
-                await common.addPlayMask(ctx, () => {
-                    runDemo(ctx, state.a, state.b, updateCb);
-                });
+                ctx.canvas.click();
             }
         });
     };

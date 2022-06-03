@@ -537,10 +537,7 @@ async function runDemo(ctx, updateCb, drawDoneCb, Q) {
                 demoTimeout = setTimeout(() => { next() }, 1.5 * 1000);
                 return true;
             } else {
-                cancelDemo();
-                common.addPlayMask(ctx, () => {
-                    runDemo(ctx, updateCb, drawDoneCb, Q);
-                });
+                ctx.canvas.click();
                 return false;
             }
         });

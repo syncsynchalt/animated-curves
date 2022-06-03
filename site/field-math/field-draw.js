@@ -207,9 +207,13 @@ function runAddSubDemo(ctx, doneCb) {
         writeLabel(ctx, vals, `${a} ${s(b)} ${Math.abs(b)} = ${a+b} % ${fmath.p} = ${fmath.reduce(a+b)}`);
         addSub(ctx, a, b, (c) => {
             if (doneCb) doneCb(a, b, c);
-            a = c;
-            b = r(a);
-            setTimeout(cycle, 2000);
+            if (common.canvasIsScrolledIntoView(ctx.canvas)) {
+                a = c;
+                b = r(a);
+                setTimeout(cycle, 2000);
+            } else {
+                ctx.canvas.click();
+            }
         });
     };
     cycle();
@@ -228,9 +232,13 @@ function runMultDemo(ctx, doneCb) {
         writeLabel(ctx, vals, `${a} ${TIMES_STR} ${b} = ${a*b} % ${fmath.p} = ${fmath.reduce(a*b)}`);
         mult(ctx, a, b, (c) => {
             if (doneCb) doneCb(a, b, c);
-            a = r();
-            b = r();
-            setTimeout(cycle, 2000);
+            if (common.canvasIsScrolledIntoView(ctx.canvas)) {
+                a = r();
+                b = r();
+                setTimeout(cycle, 2000);
+            } else {
+                ctx.canvas.click();
+            }
         });
     };
     cycle();
@@ -254,7 +262,11 @@ function runDivDemo(ctx, doneCb) {
             `= ${fmath.reduce(a*b)}, therefore ${a}${INV_STR} is ${b}`);
         mult(ctx, a, b, (c) => {
             if (doneCb) doneCb(a, b, c);
-            setTimeout(cycle, 3000);
+            if (common.canvasIsScrolledIntoView(ctx.canvas)) {
+                setTimeout(cycle, 3000);
+            } else {
+                ctx.canvas.click();
+            }
         });
     };
     cycle();
@@ -282,7 +294,11 @@ function runSqrtDemo(ctx, doneCb) {
             `= ${fmath.reduce(b*b)}, therefore ${b} is a square root of ${a}`);
         mult(ctx, b, b, () => {
             if (doneCb) doneCb(a, b);
-            setTimeout(cycle, 3000);
+            if (common.canvasIsScrolledIntoView(ctx.canvas)) {
+                setTimeout(cycle, 3000);
+            } else {
+                ctx.canvas.click();
+            }
         });
     };
     cycle();

@@ -13,18 +13,12 @@ import * as field from './field-math/field-draw.js';
 
         let n = 1;
         let Q = draw25519.P;
-
         const startDemo = () => {
             draw25519.cancelDemo();
             let updateCb = (R) => { n++; Q = R };
             return draw25519.runDemo(ctx, updateCb, () => {}, n, Q);
         };
-        canvas.onclick = async () => {
-            draw25519.cancelDemo();
-            await common.addPlayMask(ctx, async () => { await startDemo() });
-        };
-
-        await startDemo();
+        await common.addPlayPause(ctx, startDemo, draw25519.cancelDemo);
     };
 
     let ecSampleSetup = async () => {
@@ -35,12 +29,7 @@ import * as field from './field-math/field-draw.js';
         const startDemo = async () => {
             return sample.runDemo(ctx, a, b, (newA, newB) => { [a, b] = [newA, newB] });
         };
-        canvas.onclick = async () => {
-            sample.cancelDemo();
-            await common.addPlayMask(ctx, async () => { await startDemo() });
-        };
-
-        await startDemo();
+        await common.addPlayPause(ctx, startDemo, sample.cancelDemo);
     };
 
     let realAddSetup = async () => {
@@ -52,12 +41,7 @@ import * as field from './field-math/field-draw.js';
             let update = (nR, R) => { n = nR; Q = R };
             await real.runAddDemo(ctx, n, Q, update);
         };
-
-        canvas.onclick = async () => {
-            real.cancelDemo(ctx);
-            await common.addPlayMask(ctx, () => { startDemo() });
-        };
-        await common.addPlayMask(ctx, () => { startDemo() });
+        await common.addPlayPause(ctx, startDemo, real.cancelDemo);
     };
 
     let realAssocSetup = async () => {
@@ -66,31 +50,26 @@ import * as field from './field-math/field-draw.js';
         let startDemo = async () => {
             await real.runAssocDemo(ctx);
         };
-
-        canvas.onclick = async () => {
-            real.cancelDemo(ctx);
-            await common.addPlayMask(ctx, () => { startDemo() });
-        };
-        await common.addPlayMask(ctx, () => { startDemo() });
+        await common.addPlayPause(ctx, startDemo, real.cancelDemo);
     };
 
 
     let fieldSetup = async () => {
         let canvas = common.byId('canvas-field-add-sub');
         let ctx = common.convertCanvasHiDPI(canvas);
-        await field.runAddSubDemo(ctx);
+        await common.addPlayPause(ctx, field.runAddSubDemo, field.cancelDemo);
 
         canvas = common.byId('canvas-field-mult');
         ctx = common.convertCanvasHiDPI(canvas);
-        await field.runMultDemo(ctx);
+        await common.addPlayPause(ctx, field.runMultDemo, field.cancelDemo);
 
         canvas = common.byId('canvas-field-div');
         ctx = common.convertCanvasHiDPI(canvas);
-        await field.runDivDemo(ctx);
+        await common.addPlayPause(ctx, field.runDivDemo, field.cancelDemo);
 
         canvas = common.byId('canvas-field-sqrt');
         ctx = common.convertCanvasHiDPI(canvas);
-        await field.runSqrtDemo(ctx);
+        await common.addPlayPause(ctx, field.runSqrtDemo, field.cancelDemo);
     };
 
 
@@ -104,7 +83,6 @@ import * as field from './field-math/field-draw.js';
     let addPSetup = async () => {
         const canvas = common.byId('canvas-addp');
         const ctx = common.convertCanvasHiDPI(canvas);
-        await draw.resetGraph(ctx);
 
         let pointDesc = (p) => {
             if (p === undefined) return '...';
@@ -127,11 +105,7 @@ import * as field from './field-math/field-draw.js';
             let updateCb = (R) => { Q = R; n++ };
             return draw.runDemo(ctx, updateCb, drawDoneCb, Q);
         };
-        canvas.onclick = async () => {
-            draw.cancelDemo();
-            await common.addPlayMask(ctx, () => { startDemo() });
-        };
-        await common.addPlayMask(ctx, () => { startDemo() });
+        await common.addPlayPause(ctx, startDemo, draw.cancelDemo);
     };
 
     async function onload() {

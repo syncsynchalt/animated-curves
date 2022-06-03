@@ -230,6 +230,8 @@ async function addP(ctx, n, Q, drawDoneCb) {
         return timestamp - started[state];
     };
 
+    writeCoordinates(ctx, vals, Q.x, Q.y);
+
     async function step(timestamp) {
         if (!start) {
             start = timestamp;
@@ -302,10 +304,7 @@ async function runDemo(ctx, updateCb, drawDoneCb, n, Q) {
                 demoTimeout = setTimeout(() => { next() }, .5 * 1000);
                 return true;
             } else {
-                cancelDemo();
-                common.addPlayMask(ctx, () => {
-                    runDemo(ctx, updateCb, drawDoneCb, n, Q);
-                });
+                ctx.canvas.click();
                 return false;
             }
         });

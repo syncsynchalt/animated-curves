@@ -457,10 +457,7 @@ async function runAddDemo(ctx, n, Q, updateCb, drawDoneCb) {
                 if (common.canvasIsScrolledIntoView(ctx.canvas)) {
                     ctx['_demoTimeout'] = setTimeout(next, 1.5 * 1000);
                 } else {
-                    cancelDemo(ctx);
-                    common.addPlayMask(ctx, () => {
-                        runAddDemo(ctx, nR, R, updateCb, drawDoneCb);
-                    });
+                    ctx.canvas.click();
                 }
             });
             n++;
@@ -526,10 +523,7 @@ async function runAssocDemo(ctx, updateCb, drawDoneCb) {
             if (common.canvasIsScrolledIntoView(ctx.canvas)) {
                 ctx['_demoTimeout'] = setTimeout(next, 1.8 * 1000);
             } else {
-                cancelDemo(ctx);
-                common.addPlayMask(ctx, () => {
-                    runAssocDemo(ctx, updateCb, drawDoneCb);
-                });
+                ctx.canvas.click();
             }
         });
         if (updateCb) updateCb(nU, U, nV, V, nU + nV, R);
