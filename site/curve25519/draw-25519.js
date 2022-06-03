@@ -6,7 +6,8 @@ const TWO_PI = 2*Math.PI;
 
 /** @param ctx {CanvasRenderingContext2D} */
 function preCalcValues(ctx) {
-    const labelSpace = 36;
+    const ratio = ctx.canvas['_ratio'] || 1;
+    const labelSpace = 26;
     const marginWide = 16;
     const marginThin = 10;
     const dotRadius = 2.5;
@@ -15,7 +16,7 @@ function preCalcValues(ctx) {
     const fieldW = BigInt(ctx.canvas.getBoundingClientRect().width - marginWide - marginThin);
     const fieldH = BigInt(ctx.canvas.getBoundingClientRect().height - marginThin - marginWide - labelSpace);
     return {
-        ctx, labelSpace, marginWide, marginThin, w, h, fieldW, fieldH, dotRadius
+        ctx, ratio, labelSpace, marginWide, marginThin, w, h, fieldW, fieldH, dotRadius
     };
 }
 
@@ -101,7 +102,7 @@ async function resetGraph(ctx, vals) {
         setAnimationFrame(() => { return null });
     }
     const canvas = ctx.canvas;
-    const ratio = canvas._ratio || 1;
+    const ratio = vals.ratio;
     ctx.fillStyle = 'white';
     ctx.fillRect(0, 0, canvas.width / ratio, canvas.height / ratio - vals.labelSpace);
     drawGrid(ctx);
@@ -177,15 +178,21 @@ function labelPoint(ctx, vals, n, x, y) {
  * @param y {BigInt}
  */
 function writeCoordinates(ctx, vals, x, y) {
+    const wipeHeight = 32;
+    const wipeWidth = (vals.w - 80);
     ctx.save();
     ctx.fillStyle = 'white';
-    ctx.fillRect(0, vals.h - vals.labelSpace, vals.w, vals.labelSpace);
+    ctx.fillRect((vals.w - wipeWidth) / 2, vals.h - wipeHeight, wipeWidth, wipeHeight);
     ctx.font = '10px monospace';
     ctx.textBaseline = 'bottom';
     ctx.textAlign = 'left';
     ctx.fillStyle = 'black';
-    ctx.fillText(`x=0x${x.toString(16)}`, 42, vals.h - 20);
-    ctx.fillText(`y=0x${y.toString(16)}`, 42, vals.h - 6);
+    /** @param n {BigInt} */
+    let padHex = (n) => {
+        return '0x' + n.toString(16).padStart(64, '0');
+    };
+    ctx.fillText(`x=${padHex(x)}`, 42, vals.h - 20);
+    ctx.fillText(`y=${padHex(y)}`, 42, vals.h - 6);
     ctx.restore();
 }
 

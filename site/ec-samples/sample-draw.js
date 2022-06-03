@@ -183,7 +183,7 @@ function mutateGraph(state) {
  */
 function writeEquation(ctx, curveData) {
     ctx.save();
-    ctx.font = common.mathFont('1.2em');
+    ctx.font = common.mathFont('1.2em', false);
     ctx.textBaseline = 'top';
     ctx.textAlign = 'left';
     ctx.fillStyle = 'black';

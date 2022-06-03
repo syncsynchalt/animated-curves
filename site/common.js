@@ -148,16 +148,17 @@ async function addPlayPause(ctx, playFunc, stopFunc) {
         if (e) {
             e.stopPropagation();
         }
-        if (ctx.canvas['data-paused']) {
-            ctx.canvas['data-paused'] = false;
+        if (ctx.canvas.dataset.paused === 'true') {
+            ctx.canvas.dataset.paused = 'false';
             playFunc(ctx);
         } else {
-            ctx.canvas['data-paused'] = true;
+            ctx.canvas.dataset.paused = 'true';
             stopFunc(ctx);
             addPausedMask(ctx);
         }
     };
-    ctx.canvas['data-paused'] = true;
+    ctx.canvas.dataset.paused = 'true';
+    ctx.canvas.dataset.clickable = 'true';
     await addPausedMask(ctx);
 }
 
@@ -197,6 +198,28 @@ function pickLabelDirection(ctx, x, y, sampleWidth, sampleMargin) {
     return bestDir;
 }
 
+let clickableCanvases;
+function startVisibleCanvases() {
+    if (!clickableCanvases) {
+        clickableCanvases = [].slice.call(document.querySelectorAll('canvas.animated'));
+    }
+    let dirty = false;
+    for (let canvas of clickableCanvases) {
+        if (!canvas.dataset.autostarted) {
+            if (canvasIsScrolledIntoView(canvas)) {
+                dirty = true;
+                canvas.dataset.autostarted = 'true';
+                canvas.click();
+            }
+        }
+    }
+    if (dirty) {
+        clickableCanvases = clickableCanvases.filter(el => {
+            return el.dataset.autostarted !== 'true';
+        });
+    }
+}
+
 export {
     byId,
     range,
@@ -207,4 +230,5 @@ export {
     easeInOut,
     addPlayPause,
     pickLabelDirection,
+    startVisibleCanvases,
 };

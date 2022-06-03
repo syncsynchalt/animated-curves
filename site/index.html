@@ -24,8 +24,7 @@
 <figure class="illustration">
 <div class="ill-content">
 <div>
-    <canvas id="canvas-curve25519" width="500" height="300">
-    </canvas>
+    <canvas id="canvas-curve25519" class="animated" width="500" height="300"></canvas>
 </div>
 </div>
     <figcaption>Fig. 1: Curve25519 point multiplication</figcaption>
@@ -45,8 +44,7 @@
 <figure class="illustration">
 <div class="ill-content">
 <div>
-<canvas id="canvas-ec-sample" width="500" height="300">
-</canvas>
+<canvas id="canvas-ec-sample" class="animated" width="500" height="300"></canvas>
 </div>
 </div>
     <figcaption>Fig. 2: Examples of elliptic curves</figcaption>
@@ -75,8 +73,7 @@
 </ul>
 <figure class="illustration">
 <div class="ill-content">
-<canvas id="canvas-real-add" height="400" width="500">
-</canvas>
+<canvas id="canvas-real-add" class="animated" height="400" width="500"></canvas>
 </div>
     <figcaption>Fig. 3: Repeated addition of a point P</figcaption>
 </figure>
@@ -96,7 +93,7 @@
 
 <figure class="illustration">
 <div class="ill-content">
-<canvas id="canvas-real-assoc" width="500" height="400"></canvas>
+<canvas id="canvas-real-assoc" class="animated" width="500" height="400"></canvas>
 </div>
     <figcaption>Fig. 4: Point addition is associative and commutative</figcaption>
 </figure>
@@ -117,7 +114,7 @@
 <p>
 Adding and subtracting in finite fields is pretty simple. Values of 23 and over will "wrap around" to zero, and values less
 than zero will wrap around to 22:
-<canvas class="numline" id="canvas-field-add-sub" width="500" height="80"></canvas>
+<canvas class="numline animated" id="canvas-field-add-sub" width="500" height="80"></canvas>
 
 <p>You might also know this as "modulo 23", or as the remainder after dividing a number by 23.
 
@@ -125,7 +122,7 @@ than zero will wrap around to 22:
 <p>
 Multiplication is also straightforward. Similar to addition, the result is taken modulo 23:
 
-<canvas class="numline" id="canvas-field-mult" width="500" height="80"></canvas>
+<canvas class="numline animated" id="canvas-field-mult" width="500" height="80"></canvas>
 
 <h4>Division (multiplicative inverse)</h4>
 <p>
@@ -143,7 +140,7 @@ Let's use a slightly different notation for <span class="math">1/n</span> which 
     by whatever number <span class="math">n<sup>-1</sup></span> multiplied by <span class="math">n</span> equals 1.
     In the finite field multiplication that we've defined above, this is a positive integer number.
     There's exactly one solution to this problem for each non-zero integer in <span class="fat-fp">Fp</span>:
-<canvas class="numline" id="canvas-field-div" width="500" height="80"></canvas>
+<canvas class="numline animated" id="canvas-field-div" width="500" height="80"></canvas>
 
 <p>
 The inverse for each number in <span class="fat-fp-23">F23</span> is provided <a target="_blank" href="inverse23.html">in a table</a>.
@@ -156,7 +153,7 @@ The inverse for each number in <span class="fat-fp-23">F23</span> is provided <a
 <div class="math text-center">
     sqrt(n) &times; sqrt(n) = n
 </div>
-<canvas class="numline" id="canvas-field-sqrt" width="500" height="80"></canvas>
+<canvas class="numline animated" id="canvas-field-sqrt" width="500" height="80"></canvas>
 <p>
 In real numbers, there are two solutions to this problem (positive and negative).
 Similarly in <span class="fat-fp">Fp</span> there are two solutions
@@ -228,9 +225,12 @@ and working through each number in <span class="fat-fp-61">F61</span>:
 
 <p>
 The result is this:
-<div>
-<canvas id="canvas-curve61-static" width="500" height="400"></canvas>
-</div>
+<figure class="illustration">
+    <div class="ill-content">
+    <canvas id="canvas-curve61-static" width="500" height="400"></canvas>
+    </div>
+    <figcaption>Fig. 5: An elliptic curve plotted in <span class="fat-fp-61">Fp</span></figcaption>
+</figure>
 
 </div>
 
@@ -250,7 +250,7 @@ The result is this:
 <figure class="illustration">
 <div class="ill-content">
 <div>
-    <canvas id="canvas-addp" width="500" height="400"></canvas>
+    <canvas class="animated" id="canvas-addp" width="500" height="400"></canvas>
 </div>
 <span>Base point <span class="point-p">P</span> is:
     <span class="x-point-p">(7, 4)</span></span>

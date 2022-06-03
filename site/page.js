@@ -4,8 +4,26 @@ import * as sample from './ec-samples/sample-draw.js';
 import * as real from './real-curve/real-draw.js';
 import * as common from './common.js';
 import * as field from './field-math/field-draw.js';
+import {startVisibleCanvases} from './common.js';
 
 (async () => {
+
+    let setupScrollListener = () => {
+        let ticking = false;
+
+        function scrollEvent() {
+            ticking = false;
+            common.startVisibleCanvases();
+        }
+
+        document.addEventListener('scroll', () => {
+            if (!ticking) {
+                ticking = true;
+                requestAnimationFrame(scrollEvent);
+            }
+        });
+    };
+
 
     let curve25519Setup = async () => {
         const canvas = common.byId('canvas-curve25519');
@@ -109,6 +127,7 @@ import * as field from './field-math/field-draw.js';
     };
 
     async function onload() {
+        setupScrollListener();
         await curve25519Setup();
         await ecSampleSetup();
         await realAddSetup();
@@ -116,6 +135,7 @@ import * as field from './field-math/field-draw.js';
         await fieldSetup();
         await curveSetup();
         await addPSetup();
+        startVisibleCanvases();
     }
 
     if (document.readyState === 'complete') {

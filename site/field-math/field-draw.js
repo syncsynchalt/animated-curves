@@ -139,10 +139,10 @@ async function addSub(ctx, a, b, drawDoneCb) {
         if (mult >= 1.0) {
             if (drawDoneCb) drawDoneCb(c);
         } else {
-            requestAnimationFrame(step);
+            ctx['_frame'] = requestAnimationFrame(step);
         }
     }
-    requestAnimationFrame(step);
+    ctx['_frame'] = requestAnimationFrame(step);
     return c;
 }
 
@@ -176,10 +176,10 @@ async function mult(ctx, a, b, drawDoneCb) {
         if (mult >= 1.0) {
             if (drawDoneCb) drawDoneCb(c);
         } else {
-            requestAnimationFrame(step);
+            ctx['_frame'] = requestAnimationFrame(step);
         }
     }
-    requestAnimationFrame(step);
+    ctx['_frame'] = requestAnimationFrame(step);
     return c;
 }
 
@@ -210,7 +210,7 @@ function runAddSubDemo(ctx, doneCb) {
             if (common.canvasIsScrolledIntoView(ctx.canvas)) {
                 a = c;
                 b = r(a);
-                setTimeout(cycle, 2000);
+                ctx['_timeout'] = setTimeout(cycle, 2000);
             } else {
                 ctx.canvas.click();
             }
@@ -235,7 +235,7 @@ function runMultDemo(ctx, doneCb) {
             if (common.canvasIsScrolledIntoView(ctx.canvas)) {
                 a = r();
                 b = r();
-                setTimeout(cycle, 2000);
+                ctx['_timeout'] = setTimeout(cycle, 2000);
             } else {
                 ctx.canvas.click();
             }
@@ -263,7 +263,7 @@ function runDivDemo(ctx, doneCb) {
         mult(ctx, a, b, (c) => {
             if (doneCb) doneCb(a, b, c);
             if (common.canvasIsScrolledIntoView(ctx.canvas)) {
-                setTimeout(cycle, 3000);
+                ctx['_timeout'] = setTimeout(cycle, 3000);
             } else {
                 ctx.canvas.click();
             }
@@ -295,7 +295,7 @@ function runSqrtDemo(ctx, doneCb) {
         mult(ctx, b, b, () => {
             if (doneCb) doneCb(a, b);
             if (common.canvasIsScrolledIntoView(ctx.canvas)) {
-                setTimeout(cycle, 3000);
+                ctx['_timeout'] = setTimeout(cycle, 3000);
             } else {
                 ctx.canvas.click();
             }
@@ -304,9 +304,21 @@ function runSqrtDemo(ctx, doneCb) {
     cycle();
 }
 
+function cancelDemo(ctx) {
+    if (ctx['_timeout']) {
+        clearTimeout(ctx['_timeout']);
+        ctx['_timeout'] = null;
+    }
+    if (ctx['_frame']) {
+        cancelAnimationFrame(ctx['_frame']);
+        ctx['_frame'] = null;
+    }
+}
+
 export {
     runAddSubDemo,
     runMultDemo,
     runDivDemo,
     runSqrtDemo,
+    cancelDemo,
 };
