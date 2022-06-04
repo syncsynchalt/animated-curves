@@ -98,24 +98,10 @@ import * as field from './field-math/field-draw.js';
         const canvas = common.byId('canvas-addp');
         const ctx = common.convertCanvasHiDPI(canvas);
 
-        /** @param p {Point} */
-        let pointDesc = (p) => {
-            if (p === undefined) return '...';
-            if (p === null) return draw.INFINITY;
-            return `(${p.x}, ${p.y})`;
-        };
-
         let n = 1;
         let Q = undefined;
-        let setPageStuff = (R) => {
-            common.byId('n').textContent = n.toString();
-            common.byId('addp-p').textContent = pointDesc(draw.P());
-            common.byId('addp-np').textContent = pointDesc(R);
-        };
-
         const startDemo = async () => {
-            let updateCb = (nR, R) => { n = nR; Q = R; setPageStuff(R) };
-            return draw.runAddPDemo(ctx, updateCb, () => {}, n, Q);
+            return draw.runAddPDemo(ctx, n, Q, (nR, R) => { n = nR; Q = R });
         };
         await common.addPlayPause(ctx, startDemo, common.cancelAnimation);
     }

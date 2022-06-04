@@ -210,15 +210,17 @@ function drawCurve(ctx) {
  * @param vals {PreCalcVals}
  * @param P {Point} the point to label
  * @param label {String} the label to write
+ * @param coords {Boolean?} whether to also label the coordinates
  */
-function labelPoint(ctx, vals, P, label) {
+function labelPoint(ctx, vals, P, label, coords) {
     ctx.save();
     ctx.beginPath();
     const index = `${P.x},${P.y}`;
     const pt = pointToCtx(vals, P.x, P.y);
     // use a cache to keep the point label locations stable
     ctx['_pointDirCache'] = ctx['_pointDirCache'] || {};
-    const dir = ctx['_pointDirCache'][index] || common.pickLabelDirection(ctx, pt[0], pt[1]);
+    const dir = ctx['_pointDirCache'][index] ||
+        common.pickLabelDirection(ctx, pt[0], pt[1], 30);
     ctx['_pointDirCache'][index] = dir;
     ctx.strokeStyle = 'white';
     ctx.fillStyle = 'black';
@@ -228,6 +230,20 @@ function labelPoint(ctx, vals, P, label) {
     ctx.lineWidth = 2;
     ctx.strokeText(label, pt[0]+4*dir[0], pt[1]+4*dir[1]);
     ctx.fillText(label, pt[0]+4*dir[0], pt[1]+4*dir[1]);
+
+    if (coords) {
+        let coordLabel = `(${P.x}, ${P.y})`;
+        ctx.font = '12px sans';
+        const flipDir = [dir[0]*-1, dir[1]*-1];
+        const textW = ctx.measureText(coordLabel).width;
+        if (pt[0] < textW || pt[0] > vals.w - textW) flipDir[0] *= -1;
+        if (pt[1] < 16 || pt[1] > vals.h - 16) flipDir[1] *= -1;
+        ctx.textAlign = flipDir[0] === -1 ? 'right' : 'left';
+        ctx.textBaseline = flipDir[1] === -1 ? 'bottom' : 'top';
+        ctx.strokeText(coordLabel, pt[0]+4*flipDir[0], pt[1]+4*flipDir[1]);
+        ctx.fillText(coordLabel, pt[0]+4*flipDir[0], pt[1]+4*flipDir[1]);
+    }
+
     ctx.restore();
 }
 
@@ -287,9 +303,9 @@ async function addP(ctx, nQ, Q, drawDoneCb) {
             ctx.save();
             if (!finished['label']) {
                 markState('label', timestamp);
-                labelPoint(ctx, vals, P, 'P');
+                labelPoint(ctx, vals, P, 'P', true);
                 if (nQ !== 1) {
-                    labelPoint(ctx, vals, Q, `${nQ}P`);
+                    labelPoint(ctx, vals, Q, `${nQ}P`, true);
                 }
                 finished['label'] = timestamp;
             } else if (!finished['tangent']) {
@@ -319,10 +335,6 @@ async function addP(ctx, nQ, Q, drawDoneCb) {
                 }
             } else if (!finished.tanPause) {
                 let instate = markState('tanPause', timestamp);
-                labelPoint(ctx, vals, P, 'P');
-                if (nQ !== 1) {
-                    labelPoint(ctx, vals, Q, `${nQ}P`);
-                }
                 if (instate > duration.tanPause) {
                     finished.tanPause = timestamp;
                 }
@@ -379,9 +391,9 @@ async function addP(ctx, nQ, Q, drawDoneCb) {
                 }
             } else if (!finished.linePause) {
                 let instate = markState('linePause', timestamp);
-                labelPoint(ctx, vals, P, 'P');
+                labelPoint(ctx, vals, P, 'P', true);
                 if (nQ !== 1) {
-                    labelPoint(ctx, vals, Q, `${nQ}P`);
+                    labelPoint(ctx, vals, Q, `${nQ}P`, true);
                 }
                 if (instate >= duration.linePause) {
                     finished.linePause = timestamp;
@@ -408,7 +420,7 @@ async function addP(ctx, nQ, Q, drawDoneCb) {
                     ctx.strokeStyle = 'black';
                     drawDot(vals, Q.x, Q.y, 'orange');
                     drawDot(vals, R.x, R.y, 'red', +1, 2);
-                    labelPoint(ctx, vals, R, `${nQ+1}P`);
+                    labelPoint(ctx, vals, R, `${nQ+1}P`, true);
                     finished.negate = timestamp;
                 }
             } else if (!finished.callback) {
@@ -430,8 +442,8 @@ async function addP(ctx, nQ, Q, drawDoneCb) {
         if (finished.done) {
             await resetGraph(ctx);
             drawDot(vals, R.x, R.y, 'red');
-            labelPoint(ctx, vals, P, 'P');
-            labelPoint(ctx, vals, R, `${nQ+1}P`);
+            labelPoint(ctx, vals, P, 'P', true);
+            labelPoint(ctx, vals, R, `${nQ+1}P`, true);
         } else if (!cache.stopAnimation) {
             ctx['_frame'] = requestAnimationFrame(step);
         }
@@ -562,7 +574,7 @@ async function drawInfinity(ctx, P, Q, drawDoneCb) {
  * @param nQ {Number?} optional nP value of Q
  * @param Q {Point?} optional starting point
  */
-async function runAddPDemo(ctx, updateCb, drawDoneCb, nQ, Q) {
+async function runAddPDemo(ctx, nQ, Q, updateCb, drawDoneCb) {
     await resetGraph(ctx);
     let next = async () => {
         Q = await addP(ctx, nQ, Q, (R) => {
