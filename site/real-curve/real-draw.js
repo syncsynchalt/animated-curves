@@ -5,7 +5,10 @@ const TWO_PI = 2 * Math.PI;
 let dimensions = {xMin: -4, xMax: 9, yMin: -24, yMax: 24};
 const curveColor = '#33f';
 
-/** @param ctx {CanvasRenderingContext2D} */
+/**
+ * @param ctx {CanvasRenderingContext2D}
+ * @return {PreCalcVals}
+ */
 function preCalcValues(ctx) {
     const dotRadius = 3;
     const w = ctx.canvas.getBoundingClientRect().width;
@@ -23,7 +26,7 @@ function preCalcValues(ctx) {
  * Given an x,y point return the coordinates transformed for the JS Canvas context
  * (adjusted for top-left origin and half-pixel anti-aliasing)
  *
- * @param vals {Object} values from preCalcValues(ctx)
+ * @param vals {PreCalcVals}
  * @param x {Number} between 0 and p
  * @param y {Number} between 0 and p
  * @param halfPixel {Boolean?} if set, round all pixels to nearest .5 (true) or .0 (false)
@@ -43,7 +46,7 @@ function pointToCtx(vals, x, y, halfPixel) {
 }
 
 /**
- * @param vals {Object} return from cacheVals
+ * @param vals {PreCalcVals}
  * @param x {Number} coordinate
  * @param y {Number} coordinate
  * @param color {String} fill style
@@ -72,7 +75,7 @@ function drawDot(vals, x, y, color, radiusAdj, lw) {
 
 /**
  * Plot the given nP point (and label it)
- * @param vals {Object} return from cacheVals
+ * @param vals {PreCalcVals}
  * @param n {Number} scalar multiplier
  * @param nP {Point} point to plot
  * @param color {String} point color
@@ -96,7 +99,7 @@ function plotPoint(vals, n, nP, color) {
 /**
  * Draw the x/y axes and ticks
  * @param ctx {CanvasRenderingContext2D}
- * @param vals {Object} return from preCalcValues()
+ * @param vals {PreCalcVals}
  */
 function drawAxes(ctx, vals) {
     ctx.strokeStyle = 'grey';
@@ -209,7 +212,7 @@ function drawCurve(ctx) {
 /**
  * Plot the nP values on the curve for the given n's
  * @param ctx {CanvasRenderingContext2D}
- * @param vals {Object} result from preCalcValues()
+ * @param vals {PreCalcVals}
  * @param color {String}
  * @param nVals {Array[Number]}
  */
@@ -229,7 +232,7 @@ function plotNPs(ctx, vals, color, ...nVals) {
 
 /**
  * Return the x bounds of a line drawn through P and Q
- * @param vals {Object} result from preCalcValues()
+ * @param vals {PreCalcVals}
  * @param P {Point}
  * @param Q {Point}
  * @return {Number[2]} x values of start and end of a line between P and Q
@@ -444,7 +447,7 @@ async function runAddDemo(ctx, n, Q, updateCb, drawDoneCb) {
 /**
  * Write the equation for P + Q = R on the graph
  * @param ctx {CanvasRenderingContext2D}
- * @param vals {Object} result from preCalcValues()
+ * @param vals {PreCalcVals}
  * @param np {Number}
  * @param nr {Number}
  * @param nq {Number}

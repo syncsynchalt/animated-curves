@@ -186,7 +186,7 @@ function pickLabelDirection(ctx, x, y, sampleWidth, sampleMargin) {
     let bestDir = [0, 0];
     const margin = sampleMargin || 2;
     sampleWidth = sampleWidth || 20;
-    [1, -1].forEach(lr => {
+    [-1, 1].forEach(lr => {
         [-1, 1].forEach(ud => {
             let data = ctx.getImageData(ratio * (x + lr*margin), ratio * (y + ud*margin),
                 ratio * (lr*sampleWidth), ratio * (ud*sampleWidth));

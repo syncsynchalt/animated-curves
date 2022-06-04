@@ -3,7 +3,10 @@ import * as common from '../common.js';
 
 const EPS = 0.000001;
 
-/** @param ctx {CanvasRenderingContext2D} */
+/**
+ * @param ctx {CanvasRenderingContext2D}
+ * @return {PreCalcVals}
+ */
 function preCalcValues(ctx) {
     const marginThin = 15;
     const marginWide = 25;
@@ -23,7 +26,7 @@ function preCalcValues(ctx) {
  * Given an x,y point in the graph return the coordinates transformed for the JS Canvas context
  * (adjusted for top-left origin and half-pixel anti-aliasing)
  *
- * @param vals {Object} values from preCalcValues(ctx)
+ * @param vals {PreCalcVals}
  * @param x {Number} between 0 and p
  * @param y {Number} between 0 and p
  * @param halfPixel {Boolean?} if set, round all pixels to nearest .5 (true) or .0 (false)
@@ -45,7 +48,7 @@ function pointToCtx(vals, x, y, halfPixel) {
 /**
  * Draw the x/y axes and ticks
  * @param ctx {CanvasRenderingContext2D}
- * @param vals {Object} return from preCalcValues()
+ * @param vals {PreCalcVals}
  */
 function drawAxes(ctx, vals) {
     ctx.strokeStyle = 'grey';
@@ -109,7 +112,7 @@ function generateGraph(ctx, a, b) {
 /**
  * Draw the graph data
  * @param ctx {CanvasRenderingContext2D}
- * @param vals {Object} result of preCalcValues()
+ * @param vals {PreCalcVals}
  * @param data {GraphData} result from generateGraph()
  */
 function drawGraph(ctx, vals, data) {

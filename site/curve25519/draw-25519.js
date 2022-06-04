@@ -24,7 +24,7 @@ function preCalcValues(ctx) {
  * Given an x,y point in the field Fp return the coordinates transformed for the JS Canvas context
  * (adjusted for top-left origin and half-pixel anti-aliasing)
  *
- * @param vals {Object} values from preCalcValues(ctx)
+ * @param vals {PreCalcVals}
  * @param x {BigInt} between 0 and p
  * @param y {BigInt} between 0 and p
  * @param halfPixel {Boolean?} if set, round all pixels to nearest .5 (true) or .0 (false)
@@ -120,7 +120,7 @@ function drawGrid(ctx) {
 }
 
 /**
- * @param vals {Object} return from cacheVals
+ * @param vals {PreCalcVals}
  * @param x {BigInt} coordinate
  * @param y {BigInt} coordinate
  * @param color {String} fill style
@@ -148,7 +148,7 @@ function drawDot(vals, x, y, color,
 /**
  * Label the point NP.
  * @param ctx {CanvasRenderingContext2D}
- * @param vals {Object}
+ * @param vals {PreCalcVals}
  * @param n {Number}
  * @param x {BigInt}
  * @param y {BigInt}
@@ -170,7 +170,7 @@ function labelPoint(ctx, vals, n, x, y) {
 /**
  * Write the coordinates of the resulting point on the graph.
  * @param ctx {CanvasRenderingContext2D}
- * @param vals {Object}
+ * @param vals {PreCalcVals}
  * @param x {BigInt}
  * @param y {BigInt}
  */

@@ -2,6 +2,8 @@ import * as field from './field.js';
 import * as curve from './curve.js';
 import * as common from '../common.js';
 
+const EPS = 0.0000001;
+
 let xAtY = (P, m, y) => {
     let c = P.y - m * P.x;
     return (y - c) / m;
@@ -64,7 +66,8 @@ function findTotalXLength(P, Q, negR) {
     [P, Q] = common.orderPointsByX(P, Q);
     const slope = getSlope(P, Q);
     for (let xp = 1; xp < 100000; xp++) {
-        if (field.reduce(P.x + xp) === negR.x && field.reduce(P.y + (xp*slope)) === negR.y) {
+        if (field.reduce(P.x + xp) === negR.x &&
+            Math.abs(field.reduce(P.y + (xp*slope)) - negR.y) < EPS) {
             return xp;
         }
     }

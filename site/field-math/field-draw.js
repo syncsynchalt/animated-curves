@@ -6,7 +6,10 @@ const TWO_PI = Math.PI * 2;
 const INV_STR = '\u207b\xb9';
 const TIMES_STR = '\xd7';
 
-/** @param ctx {CanvasRenderingContext2D} */
+/**
+ * @param ctx {CanvasRenderingContext2D}
+ * @return {PreCalcVals}
+ */
 function preCalcValues(ctx) {
     const margin = 25;
     const dotRadius = 3;
@@ -25,7 +28,7 @@ function preCalcValues(ctx) {
  * Given an x point in the graph return the coordinates transformed for the JS Canvas context
  * (adjusted for top-left origin and half-pixel anti-aliasing)
  *
- * @param vals {Object} values from preCalcValues(ctx)
+ * @param vals {PreCalcVals}
  * @param x {Number} between 0 and p
  * @param halfPixel {Boolean?} if set, round all pixels to nearest .5 (true) or .0 (false)
  * @return {Number[2]} x,y values transformed for canvas context
@@ -41,7 +44,7 @@ function xToCtx(vals, x, halfPixel) {
 }
 
 /**
- * @param vals {Object} return from cacheVals
+ * @param vals {PreCalcVals}
  * @param x {Number} coordinate
  * @param color {String} fill style
  * @param radiusAdj {Number?} adjustment to built-in dot radius
@@ -96,7 +99,7 @@ function drawGraph(ctx) {
 /**
  * Write the given label in the top left of the graph.
  * @param ctx {CanvasRenderingContext2D}
- * @param vals {Object} return from preCalcValues()
+ * @param vals {PreCalcVals}
  * @param label {String} label to write
  */
 function writeLabel(ctx, vals, label) {

@@ -114,9 +114,8 @@ import * as field from './field-math/field-draw.js';
         };
 
         const startDemo = async () => {
-            let drawDoneCb = (R) => { setPageStuff(R) };
-            let updateCb = (R) => { Q = R; n++; setPageStuff(R) };
-            return draw.runDemo(ctx, updateCb, drawDoneCb, Q);
+            let updateCb = (nR, R) => { n = nR; Q = R; setPageStuff(R) };
+            return draw.runAddPDemo(ctx, updateCb, () => {}, n, Q);
         };
         await common.addPlayPause(ctx, startDemo, common.cancelAnimation);
     }
