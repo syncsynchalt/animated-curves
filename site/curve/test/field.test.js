@@ -33,9 +33,9 @@ describe('field math library', () => {
         expect(field.sqrt(1)).to.eql([1, 60]);
         expect(field.sqrt(2)).to.be.undefined;
         expect(field.sqrt(3)).to.eql([8, 53]);
-        expect(field.sqrt(9)).to.eql([58, 3]);
-        expect(field.sqrt(248)).to.eql([59, 2]);
-        expect(field.sqrt(249)).to.eql([35, 26]);
+        expect(field.sqrt(9)).to.eql([3, 58]);
+        expect(field.sqrt(248)).to.eql([2, 59]);
+        expect(field.sqrt(249)).to.eql([26, 35]);
         expect(field.sqrt(250)).to.be.undefined;
         expect(field.sqrt(251)).to.be.undefined;
         expect(field.sqrt(256)).to.eql([16, 45]);

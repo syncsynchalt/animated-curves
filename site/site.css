@@ -1,5 +1,10 @@
-div.container {
+.container {
     max-width: 600px;
+}
+
+.main-page .container {
+    background-color: #faf1e8;
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
 }
 
 .illustration {
@@ -10,11 +15,6 @@ div.container {
 
 .illustration .ill-content {
     width: min-content;
-    padding: 15px;
-    background-color: antiquewhite;
-    border: 1px solid #666;
-    border-radius: 10px;
-    box-shadow: 2px 2px 2px rgba(0, 0, 0, 0.3);
     margin: 0 auto;
 }
 
@@ -27,7 +27,7 @@ div.container {
 .illustration canvas {
     background-color: white;
     border-radius: 10px;
-    box-shadow: 1px 1px 3px rgba(0, 0, 0, 0.3);
+    box-shadow: 1px 1px 4px rgba(0, 0, 0, 0.3);
 }
 
 canvas.animated {
@@ -82,6 +82,7 @@ ul.no-bullet {
 }
 
 canvas.numline {
+    background-color: white;
     display: block;
     margin: 1em auto;
     border: 1px solid black;

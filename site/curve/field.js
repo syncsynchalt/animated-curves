@@ -44,15 +44,6 @@ function extended_euclidean_algorithm(a, b) {
 
 
 /**
- * @param {Number} n
- * @return {Number}
- */
-function square(n) {
-    return n * n;
-}
-
-
-/**
  * Reduce a number to modulo p (into the positive range of this field).
  * @param {Number} n
  * @return {Number} result
@@ -231,7 +222,6 @@ function setP(p_) {
 
 export {
     setP,
-    square,
     reduce,
     inverseOf,
     negate,

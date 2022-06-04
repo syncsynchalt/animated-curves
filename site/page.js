@@ -75,6 +75,10 @@ import * as field from './field-math/field-draw.js';
         ctx = common.convertCanvasHiDPI(canvas);
         await common.addPlayPause(ctx, field.runMultDemo, common.cancelAnimation);
 
+        canvas = common.byId('canvas-field-negate');
+        ctx = common.convertCanvasHiDPI(canvas);
+        await common.addPlayPause(ctx, field.runNegateDemo, common.cancelAnimation);
+
         canvas = common.byId('canvas-field-div');
         ctx = common.convertCanvasHiDPI(canvas);
         await common.addPlayPause(ctx, field.runDivDemo, common.cancelAnimation);
@@ -94,6 +98,7 @@ import * as field from './field-math/field-draw.js';
         const canvas = common.byId('canvas-addp');
         const ctx = common.convertCanvasHiDPI(canvas);
 
+        /** @param p {Point} */
         let pointDesc = (p) => {
             if (p === undefined) return '...';
             if (p === null) return draw.INFINITY;
@@ -104,13 +109,13 @@ import * as field from './field-math/field-draw.js';
         let Q = undefined;
         let setPageStuff = (R) => {
             common.byId('n').textContent = n.toString();
-            common.byId('np').textContent = pointDesc(R);
-            common.byId('np').classList.toggle('calculating', !R);
+            common.byId('addp-p').textContent = pointDesc(draw.P());
+            common.byId('addp-np').textContent = pointDesc(R);
         };
 
         const startDemo = async () => {
             let drawDoneCb = (R) => { setPageStuff(R) };
-            let updateCb = (R) => { Q = R; n++ };
+            let updateCb = (R) => { Q = R; n++; setPageStuff(R) };
             return draw.runDemo(ctx, updateCb, drawDoneCb, Q);
         };
         await common.addPlayPause(ctx, startDemo, common.cancelAnimation);

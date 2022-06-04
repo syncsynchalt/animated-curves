@@ -63,9 +63,19 @@ function sqrt(n) {
     return sqrts[reduce(n)];
 }
 
+/**
+ * Negate a number in Fp.
+ * @param n {Number}
+ * @return {Number}
+ */
+function negate(n) {
+    return reduce(p - n);
+}
+
 export {
     p,
     reduce,
     inverseOf,
     sqrt,
+    negate,
 };

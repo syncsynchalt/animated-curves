@@ -107,7 +107,7 @@ function writeLabel(ctx, vals, label) {
     ctx.font = common.mathFont('18px');
     ctx.textAlign = 'center';
     ctx.textBaseline = 'top';
-    ctx.fillText(label, vals.w / 2, 6);
+    ctx.fillText(label, vals.w / 2, 5);
     ctx.restore();
 }
 
@@ -245,6 +245,43 @@ function runMultDemo(ctx, doneCb) {
 }
 
 /**
+ * Run the "negation" demo
+ * @param ctx {CanvasRenderingContext2D}
+ * @param doneCb {Function?} callback every cycle
+ */
+function runNegateDemo(ctx, doneCb) {
+    const vals = preCalcValues(ctx);
+    const mid = fmath.p/2;
+    let a, negA, b, lastA;
+    let refresh = () => {
+        if (a !== undefined && a < mid) {
+            a = fmath.negate(a);
+        } else {
+            do {
+                a = Math.floor(Math.random() * mid) + 1;
+            }
+            while (a === lastA);
+            lastA = a;
+        }
+        negA = fmath.negate(a);
+        b = negA - a;
+    };
+    let cycle = () => {
+        refresh();
+        writeLabel(ctx, vals, `${a} negated is ${negA}`);
+        addSub(ctx, a, b, () => {
+            if (doneCb) doneCb(a, negA);
+            if (common.canvasIsScrolledIntoView(ctx.canvas)) {
+                ctx['_timeout'] = setTimeout(cycle, 1000);
+            } else {
+                ctx.canvas.click();
+            }
+        });
+    };
+    cycle();
+}
+
+/**
  * Run the "division" demo
  * @param ctx {CanvasRenderingContext2D}
  * @param doneCb {Function?} callback every cycle
@@ -307,6 +344,7 @@ function runSqrtDemo(ctx, doneCb) {
 export {
     runAddSubDemo,
     runMultDemo,
+    runNegateDemo,
     runDivDemo,
     runSqrtDemo,
 };

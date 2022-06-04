@@ -7,6 +7,10 @@ const TWO_PI = 2*Math.PI;
 const EPS = 0.0000001;
 const INFINITY = '\u221E';
 
+function P() {
+    return curve.P();
+}
+
 /** @param ctx {CanvasRenderingContext2D} */
 function preCalcValues(ctx) {
     const marginWide = 25;
@@ -531,6 +535,7 @@ async function runDemo(ctx, updateCb, drawDoneCb, Q) {
 
 export {
     INFINITY,
+    P,
     resetGraph,
     addP,
     runDemo,

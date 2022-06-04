@@ -6,113 +6,21 @@ let expect = chai.expect;
 
 describe('curve library', () => {
 
+    /**
+     * @param n {Number}
+     * @return {Number[n]} Array of numbers 1...n
+     */
     let range = (n) => {
         return Array.from({length: n}, (_, i) => {return i+1});
     };
 
-    /**
-     * Calculate the x/z of point nP via add1 construction
-     * @param baseX {Number}
-     * @param n {Number}
-     * @return {{x: Number, z: Number}}
-     */
-    let calcViaAdd1 = (baseX, n) => {
-        let [ prev_x, prev_z ] = [ curve.P().x, 1 ]; // 1P
-        let { x, z } = curve.xDouble(prev_x, prev_z);  // 2P
-        if (n === 1) return { x: prev_x, z: prev_z };
-
-        let next_x = 0, next_z = 0;
-        for (let i = 0; i < n - 2; i++) {
-            ({ x: next_x, z: next_z } = curve.xAdd1(x, z, prev_x, prev_z));
-            [prev_x, prev_z] = [x, z];
-            [x, z] = [next_x, next_z];
-        }
-        return { x, z };
-    };
-
-    it('can match add1 to result via doubling', () => {
-        for (let exp = 0; exp < 6; exp++) {
-            let n = 2 ** exp;
-            let nPad = `000${n}`.slice(-3);
-
-            // get {2^exp}P via doubling
-            let [x, z] = [curve.P().x, 1];
-            for (let i = 0; i < exp; i++) {
-                ({x, z} = curve.xDouble(x, z));
-            }
-            let viaDoubling = curve.X(x, z);
-
-            // get {2^exp}P via add1
-            ({x, z} = calcViaAdd1(curve.P().x, n));
-            let viaAdd1 = curve.X(x, z);
-
-            // compare them
-            expect(field.toHex(viaDoubling, 9))
-                .to.equal(field.toHex(viaAdd1, 9), `${nPad}P`);
-            expect(viaDoubling).to.equal(viaAdd1, `${nPad}P`);
-        }
-    });
-
-    it('should have working scalar multiplication (compare to add1)', () => {
-        let runTest = (n, msg) => {
-            let X = curve.xLadderMult(curve.P().x, n);
-            let chkX = X;
-            let {x, z} = calcViaAdd1(curve.P().x, n);
-            X = curve.X(x, z);
-            let expX = X;
-
-            expect(chkX).to.equal(expX, msg);
-        };
-        runTest(3, `${3}P`);
-        for (let n = 1; n <= 32; n++) {
-            runTest(n, `${n}P`);
-        }
-    });
-
-    it('should have working scalar multiplication (compare to doubling)', () => {
-        let runTest = (exp, msg) => {
-            let [x, z] = [curve.P().x, 1];
-            for (let i = 0; i < exp; i++) {
-                ({x, z} = curve.xDouble(x, z));
-            }
-            let expX = curve.X(x, z);
-            let chkX = curve.xLadderMult(curve.P().x, 2 ** exp);
-            expect(chkX).to.equal(expX, msg);
-        };
-        for (let exp = 0; exp <= 5; exp++) {
-            runTest(exp, `${2**exp}P`);
-        }
-    });
-
-    it('has working key exchange', () => {
-        const cKeys = range(100);
-        const sKeys = range(100);
-        let results = {};
-        cKeys.forEach(cKey => {
-            sKeys.forEach(sKey => {
-                let cPubKey = curve.xLadderMult(curve.P().x, cKey);
-                let sPubKey = curve.xLadderMult(curve.P().x, sKey);
-                const chk1 = curve.xLadderMult(cPubKey, sKey);
-                const chk2 = curve.xLadderMult(sPubKey, cKey);
-                expect(chk1).to.equal(chk2, `cKey:${cKey} sKey:${sKey}`);
-                results[chk1] = results[chk1] || 0;
-                results[chk1]++;
-            });
-        });
-        console.log(`landed on ${Object.keys(results).length} X values`);
-    });
-
-    it('comes back to the same point in ladder', () => {
-        let origY = curve.Y(curve.P().x);
-        for (let n = 1; n < 256; n++) {
-            let X = curve.xLadderMult(curve.P().x, n);
-            let Y = (X === 0 ? [0, 0] : curve.Y(X));
-            expect(Y).to.not.be.undefined;
-            if (X === curve.P().x) {
+    it('comes back to the same point (has order)', () => {
+        for (let n = 1; n <= field.p*2; n++) {
+            let Q = curve.pointMult(curve.P(), n);
+            if (Q && Q.x === curve.P().x && Q.y === curve.P().y) {
                 if (n !== 1) {
                     console.log(`Detected order of ${n}`);
                 }
-                expect(Y).to.eql(origY);
             }
         }
     });
@@ -169,8 +77,8 @@ describe('curve library', () => {
 
         const checks = range(100);
         checks.forEach(n => {
-            let addP = viaAdd(baseP, n);
-            let multP = curve.pointMult(baseP, n);
+            const addP = viaAdd(baseP, n);
+            const multP = curve.pointMult(baseP, n);
             expect(multP).to.eql(addP, `failed at n=${n}`);
         });
     });
@@ -198,5 +106,23 @@ describe('curve library', () => {
                 }
             }
         }
+    });
+
+    it('has working key exchange', () => {
+        const cKeys = range(100);
+        const sKeys = range(100);
+        let results = {};
+        cKeys.forEach(cKey => {
+            sKeys.forEach(sKey => {
+                let cPubKey = curve.pointMult(curve.P(), cKey);
+                let sPubKey = curve.pointMult(curve.P(), sKey);
+                let chk1 = curve.pointMult(cPubKey, sKey);
+                let chk2 = curve.pointMult(sPubKey, cKey);
+                expect(chk1).to.eql(chk2, `cKey:${cKey} sKey:${sKey}`);
+                results[chk1] = results[chk1] || 0;
+                results[chk1]++;
+            });
+        });
+        console.log(`landed on ${Object.keys(results).length} X values`);
     });
 });
