@@ -227,21 +227,21 @@ function labelPoint(ctx, vals, P, label, coords) {
     ctx.font = '14px sans';
     ctx.textAlign = dir[0] === -1 ? 'right' : 'left';
     ctx.textBaseline = dir[1] === -1 ? 'bottom' : 'top';
-    ctx.lineWidth = 2;
-    ctx.strokeText(label, pt[0]+4*dir[0], pt[1]+4*dir[1]);
-    ctx.fillText(label, pt[0]+4*dir[0], pt[1]+4*dir[1]);
+    ctx.lineWidth = 4;
+    ctx.strokeText(label, pt[0]+3*dir[0], pt[1]+3*dir[1]);
+    ctx.fillText(label, pt[0]+3*dir[0], pt[1]+3*dir[1]);
 
     if (coords) {
         let coordLabel = `(${P.x}, ${P.y})`;
         ctx.font = '12px sans';
         const flipDir = [dir[0]*-1, dir[1]*-1];
-        const textW = ctx.measureText(coordLabel).width;
-        if (pt[0] < textW || pt[0] > vals.w - textW) flipDir[0] *= -1;
+        const tw = ctx.measureText(coordLabel).width + 2;
+        if (pt[0] < tw || pt[0] > vals.w - tw) flipDir[0] *= -1;
         if (pt[1] < 16 || pt[1] > vals.h - 16) flipDir[1] *= -1;
         ctx.textAlign = flipDir[0] === -1 ? 'right' : 'left';
         ctx.textBaseline = flipDir[1] === -1 ? 'bottom' : 'top';
-        ctx.strokeText(coordLabel, pt[0]+4*flipDir[0], pt[1]+4*flipDir[1]);
-        ctx.fillText(coordLabel, pt[0]+4*flipDir[0], pt[1]+4*flipDir[1]);
+        ctx.strokeText(coordLabel, pt[0]+3*flipDir[0], pt[1]-2+3*flipDir[1]);
+        ctx.fillText(coordLabel, pt[0]+3*flipDir[0], pt[1]-2+3*flipDir[1]);
     }
 
     ctx.restore();
@@ -391,10 +391,6 @@ async function addP(ctx, nQ, Q, drawDoneCb) {
                 }
             } else if (!finished.linePause) {
                 let instate = markState('linePause', timestamp);
-                labelPoint(ctx, vals, P, 'P', true);
-                if (nQ !== 1) {
-                    labelPoint(ctx, vals, Q, `${nQ}P`, true);
-                }
                 if (instate >= duration.linePause) {
                     finished.linePause = timestamp;
                 }
