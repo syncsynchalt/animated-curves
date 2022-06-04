@@ -125,7 +125,7 @@ function writeLabel(ctx, vals, label) {
 async function addSub(ctx, a, b, drawDoneCb) {
     const vals = preCalcValues(ctx);
     const c = fmath.reduce(a + b);
-    const duration = 2000;
+    const duration = 1000;
     let start;
 
     async function step(timestamp) {

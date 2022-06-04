@@ -51,7 +51,14 @@
     for (let i = 0; i < fmath.p; i++) {
         const tr = document.createElement('tr');
         const sqrt = fmath.sqrt(i);
-        if (sqrt) {
+        if (i === 0) {
+            tr.innerHTML = `
+            <td class="text-center">${i}</td>
+            <td class="text-center copy-action" onclick="copyPasteClick(this, '${sqrt[0]}')" colspan=2>
+                <span>${sqrt[0]}</span>
+            </td>
+            `;
+        } else if (sqrt) {
             tr.innerHTML = `
             <td class="text-center">${i}</td>
             <td class="text-center copy-action" onclick="copyPasteClick(this, '${sqrt[0]}')">

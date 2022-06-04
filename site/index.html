@@ -82,7 +82,7 @@
     Point addition has two useful properties which we'll need later:
 <ul>
     <li><strong>commutative</strong>: adding points in any order gives the same result:
-        <div class="text-center"><span class="math">P + Q + R = R + Q + P</span></div></li>
+        <div class="text-center"><span class="math">P + Q + R = R + Q + P = Q + R + P</span></div></li>
     <li><strong>associative</strong>: any grouping of addition gives the same result:
         <div class="text-center"><span class="math">P+P+P+P+P = (P+P+P)+(P+P) = 3P+2P = 5P</span></div>
         <div class="text-center"><span class="math">P+P+P+P+P = (P)+(P+P+P+P) = 1P+4P = 5P</span></div>
@@ -104,7 +104,7 @@
 <p>Next let's put the curves aside and introduce a new set of math operations,
     the operations of the finite field <span class="fat-fp">Fp</span>.
 
-<p>A finite field is just a list of numbers. In this case we'll use <span class="math">p = 23</span>
+<p>A finite field is just a list of numbers. In this section we'll set <span class="math">p = 23</span>
     (a prime number). The finite field <span class="fat-fp-23">F23</span> is the list
     of numbers 0 through 22:
 <div class="math text-center pb1">
@@ -157,8 +157,8 @@ Using our rules for addition above, we can work out that negating a number
 
 <h4>Division (multiplicative inverse)</h4>
 <p>
-The operation that we'll use for division is where things become interesting. Let's start by noting
-    that any positive number <span class="math">n</span> divided by itself is 1:
+Division is where things become interesting. Let's start by noting
+    that any non-zero number <span class="math">n</span> divided by itself is 1:
 <div class="text-center">
 <div class=math>n / n = 1</div>
 Or if we expand some terms:
@@ -170,7 +170,7 @@ Let's use a slightly different notation for <span class="math">1/n</span> which 
     Based on the above, you can see that dividing by <span class="math">n</span> is the same as multiplying
     by the term <span class="math">n<sup>-1</sup></span>.
 <p>
-    In the finite field multiplication that we've defined above, you can see how it's possible for two
+    In the description of multiplication above, you can see how it's possible for two
     positive integers to equal 1 when multiplied together.
     It turns out that for each positive integer in <span class="fat-fp">Fp</span> there is one
     positive integer that acts as this "multiplicative inverse":
@@ -182,27 +182,28 @@ To tie it all together, when working in <span class="fat-fp">Fp</span> any time 
     the number which satisfies the equation <span class="math">n &times; n<sup>-1</sup> = 1</span>.
 
 <p>
-    The inverse for each number in <span class="fat-fp-23">F23</span> is provided <a target="_blank" href="inverse23.html">in a table</a>.
+    The inverse for each number in
+    <span class="fat-fp-23">F23</span> is provided <a target="_blank" href="inverse23.html">in this table</a>.
 
 <h4>Square root</h4>
 <p>
     Our last operation to define is taking a square root.
-    Similar to operations above, we'll define the square root of <span class="math">n</span>
+    We'll define the square root of <span class="math">n</span>
     as a number in <span class="fat-fp">Fp</span>
     which satisfies this equation:
-<div class="math text-center">
+<div class="math text-center pb1">
     sqrt(n) &times; sqrt(n) = n
 </div>
-<canvas class="numline animated" id="canvas-field-sqrt" width="500" height="80"></canvas>
 <p>
-In real numbers, for non-zero numbers there are two solutions to this problem (positive and negative).
-Similarly in <span class="fat-fp">Fp</span> for non-zero numbers there are two solutions.
+In real numbers there are two solutions to this problem for non-zero numbers (positive and negative).
+Non-zero numbers in <span class="fat-fp">Fp</span> also have two solutions.
+
+    <canvas class="numline animated" id="canvas-field-sqrt" width="500" height="80"></canvas>
 
 <p>
-    There is not a square root for each number in <span class="fat-fp">Fp</span>.
     Only half of the non-zero members of <span class="fat-fp">Fp</span> have square roots.
     The square roots in <span class="fat-fp-23">F23</span> are
-    provided <a target="_blank" href="sqrt23.html">in a table</a>.
+    provided <a target="_blank" href="sqrt23.html">in this table</a>.
 </div>
 
 <h2>Concept 3: Elliptic curves <em>plus</em> finite fields</h2>
@@ -225,7 +226,8 @@ in <span class="fat-fp-61">F61</span>.
 <p>
 What would it look like to plot this elliptic curve on a graph?
 Starting with <span class="math">x = 0</span>,
-and working through each number in <span class="fat-fp-61">F61</span>:
+and working through each number from 0 to 60, and using the math operations defined for
+    <span class="fat-fp-61">F61</span>:
 
 <table class="table table-sm table-borderless math ml2">
     <tbody>
@@ -233,37 +235,37 @@ and working through each number in <span class="fat-fp-61">F61</span>:
         <td>x = 0:</td>
         <td>y<sup>2</sup> = 0<sup>3</sup> + 9&middot;0 + 1;</td>
         <td>y<sup>2</sup> = 1 % 61 = 1;</td>
-        <td>y = sqrt(y<sup>2</sup>) = 1 and 60</td>
+        <td>y = sqrt(1) = 1 and 60</td>
     </tr>
     <tr>
         <td>x = 1:</td>
         <td>y<sup>2</sup> = 1<sup>3</sup> + 9&middot;1 + 1;</td>
         <td>y<sup>2</sup> = 11 % 61 = 11;</td>
-        <td>y = sqrt(y<sup>2</sup>) = undefined</td>
+        <td>y = sqrt(11) = undefined</td>
     </tr>
     <tr>
         <td>x = 2:</td>
         <td>y<sup>2</sup> = 2<sup>3</sup> + 9&middot;2 + 1;</td>
         <td>y<sup>2</sup> = 27 % 61 = 27;</td>
-        <td>y = sqrt(y<sup>2</sup>) = 24 and 37</td>
+        <td>y = sqrt(27) = 24 and 37</td>
     </tr>
     <tr>
         <td>x = 3:</td>
         <td>y<sup>2</sup> = 3<sup>3</sup> + 9&middot;3 + 1;</td>
         <td>y<sup>2</sup> = 55 % 61 = 55;</td>
-        <td>y = sqrt(y<sup>2</sup>) = not defined</td>
+        <td>y = sqrt(55) = not defined</td>
     </tr>
     <tr>
         <td>x = 4:</td>
         <td>y<sup>2</sup> = 4<sup>3</sup> + 9&middot;4 + 1;</td>
         <td>y<sup>2</sup> = 101 % 61 = 40;</td>
-        <td>y = sqrt(y<sup>2</sup>) = not defined</td>
+        <td>y = sqrt(40) = not defined</td>
     </tr>
     <tr>
         <td>x = 5:</td>
         <td>y<sup>2</sup> = 5<sup>3</sup> + 9&middot;5 + 1;</td>
         <td>y<sup>2</sup> = 171 % 61 = 49;</td>
-        <td>y = sqrt(y<sup>2</sup>) = 7 and 54</td>
+        <td>y = sqrt(49) = 7 and 54</td>
     </tr>
     <tr>
         <td colspan=4>... and so on ...</td>
@@ -281,7 +283,7 @@ The resulting graph is this:
 </figure>
 
 <p>
-We can still add points on this curve, using the math of <span class="fat-fp-61">F61</span> and
+We can add points on this curve, using the math of <span class="fat-fp-61">F61</span> and
 the rules of point addition (draw lines between two points, find the curve intersection, negate the point):
 
 <figure class="illustration">
@@ -293,9 +295,9 @@ the rules of point addition (draw lines between two points, find the curve inter
 
 <p>The animation above shows lines wrapping between 61 and 0 (the modulus effect shown visually),
     sometimes many times. The actual math of finding the intersecting curve points is relatively
-    straightforward, though.
+    straightforward, though:
 <p>
-    To double a point P at (x_1, y_1) to get 2P (x_3, y_3):
+    To double a point P (x_1, y_1) to get 2P (x_3, y_3):
 <div class="math text-center">
 &lambda; = (3x_1^2 + 9) / (2y_1)
 <br>
