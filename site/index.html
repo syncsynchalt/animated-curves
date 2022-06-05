@@ -18,8 +18,7 @@
     Every TLS 1.3 session starts with a key exchange
     made via an elliptic curve. The most popular curve is
     Curve25519, and the exchange involves adding a "base point"
-    <span class="math">P</span> to
-    itself over and over again:
+    <math><mi>P</mi></math> to itself over and over again:
 </p>
 <figure class="illustration">
 <div class="ill-content">
@@ -27,7 +26,7 @@
     <canvas id="canvas-curve25519" class="animated" width="500" height="300"></canvas>
 </div>
 </div>
-    <figcaption>Curve25519 point multiplication</figcaption>
+    <figcaption>Curve25519 point addition</figcaption>
 </figure>
 <p>
     We're looking at the heart of TLS 1.3 key exchange,
@@ -37,7 +36,16 @@
 
 <h2>Concept 1: Adding points on a curve</h2>
 <p>
-    The elliptic curves we're going to start with are in this form: <span class="math">y<sup>2</sup> = x<sup>3</sup> + Ax + B</span>
+    The elliptic curves we're going to use are in this form:
+    <math>
+        <mrow>
+            <msup><mi>y</mi><mn>2</mn></msup>
+            <mo>=</mo>
+            <msup><mi>x</mi><mn>3</mn></msup>
+            <mo>+</mo><mi>A</mi><mi>x</mi>
+            <mo>+</mo><mi>B</mi>
+        </mrow>
+    </math>
 <br>
 
 <div>
@@ -53,24 +61,78 @@
 <p>
     Let's define <strong>point addition</strong>: a way to combine two points on an elliptic
     curve to yield a third point (also on the curve).
-<figure>
-    <figcaption>Point addition:</figcaption>
-    <ol>
+<div class="skinny-block">
+    <strong>Point addition:</strong>
+    <ul>
     <li>draw a line between the two points
     (or if you're adding a point to itself, make a line tangent to the curve at that
     point),</li>
     <li>find where that line intersects the curve,</li>
     <li>and finally negate the y-value of that point (flip it from positive to negative or vice versa).</li>
-    </ol>
-</figure>
-<p>Let's also introduce a shorthand for adding a point to itself multiple times (also called
+    </ul>
+</div>
+<p>We're going to use a shorthand for adding a point to itself multiple times (also called
     <strong>scalar multiplication</strong>):
-<ul class="no-bullet">
-    <li><span class="math">P+P = 2P</span></li>
-    <li><span class="math">P+P+P = 3P</span></li>
-    <li><span class="math">P+P+P+P = 4P</span></li>
-    <li>... and so on.</li>
-</ul>
+
+    <math display="block" class="pthalf">
+        <mrow>
+            <mi>P</mi>
+            <mspace width="-0.1667em"></mspace>
+            <mo>+</mo>
+            <mspace width="-0.1667em"></mspace>
+            <mi>P</mi>
+            <mspace width="0.2778em"></mspace>
+            <mo>=</mo>
+            <mspace width="0.2778em"></mspace>
+            <mn>2</mn>
+            <mi>P</mi>
+        </mrow>
+    </math>
+    <math display="block">
+        <mrow>
+            <mi>P</mi>
+            <mspace width="-0.1667em"></mspace>
+            <mo>+</mo>
+            <mspace width="-0.1667em"></mspace>
+            <mi>P</mi>
+            <mspace width="-0.1667em"></mspace>
+            <mo>+</mo>
+            <mspace width="-0.1667em"></mspace>
+            <mi>P</mi>
+            <mspace width="0.2778em"></mspace>
+            <mo>=</mo>
+            <mspace width="0.2778em"></mspace>
+            <mn>3</mn>
+            <mi>P</mi>
+        </mrow>
+    </math>
+    <math display="block">
+        <mrow>
+            <mi>P</mi>
+            <mspace width="-0.1667em"></mspace>
+            <mo>+</mo>
+            <mspace width="-0.1667em"></mspace>
+            <mi>P</mi>
+            <mspace width="-0.1667em"></mspace>
+            <mo>+</mo>
+            <mspace width="-0.1667em"></mspace>
+            <mi>P</mi>
+            <mspace width="-0.1667em"></mspace>
+            <mo>+</mo>
+            <mspace width="-0.1667em"></mspace>
+            <mi>P</mi>
+            <mspace width="0.2778em"></mspace>
+            <mo>=</mo>
+            <mspace width="0.2778em"></mspace>
+            <mn>4</mn>
+            <mi>P</mi>
+        </mrow>
+    </math>
+    <math display="block">
+        <mrow>
+            <mtext>... and so on</mtext>
+        </mrow>
+    </math>
 <figure class="illustration">
 <div class="ill-content">
 <canvas id="canvas-real-add" class="animated" height="400" width="500"></canvas>
@@ -80,16 +142,84 @@
 
 <p>
     Point addition has two useful properties which we'll need later:
-<ul>
-    <li><strong>commutative</strong>: adding points in any order gives the same result:
-        <div class="text-center"><span class="math">P + Q + R = R + Q + P = Q + R + P</span></div></li>
-    <li><strong>associative</strong>: any grouping of addition gives the same result:
-        <div class="text-center"><span class="math">P+P+P+P+P = (P+P+P)+(P+P) = 3P+2P = 5P</span></div>
-        <div class="text-center"><span class="math">P+P+P+P+P = (P)+(P+P+P+P) = 1P+4P = 5P</span></div>
+<ul class="skinny-block">
+    <li><strong>commutative</strong>: adding points in any order results in the same point:
+        <math display="block" class="pthalf pbhalf">
+            <mrow>
+                <mi>P</mi><mo>+</mo><mi>Q</mi><mo>+</mo>
+                <mi>R</mi>
+                <mspace width="0.2778em"></mspace>
+                <mo>=</mo>
+                <mspace width="0.2778em"></mspace>
+                <mi>R</mi><mo>+</mo><mi>Q</mi><mo>+</mo>
+                <mi>P</mi>
+                <mspace width="0.2778em"></mspace>
+                <mo>=</mo>
+                <mspace width="0.2778em"></mspace>
+                <mi>Q</mi><mo>+</mo><mi>R</mi><mo>+</mo>
+                <mi>P</mi>
+            </mrow>
+        </math>
+    <li><strong>associative</strong>: adding the results of additions results in the same point:
+    <math display="block" class="pthalf">
+        <mrow>
+            <mi>P</mi><mspace width="-0.1667em"></mspace><mo>+</mo><mspace width="-0.1667em"></mspace>
+            <mi>P</mi><mspace width="-0.1667em"></mspace><mo>+</mo><mspace width="-0.1667em"></mspace>
+            <mi>P</mi><mspace width="-0.1667em"></mspace><mo>+</mo><mspace width="-0.1667em"></mspace>
+            <mi>P</mi><mspace width="-0.1667em"></mspace><mo>+</mo><mspace width="-0.1667em"></mspace>
+            <mi>P</mi>
+            <mspace width="0.2778em"></mspace>
+            <mo>=</mo>
+            <mspace width="0.2778em"></mspace>
+            <mo form="prefix" stretchy="false">(</mo>
+            <mi>P</mi><mspace width="-0.1667em"></mspace><mo>+</mo><mspace width="-0.1667em"></mspace>
+            <mi>P</mi><mspace width="-0.1667em"></mspace><mo>+</mo><mspace width="-0.1667em"></mspace>
+            <mi>P</mi><mo form="postfix" stretchy="false">)</mo>
+            <mo>+</mo>
+            <mo form="prefix" stretchy="false">(</mo>
+            <mi>P</mi><mspace width="-0.1667em"></mspace><mo>+</mo><mspace width="-0.1667em"></mspace>
+            <mi>P</mi><mo form="postfix" stretchy="false">)</mo>
+            <mspace width="0.2778em"></mspace>
+            <mo>=</mo>
+            <mspace width="0.2778em"></mspace>
+            <mn>3</mn><mi>P</mi><mo>+</mo><mn>2</mn><mi>P</mi>
+            <mspace width="0.2778em"></mspace>
+            <mo>=</mo>
+            <mspace width="0.2778em"></mspace>
+            <mn>5</mn><mi>P</mi>
+        </mrow>
+    </math>
+    <math display="block">
+        <mrow>
+            <mi>P</mi><mspace width="-0.1667em"></mspace><mo>+</mo><mspace width="-0.1667em"></mspace>
+            <mi>P</mi><mspace width="-0.1667em"></mspace><mo>+</mo><mspace width="-0.1667em"></mspace>
+            <mi>P</mi><mspace width="-0.1667em"></mspace><mo>+</mo><mspace width="-0.1667em"></mspace>
+            <mi>P</mi><mspace width="-0.1667em"></mspace><mo>+</mo><mspace width="-0.1667em"></mspace>
+            <mi>P</mi>
+            <mspace width="0.2778em"></mspace>
+            <mo>=</mo>
+            <mspace width="0.2778em"></mspace>
+            <mo form="prefix" stretchy="false">(</mo><mi>P</mi><mo form="postfix" stretchy="false">)</mo>
+            <mo>+</mo>
+            <mo form="prefix" stretchy="false">(</mo><mi>P</mi><mspace width="-0.1667em"></mspace>
+            <mo>+</mo><mspace width="-0.1667em"></mspace><mi>P</mi><mspace width="-0.1667em"></mspace>
+            <mo>+</mo><mspace width="-0.1667em"></mspace><mi>P</mi><mspace width="-0.1667em"></mspace>
+            <mo>+</mo><mspace width="-0.1667em"></mspace><mi>P</mi>
+            <mo form="postfix" stretchy="false">)</mo>
+            <mspace width="0.2778em"></mspace>
+            <mo>=</mo>
+            <mspace width="0.2778em"></mspace>
+            <mn>1</mn><mi>P</mi><mo>+</mo><mn>4</mn><mi>P</mi>
+            <mspace width="0.2778em"></mspace>
+            <mo>=</mo>
+            <mspace width="0.2778em"></mspace>
+            <mn>5</mn><mi>P</mi>
+        </mrow>
+    </math>
     </li>
 </ul>
-<p>See the animation below, which adds points together in random order.
-    The result is always the expected number.</p>
+<p>See the animation below which adds points in random order.
+    The result is always the expected point.</p>
 
 <figure class="illustration">
 <div class="ill-content">
@@ -104,12 +234,20 @@
 <p>Next let's put the curves aside and introduce a new set of math operations,
     the operations of the finite field <span class="fat-fp">Fp</span>.
 
-<p>A finite field is just a list of numbers. In this section we'll set <span class="math">p = 23</span>
+<p>A finite field is just a set of numbers. In this section we'll set
+    <math><mi>p</mi></math> to 23
     (a prime number). The finite field <span class="fat-fp-23">F23</span> is the list
     of numbers 0 through 22:
-<div class="math text-center pb1">
-<span class="fat-fp-23">F23</span> = { 0, 1, 2, 3, ..., 20, 21, 22 }
-</div>
+    <math display="block" class="pthalf">
+        <mrow>
+            <msub><mi>𝔽</mi><mn>23</mn></msub>
+            <mo>=</mo>
+            <mo form="prefix" stretchy="false">{</mo>
+            <mn>0</mn><mo separator="true">,</mo><mn>1</mn><mo separator="true">,</mo>
+            <mn>2</mn><mo separator="true">,</mo><mo>…</mo><mo separator="true">,</mo><mn>22</mn>
+            <mo form="postfix" stretchy="false">}</mo>
+        </mrow>
+    </math>
 
 <p>
 All the math operations below use only those 23 numbers as inputs as outputs. No negative numbers,
@@ -117,8 +255,8 @@ All the math operations below use only those 23 numbers as inputs as outputs. No
 
 <h4>Addition and subtraction</h4>
 <p>
-Adding and subtracting in finite fields is pretty simple. Values of 23 and over will "wrap around" to zero, and values less
-than zero will wrap around to 22:
+Adding and subtracting in finite fields is pretty simple. Values of 23 and over will "wrap around" to zero, and values below
+zero will wrap around to 22:
 <canvas class="numline animated" id="canvas-field-add-sub" width="500" height="80"></canvas>
 
 <p>You might also know this as "modulo 23", or as the remainder after dividing a number by 23.
@@ -131,46 +269,88 @@ Multiplication is also straightforward. Similar to addition, the result is taken
 
 <h4>Negation</h4>
 <p>
-Negating a value in real numbers means flipping it from positive to negative (or vice versa). Another
-    definition could be finding the value <span class="math">n</span> for <span class="math">p</span>
+    You might be familiar with negation meaning flipping a value's sign from positive to negative
+    (or vice versa). Another definition could be finding the value
+    <math><mtext>-</mtext><mi>n</mi></math> for <math><mi>n</mi></math>
     that satisfies this equation:
-<div class="math text-center pb1">
-p + n = 0
-</div>
+    <math display="block">
+        <mrow>
+            <mi>n</mi>
+            <mo>+</mo>
+            <mtext>-</mtext>
+            <mi>n</mi>
+            <mo>=</mo>
+            <mn>0</mn>
+        </mrow>
+    </math>
 
 <p>
-Using our rules for addition above, we can work out that negating a number
-    in <span class="fat-fp">Fp</span> means subtracting that number from <span class="math">p</span>:
-<div class="math text-center pb1">
-1 + 22 = 0; 1 negated is 22
-<br>
-2 + 21 = 0; 2 negated is 21
-<br>
-3 + 20 = 0; 3 negated is 20
-<br>
-...
-<br>
-22 + 1 = 0; 22 negated is 1
-</div>
+Using our rules for addition above, we can work out that to negate a number
+    in <span class="fat-fp">Fp</span> we can just subtract that number from <math><mi>p</mi></math>:
+    <math display=block>
+        <mrow><mn>1</mn><mo>+</mo><mn>22</mn><mo>=</mo><mn>0</mn><mo separator="true">;</mo>
+            <mspace width="0.2778em"></mspace>
+            <mtext>1 negated is 22</mtext></mrow>
+    </math>
+    <math display=block>
+        <mrow><mn>2</mn><mo>+</mo><mn>21</mn><mo>=</mo><mn>0</mn><mo separator="true">;</mo>
+            <mspace width="0.2778em"></mspace>
+            <mtext>2 negated is 21</mtext></mrow>
+    </math>
+    <math display=block>
+        <mrow><mn>3</mn><mo>+</mo><mn>20</mn><mo>=</mo><mn>0</mn><mo separator="true">;</mo>
+            <mspace width="0.2778em"></mspace>
+            <mtext>3 negated is 20</mtext></mrow>
+    </math>
+    <math display=block>
+        <mrow><mo>…</mo></mrow>
+    </math>
+    <math display=block>
+        <mrow><mn>22</mn><mo>+</mo><mn>1</mn><mo>=</mo><mn>0</mn><mo separator="true">;</mo>
+            <mspace width="0.2778em"></mspace>
+            <mtext>22 negated is 1</mtext></mrow>
+    </math>
 
 <canvas class="numline animated" id="canvas-field-negate" width="500" height="80"></canvas>
 
 <h4>Division (multiplicative inverse)</h4>
 <p>
 Division is where things become interesting. Let's start by noting
-    that any non-zero number <span class="math">n</span> divided by itself is 1:
-<div class="text-center">
-<div class=math>n / n = 1</div>
+    that any non-zero number <math><mi>n</mi></math> divided by itself is 1:
+    <math display="block">
+        <mrow>
+            <mfrac>
+                <mi>n</mi>
+                <mi>n</mi>
+            </mfrac>
+            <mo>=</mo>
+            <mn>1</mn>
+        </mrow>
+    </math>
 Or if we expand some terms:
-<div class=math>n &times; (1/n) = 1</div>
-Let's use a slightly different notation for <span class="math">1/n</span> which is easier to fit on a line:
-<div class=math>n &times; n<sup>-1</sup> = 1</div>
-</div>
+    <math display="block">
+        <mrow>
+            <mi>n</mi><mo>&middot;</mo>
+            <mfrac><mn>1</mn><mi>n</mi></mfrac>
+            <mo>=</mo><mn>1</mn>
+        </mrow>
+    </math>
+Let's use a different notation for
+    <math><mfrac><mn>1</mn><mi>n</mi></mfrac></math>
+    which is easier to fit on a line:
+    <math display="block">
+        <mrow>
+            <mi>n</mi><mo>&middot;</mo>
+            <msup><mi>n</mi><mrow><mo>−</mo><mn>1</mn></mrow></msup>
+            <mo>=</mo><mn>1</mn>
+        </mrow>
+    </math>
+
 <p>
-    Based on the above, you can see that dividing by <span class="math">n</span> is the same as multiplying
-    by the term <span class="math">n<sup>-1</sup></span>.
+    Based on the above, you can see that dividing by <math><mi>n</mi></math> is the same as multiplying
+    by the term <math><msup><mi>n</mi><mrow><mo>-</mo><mn>1</mn></mrow></msup></math>.
 <p>
-    In the description of multiplication above, you can see how it's possible for two
+    In the multiplication description above you can see how it's possible for two
     positive integers to equal 1 when multiplied together.
     It turns out that for each positive integer in <span class="fat-fp">Fp</span> there is one
     positive integer that acts as this "multiplicative inverse":
@@ -178,8 +358,16 @@ Let's use a slightly different notation for <span class="math">1/n</span> which 
 
 <p>
 To tie it all together, when working in <span class="fat-fp">Fp</span> any time we need to divide by a number
-    <span class="math">n</span> we will instead multiply by its multiplicative inverse <span class="math">n<sup>-1</sup></span>,
-    the number which satisfies the equation <span class="math">n &times; n<sup>-1</sup> = 1</span>.
+    <math><mi>n</mi></math> we will instead multiply by its multiplicative inverse
+    <math><msup><mi>n</mi><mrow><mo>-</mo><mn>1</mn></mrow></msup></math>,
+    the number which satisfies the equation
+    <math>
+        <mrow>
+            <mi>n</mi><mo>&middot;</mo>
+            <msup><mi>n</mi><mrow><mo>-</mo><mn>1</mn></mrow></msup>
+            <mo>=</mo><mn>1</mn>
+        </mrow>
+    </math>.
 
 <p>
     The inverse for each number in
@@ -188,12 +376,22 @@ To tie it all together, when working in <span class="fat-fp">Fp</span> any time 
 <h4>Square root</h4>
 <p>
     Our last operation to define is taking a square root.
-    We'll define the square root of <span class="math">n</span>
+    We'll define the square root of <math><mi>n</mi></math>
     as a number in <span class="fat-fp">Fp</span>
     which satisfies this equation:
-<div class="math text-center pb1">
-    sqrt(n) &times; sqrt(n) = n
-</div>
+    <math display="block">
+        <mrow>
+            <msqrt>
+                <mi>n</mi>
+            </msqrt>
+            <mo>×</mo>
+            <msqrt>
+                <mi>n</mi>
+            </msqrt>
+            <mo>=</mo>
+            <mi>n</mi>
+        </mrow>
+    </math>
 <p>
 In real numbers there are two solutions to this problem for non-zero numbers (positive and negative).
 Non-zero numbers in <span class="fat-fp">Fp</span> also have two solutions.
@@ -212,66 +410,88 @@ Non-zero numbers in <span class="fat-fp">Fp</span> also have two solutions.
 Now we can combine the two concepts of elliptic curves and finite field math.
 <p>
 Let's start with an elliptic curve equation:
-<div class="text-center math pb1">
-y<sup>2</sup> = x<sup>3</sup> + 9x + 1
-</div>
-<p>For our finite field we choose a small prime integer, <span class="math">p = 61</span>:
-<div class="text-center math pb1">
-<span class="fat-fp-61">F61</span> = { 0, 1, 2, ... 59, 60 }
-</div>
+    <math display="block" class="pt1">
+        <mrow>
+            <msup>
+                <mi>y</mi>
+                <mn>2</mn>
+            </msup>
+            <mo>=</mo>
+            <msup>
+                <mi>x</mi>
+                <mn>3</mn>
+            </msup>
+            <mo>+</mo>
+            <mn>9</mn>
+            <mi>x</mi>
+            <mo>+</mo>
+            <mn>1</mn>
+        </mrow>
+    </math>
+<p>For our finite field we choose the prime number 61:
+
+    <math display="block" class="pt1">
+        <mrow>
+            <msub><mi>𝔽</mi><mn>61</mn></msub>
+            <mo>=</mo>
+            <mo form="prefix" stretchy="false">{</mo>
+            <mn>0</mn>
+            <mo separator="true">,</mo>
+            <mn>1</mn>
+            <mo separator="true">,</mo>
+            <mn>2</mn>
+            <mo separator="true">,</mo>
+            <mo>…</mo>
+            <mo separator="true">,</mo>
+            <mn>60</mn>
+            <mo form="postfix" stretchy="false">}</mo>
+        </mrow>
+    </math>
 <p>
 We'll also pre-compute the tables for <a href="inverse61.html">division</a> and <a href="sqrt61.html">square roots</a>
 in <span class="fat-fp-61">F61</span>.
 
 <p>
 What would it look like to plot this elliptic curve on a graph?
-Starting with <span class="math">x = 0</span>,
+Starting with <math><mi>x</mi><mo>=</mo><mn>0</mn></math>,
 and working through each number from 0 to 60, and using the math operations defined for
     <span class="fat-fp-61">F61</span>:
 
-<table class="table table-sm table-borderless math ml2">
-    <tbody>
-    <tr>
-        <td>x = 0:</td>
-        <td>y<sup>2</sup> = 0<sup>3</sup> + 9&middot;0 + 1;</td>
-        <td>y<sup>2</sup> = 1 % 61 = 1;</td>
-        <td>y = sqrt(1) = 1 and 60</td>
-    </tr>
-    <tr>
-        <td>x = 1:</td>
-        <td>y<sup>2</sup> = 1<sup>3</sup> + 9&middot;1 + 1;</td>
-        <td>y<sup>2</sup> = 11 % 61 = 11;</td>
-        <td>y = sqrt(11) = undefined</td>
-    </tr>
-    <tr>
-        <td>x = 2:</td>
-        <td>y<sup>2</sup> = 2<sup>3</sup> + 9&middot;2 + 1;</td>
-        <td>y<sup>2</sup> = 27 % 61 = 27;</td>
-        <td>y = sqrt(27) = 24 and 37</td>
-    </tr>
-    <tr>
-        <td>x = 3:</td>
-        <td>y<sup>2</sup> = 3<sup>3</sup> + 9&middot;3 + 1;</td>
-        <td>y<sup>2</sup> = 55 % 61 = 55;</td>
-        <td>y = sqrt(55) = not defined</td>
-    </tr>
-    <tr>
-        <td>x = 4:</td>
-        <td>y<sup>2</sup> = 4<sup>3</sup> + 9&middot;4 + 1;</td>
-        <td>y<sup>2</sup> = 101 % 61 = 40;</td>
-        <td>y = sqrt(40) = not defined</td>
-    </tr>
-    <tr>
-        <td>x = 5:</td>
-        <td>y<sup>2</sup> = 5<sup>3</sup> + 9&middot;5 + 1;</td>
-        <td>y<sup>2</sup> = 171 % 61 = 49;</td>
-        <td>y = sqrt(49) = 7 and 54</td>
-    </tr>
-    <tr>
-        <td colspan=4>... and so on ...</td>
-    </tr>
-    </tbody>
+<table class="results">
+    <tbody id="mult-table-body"></tbody>
 </table>
+<script type=module>
+    import * as common from './common.js';
+    import * as field61 from './curve/field.js';
+
+    for (let i = 0; i <= 5; i++) {
+        const tr = document.createElement('tr');
+        let y2 = i**3 + 9*i + 1;
+        let y = field61.sqrt(y2 % 61);
+        tr.innerHTML = `
+        <td><math><mrow>
+            <mi>x</mi><mo>=</mo><mn>${i}</mn><mtext>:</mtext>
+        </mrow></math></td>
+        <td><math><mrow>
+            <msup><mi>y</mi><mn>2</mn></msup>
+            <mo>=</mo>
+            <msup><mn>${i}</mn><mn>3</mn></msup><mo>+</mo><mn>9</mn><mo>⋅</mo><mn>${i}</mn>
+                <mo>+</mo><mn>1</mn><mo>=</mo><mn>${y2}</mn><mi>%</mi><mn>61</mn>
+                <mo>=</mo><mn>${y2 % 61}</mn>
+            <mtext>;</mtext>
+        </mrow></math></td>
+        <td><math><mrow>
+            <mi>y</mi><mo>=</mo><msqrt><mn>${y2 % 61}</mn></msqrt><mo>=</mo><mtext>
+            ${y ? y[0] + ' and ' + y[1] : 'undefined'}
+            </mtext>
+        </mrow></math></td>
+        `;
+        common.byId('mult-table-body').appendChild(tr);
+    }
+    const lastTr = document.createElement('tr');
+    lastTr.innerHTML = `<tr><td colspan=3>... and so on ...</td></tr>`;
+    common.byId('mult-table-body').appendChild(lastTr);
+</script>
 
 <p>
 The resulting graph is this:
@@ -294,26 +514,174 @@ the rules of point addition (draw lines between two points, find the curve inter
 </figure>
 
 <p>The animation above shows lines wrapping between 61 and 0 (the modulus effect shown visually),
-    sometimes many times. The actual math of finding the intersecting curve points is relatively
-    straightforward, though:
+    sometimes many times. Finding the values with math is relatively easy though, just remember
+    to use the rules of finite field math:
 <p>
-    To double a point P (x_1, y_1) to get 2P (x_3, y_3):
-<div class="math text-center">
-&lambda; = (3x_1^2 + 9) / (2y_1)
-<br>
-x_3 = &lambda;^2 - x_1 - x_1
-<br>
-y_3 = &lambda;(x_1 - x_3) - y_1
-</div>
+    To double a point P
+    <math>
+        <mrow>
+            <mo form="prefix" stretchy="false">(</mo>
+            <msub><mi>x</mi><mn>1</mn></msub>
+            <mo separator="true">,</mo>
+            <msub><mi>y</mi><mn>1</mn></msub>
+            <mo form="postfix" stretchy="false">)</mo>
+        </mrow>
+    </math>
+    to get 2P
+    <math>
+        <mrow>
+            <mo form="prefix" stretchy="false">(</mo>
+            <msub><mi>x</mi><mn>2</mn></msub>
+            <mo separator="true">,</mo>
+            <msub><mi>y</mi><mn>2</mn></msub>
+            <mo form="postfix" stretchy="false">)</mo>
+        </mrow>
+    </math>:
+
+<math display="block">
+    <mrow>
+        <mi>λ</mi>
+        <mo>=</mo>
+        <mfrac>
+            <mrow>
+                <mn>3</mn>
+                <msubsup>
+                    <mi>x</mi>
+                    <mn>1</mn>
+                    <mn>2</mn>
+                </msubsup>
+                <mo>+</mo>
+                <mn>9</mn>
+            </mrow>
+            <mrow>
+                <mn>2</mn>
+                <msub>
+                    <mi>y</mi>
+                    <mn>1</mn>
+                </msub>
+            </mrow>
+        </mfrac>
+    </mrow>
+</math>
+<math display="block">
+    <mrow>
+        <msub>
+            <mi>x</mi>
+            <mn>2</mn>
+        </msub>
+        <mo>=</mo>
+        <msup>
+            <mi>λ</mi>
+            <mn>2</mn>
+        </msup>
+        <mo>−</mo>
+        <msub>
+            <mi>x</mi>
+            <mn>1</mn>
+        </msub>
+        <mo>−</mo>
+        <msub>
+            <mi>x</mi>
+            <mn>1</mn>
+        </msub>
+    </mrow>
+</math>
+<math display="block">
+    <mrow>
+        <msub>
+            <mi>y</mi>
+            <mn>2</mn>
+        </msub>
+        <mo>=</mo>
+        <mi>λ</mi>
+        <mo form="prefix" stretchy="false">(</mo>
+        <msub>
+            <mi>x</mi>
+            <mn>1</mn>
+        </msub>
+        <mo>−</mo>
+        <msub>
+            <mi>x</mi>
+            <mn>2</mn>
+        </msub>
+        <mo form="postfix" stretchy="false">)</mo>
+        <mo>−</mo>
+        <msub>
+            <mi>y</mi>
+            <mn>1</mn>
+        </msub>
+    </mrow>
+</math>
 <p>
-    To add two points P (x_1, y_1) and Q (x_2, y_2) to get R (x_3, y_3):
-<div class="math text-center">
-&lambda; = (y_2 - y_1) / (x_2 - x_1)
-<br>
-x_3 = &lambda;^2 - x_1 - x_1
-<br>
-y_3 = &lambda;(x_1 - x_3) - y_1
-</div>
+    To add two points P
+    <math>
+        <mrow>
+            <mo form="prefix" stretchy="false">(</mo>
+            <msub><mi>x</mi><mn>1</mn></msub>
+            <mo separator="true">,</mo>
+            <msub><mi>y</mi><mn>1</mn></msub>
+            <mo form="postfix" stretchy="false">)</mo>
+        </mrow>
+    </math>
+    and Q
+    <math>
+        <mrow>
+            <mo form="prefix" stretchy="false">(</mo>
+            <msub><mi>x</mi><mn>2</mn></msub>
+            <mo separator="true">,</mo>
+            <msub><mi>y</mi><mn>2</mn></msub>
+            <mo form="postfix" stretchy="false">)</mo>
+        </mrow>
+    </math>
+    to get a third point R
+    <math>
+        <mrow>
+            <mo form="prefix" stretchy="false">(</mo>
+            <msub><mi>x</mi><mn>3</mn></msub>
+            <mo separator="true">,</mo>
+            <msub><mi>y</mi><mn>3</mn></msub>
+            <mo form="postfix" stretchy="false">)</mo>
+        </mrow>
+    </math>:
+
+<math display="block">
+    <mrow>
+        <mi>λ</mi>
+        <mo>=</mo>
+        <mfrac>
+            <mrow>
+                <msub><mi>y</mi><mn>2</mn></msub><mo>−</mo><msub><mi>y</mi><mn>1</mn></msub>
+            </mrow>
+            <mrow>
+                <msub><mi>x</mi><mn>2</mn></msub><mo>−</mo><msub><mi>x</mi><mn>1</mn></msub>
+            </mrow>
+        </mfrac>
+    </mrow>
+</math>
+<math display="block">
+    <mrow>
+        <msub><mi>x</mi><mn>3</mn></msub><mo>=</mo>
+        <msup><mi>λ</mi><mn>2</mn></msup>
+        <mo>−</mo>
+        <msub><mi>x</mi><mn>1</mn></msub>
+        <mo>−</mo>
+        <msub><mi>x</mi><mn>2</mn></msub>
+    </mrow>
+</math>
+<math display="block">
+    <mrow>
+        <msub><mi>y</mi><mn>3</mn></msub>
+        <mo>=</mo>
+        <mi>λ</mi>
+        <mo form="prefix" stretchy="false">(</mo>
+        <msub><mi>x</mi><mn>1</mn></msub>
+        <mo>−</mo>
+        <msub><mi>x</mi><mn>3</mn></msub>
+        <mo form="postfix" stretchy="false">)</mo>
+        <mo>−</mo>
+        <msub><mi>y</mi><mn>1</mn></msub>
+    </mrow>
+</math>
 </div>
 
 </div> <!-- container -->
@@ -321,15 +689,15 @@ y_3 = &lambda;(x_1 - x_3) - y_1
 <script>
     let fs = document.getElementsByClassName('fat-fp')
     for (let f of fs) {
-        f.innerHTML = '<span class="math">&#x1D53D;<sub>p</sub></span>';
+        f.innerHTML = '<span>&#x1D53D;<sub>p</sub></span>';
     }
     fs = document.getElementsByClassName('fat-fp-23')
     for (let f of fs) {
-        f.innerHTML = '<span class="math">&#x1D53D;<sub>23</sub></span>';
+        f.innerHTML = '<span>&#x1D53D;<sub>23</sub></span>';
     }
     fs = document.getElementsByClassName('fat-fp-61')
     for (let f of fs) {
-        f.innerHTML = '<span class="math">&#x1D53D;<sub>61</sub></span>';
+        f.innerHTML = '<span>&#x1D53D;<sub>61</sub></span>';
     }
 </script>
 </body>

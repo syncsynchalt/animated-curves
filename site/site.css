@@ -1,8 +1,5 @@
-.container {
-    max-width: 600px;
-}
-
 .main-page .container {
+    max-width: 600px;
     background-color: #faf1e8;
     box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
 }
@@ -11,6 +8,8 @@
     display: flex;
     flex-direction: column;
     align-content: center;
+    margin-top: 1em;
+    margin-bottom: 1em;
 }
 
 .illustration .ill-content {
@@ -37,48 +36,15 @@ canvas.animated {
     cursor: pointer;
 }
 
-.center-block {
+.skinny-block {
     display: block;
-    margin: 0 auto;
-    text-align: center;
-}
-
-.math {
-    font-style: italic;
-    font-family: STIXGeneral, 'DejaVu Serif', 'DejaVu Sans', Times,
-    'Lucida Sans Unicode', OpenSymbol, 'Standard Symbols L', serif;
-    line-height: 1.2;
-}
-
-.smaller {
-    font-size: 0.9em;
-}
-
-.squish {
-    font-family: "Courier", monospace;
-    letter-spacing: -1.4px;
+    margin: auto 1em;
 }
 
 button {
     touch-action: manipulation;
     user-select: none;
     -webkit-user-select: none;
-}
-
-.point-p {
-    font-weight: 600;
-    color: black;
-}
-.point-np {
-    font-weight: 600;
-}
-
-.hidden {
-    visibility: hidden;
-}
-
-ul.no-bullet {
-    list-style-type: none;
 }
 
 canvas.numline {
@@ -113,9 +79,23 @@ canvas.numline {
     min-width: 2em;
 }
 
+table.results {
+    margin-left: 2em;
+    margin-bottom: 1em;
+}
+table.results td {
+    padding-left: 2em;
+}
+
 .pb1 {
     padding-bottom: 1em;
 }
-.ml2 {
-    margin-left: 2em;
+.pt1 {
+    padding-top: 1em;
+}
+.pthalf {
+    padding-top: 0.5em;
+}
+.pbhalf {
+    padding-bottom: 0.5em;
 }

@@ -45,7 +45,7 @@
     }
 
     let tags = document.getElementsByClassName('fat-fp');
-    for (let t of tags) t.innerHTML = `<span class="math">&#x1D53D;<sub>${fmath.p}</sub></span>`;
+    for (let t of tags) t.innerHTML = `<span>&#x1D53D;<sub>${fmath.p}</sub></span>`;
 
     const tb = common.byId('sqrt-table-body');
     for (let i = 0; i < fmath.p; i++) {
