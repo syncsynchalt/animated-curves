@@ -18,7 +18,7 @@
     Every TLS 1.3 session starts with a key exchange
     made via an elliptic curve. The most popular curve is
     Curve25519, and the exchange involves adding a "base point"
-    <math><mi>P</mi></math> to itself over and over again:
+    <math data-alt="math/i-954065.svg 0 0"><mi>P</mi></math> to itself over and over again:
 </p>
 <figure class="illustration">
 <div class="ill-content">
@@ -37,7 +37,7 @@
 <h2>Concept 1: Adding points on a curve</h2>
 <p>
     The elliptic curves we're going to use are in this form:
-    <math>
+    <math data-alt="math/i-560588.svg 0 0">
         <mrow>
             <msup><mi>y</mi><mn>2</mn></msup>
             <mo>=</mo>
@@ -74,7 +74,7 @@
 <p>We're going to use a shorthand for adding a point to itself multiple times (also called
     <strong>scalar multiplication</strong>):
 
-    <math display="block" class="pthalf">
+    <math display="block" class="pthalf" data-alt="math/b-717493.svg 0 0">
         <mrow>
             <mi>P</mi>
             <mspace width="-0.1667em"></mspace>
@@ -88,7 +88,7 @@
             <mi>P</mi>
         </mrow>
     </math>
-    <math display="block">
+    <math display="block" data-alt="math/b-535608.svg 0 0">
         <mrow>
             <mi>P</mi>
             <mspace width="-0.1667em"></mspace>
@@ -106,7 +106,7 @@
             <mi>P</mi>
         </mrow>
     </math>
-    <math display="block">
+    <math display="block" data-alt="math/b-604709.svg 0 0">
         <mrow>
             <mi>P</mi>
             <mspace width="-0.1667em"></mspace>
@@ -128,7 +128,7 @@
             <mi>P</mi>
         </mrow>
     </math>
-    <math display="block">
+    <math display="block" data-alt="math/b-438171.svg 0 0">
         <mrow>
             <mtext>... and so on</mtext>
         </mrow>
@@ -144,7 +144,7 @@
     Point addition has two useful properties which we'll need later:
 <ul class="skinny-block">
     <li><strong>commutative</strong>: adding points in any order results in the same point:
-        <math display="block" class="pthalf pbhalf">
+        <math display="block" class="pthalf pbhalf" data-alt="math/b-755879.svg 0 0">
             <mrow>
                 <mi>P</mi><mo>+</mo><mi>Q</mi><mo>+</mo>
                 <mi>R</mi>
@@ -161,7 +161,7 @@
             </mrow>
         </math>
     <li><strong>associative</strong>: adding the results of additions results in the same point:
-    <math display="block" class="pthalf">
+    <math display="block" class="pthalf" data-alt="math/b-116080.svg 0 0">
         <mrow>
             <mi>P</mi><mspace width="-0.1667em"></mspace><mo>+</mo><mspace width="-0.1667em"></mspace>
             <mi>P</mi><mspace width="-0.1667em"></mspace><mo>+</mo><mspace width="-0.1667em"></mspace>
@@ -189,7 +189,7 @@
             <mn>5</mn><mi>P</mi>
         </mrow>
     </math>
-    <math display="block">
+    <math display="block" data-alt="math/b-364622.svg 0 0">
         <mrow>
             <mi>P</mi><mspace width="-0.1667em"></mspace><mo>+</mo><mspace width="-0.1667em"></mspace>
             <mi>P</mi><mspace width="-0.1667em"></mspace><mo>+</mo><mspace width="-0.1667em"></mspace>
@@ -235,10 +235,10 @@
     the operations of the finite field <span class="fat-fp">Fp</span>.
 
 <p>A finite field is just a set of numbers. In this section we'll set
-    <math><mi>p</mi></math> to 23
+    <math data-alt="math/i-128808.svg 0 0"><mi>p</mi></math> to 23
     (a prime number). The finite field <span class="fat-fp-23">F23</span> is the list
     of numbers 0 through 22:
-    <math display="block" class="pthalf">
+    <math display="block" class="pthalf" data-alt="math/b-199423.svg 0 0">
         <mrow>
             <msub><mi>𝔽</mi><mn>23</mn></msub>
             <mo>=</mo>
@@ -271,9 +271,10 @@ Multiplication is also straightforward. Similar to addition, the result is taken
 <p>
     You might be familiar with negation meaning flipping a value's sign from positive to negative
     (or vice versa). Another definition could be finding the value
-    <math><mtext>-</mtext><mi>n</mi></math> for <math><mi>n</mi></math>
+    <math data-alt="math/i-813408.svg 0 0"><mtext>-</mtext><mi>n</mi></math>
+    for <math data-alt="math/i-592762.svg 0 0"><mi>n</mi></math>
     that satisfies this equation:
-    <math display="block">
+    <math display="block" data-alt="math/b-880129.svg 0 0">
         <mrow>
             <mi>n</mi>
             <mo>+</mo>
@@ -286,26 +287,27 @@ Multiplication is also straightforward. Similar to addition, the result is taken
 
 <p>
 Using our rules for addition above, we can work out that to negate a number
-    in <span class="fat-fp">Fp</span> we can just subtract that number from <math><mi>p</mi></math>:
-    <math display=block>
+    in <span class="fat-fp">Fp</span> we can just subtract that number from
+     <math data-alt="math/i-665765.svg 0 0"><mi>p</mi></math>:
+    <math display=block data-alt="math/b-067170.svg 0 0">
         <mrow><mn>1</mn><mo>+</mo><mn>22</mn><mo>=</mo><mn>0</mn><mo separator="true">;</mo>
             <mspace width="0.2778em"></mspace>
             <mtext>1 negated is 22</mtext></mrow>
     </math>
-    <math display=block>
+    <math display=block data-alt="math/b-835565.svg 0 0">
         <mrow><mn>2</mn><mo>+</mo><mn>21</mn><mo>=</mo><mn>0</mn><mo separator="true">;</mo>
             <mspace width="0.2778em"></mspace>
             <mtext>2 negated is 21</mtext></mrow>
     </math>
-    <math display=block>
+    <math display=block data-alt="math/b-326553.svg 0 0">
         <mrow><mn>3</mn><mo>+</mo><mn>20</mn><mo>=</mo><mn>0</mn><mo separator="true">;</mo>
             <mspace width="0.2778em"></mspace>
             <mtext>3 negated is 20</mtext></mrow>
     </math>
-    <math display=block>
+    <math display=block data-alt="math/b-831557.svg 0 0">
         <mrow><mo>…</mo></mrow>
     </math>
-    <math display=block>
+    <math display=block data-alt="math/b-508088.svg 0 0">
         <mrow><mn>22</mn><mo>+</mo><mn>1</mn><mo>=</mo><mn>0</mn><mo separator="true">;</mo>
             <mspace width="0.2778em"></mspace>
             <mtext>22 negated is 1</mtext></mrow>
@@ -316,8 +318,9 @@ Using our rules for addition above, we can work out that to negate a number
 <h4>Division (multiplicative inverse)</h4>
 <p>
 Division is where things become interesting. Let's start by noting
-    that any non-zero number <math><mi>n</mi></math> divided by itself is 1:
-    <math display="block">
+    that any non-zero number <math data-alt="math/i-599398.svg 0 0"><mi>n</mi></math>
+    divided by itself is 1:
+    <math display="block" data-alt="math/b-366287.svg 0 0">
         <mrow>
             <mfrac>
                 <mi>n</mi>
@@ -328,7 +331,7 @@ Division is where things become interesting. Let's start by noting
         </mrow>
     </math>
 Or if we expand some terms:
-    <math display="block">
+    <math display="block" data-alt="math/b-743770.svg 0 0">
         <mrow>
             <mi>n</mi><mo>&middot;</mo>
             <mfrac><mn>1</mn><mi>n</mi></mfrac>
@@ -336,9 +339,9 @@ Or if we expand some terms:
         </mrow>
     </math>
 Let's use a different notation for
-    <math><mfrac><mn>1</mn><mi>n</mi></mfrac></math>
+    <math data-alt="math/i-508452.svg 0 0"><mfrac><mn>1</mn><mi>n</mi></mfrac></math>
     which is easier to fit on a line:
-    <math display="block">
+    <math display="block" data-alt="math/b-848616.svg 0 0">
         <mrow>
             <mi>n</mi><mo>&middot;</mo>
             <msup><mi>n</mi><mrow><mo>−</mo><mn>1</mn></mrow></msup>
@@ -347,8 +350,11 @@ Let's use a different notation for
     </math>
 
 <p>
-    Based on the above, you can see that dividing by <math><mi>n</mi></math> is the same as multiplying
-    by the term <math><msup><mi>n</mi><mrow><mo>-</mo><mn>1</mn></mrow></msup></math>.
+    Based on the above, you can see that dividing by
+    <math data-alt="math/i-971135.svg 0 0"><mi>n</mi></math> is the same as multiplying
+    by the term <math data-alt="math/i-705997.svg 0 0">
+        <msup><mi>n</mi><mrow><mo>-</mo><mn>1</mn></mrow></msup>
+    </math>.
 <p>
     In the multiplication description above you can see how it's possible for two
     positive integers to equal 1 when multiplied together.
@@ -357,11 +363,15 @@ Let's use a different notation for
 <canvas class="numline animated" id="canvas-field-div" width="500" height="80"></canvas>
 
 <p>
-To tie it all together, when working in <span class="fat-fp">Fp</span> any time we need to divide by a number
-    <math><mi>n</mi></math> we will instead multiply by its multiplicative inverse
-    <math><msup><mi>n</mi><mrow><mo>-</mo><mn>1</mn></mrow></msup></math>,
+To tie it all together, when working in <span class="fat-fp">Fp</span>
+    any time we need to divide by a number
+    <math data-alt="math/i-468525.svg 0 0"><mi>n</mi></math> we will instead
+    multiply by its multiplicative inverse
+    <math data-alt="math/i-358217.svg 0 0">
+        <msup><mi>n</mi><mrow><mo>-</mo><mn>1</mn></mrow></msup>
+    </math>,
     the number which satisfies the equation
-    <math>
+    <math data-alt="math/i-127449.svg 0 0">
         <mrow>
             <mi>n</mi><mo>&middot;</mo>
             <msup><mi>n</mi><mrow><mo>-</mo><mn>1</mn></mrow></msup>
@@ -376,10 +386,10 @@ To tie it all together, when working in <span class="fat-fp">Fp</span> any time 
 <h4>Square root</h4>
 <p>
     Our last operation to define is taking a square root.
-    We'll define the square root of <math><mi>n</mi></math>
+    We'll define the square root of <math data-alt="math/i-664940.svg 0 0"><mi>n</mi></math>
     as a number in <span class="fat-fp">Fp</span>
     which satisfies this equation:
-    <math display="block">
+    <math display="block" data-alt="math/b-284785.svg 0 0">
         <mrow>
             <msqrt>
                 <mi>n</mi>
@@ -410,7 +420,7 @@ Non-zero numbers in <span class="fat-fp">Fp</span> also have two solutions.
 Now we can combine the two concepts of elliptic curves and finite field math.
 <p>
 Let's start with an elliptic curve equation:
-    <math display="block" class="pt1">
+    <math display="block" class="pt1" data-alt="math/b-011536.svg 0 0">
         <mrow>
             <msup>
                 <mi>y</mi>
@@ -430,7 +440,7 @@ Let's start with an elliptic curve equation:
     </math>
 <p>For our finite field we choose the prime number 61:
 
-    <math display="block" class="pt1">
+    <math display="block" class="pt1" data-alt="math/b-384237.svg 0 0">
         <mrow>
             <msub><mi>𝔽</mi><mn>61</mn></msub>
             <mo>=</mo>
@@ -453,7 +463,7 @@ in <span class="fat-fp-61">F61</span>.
 
 <p>
 What would it look like to plot this elliptic curve on a graph?
-Starting with <math><mi>x</mi><mo>=</mo><mn>0</mn></math>,
+Starting with <math data-alt="math/i-123935.svg 0 0"><mi>x</mi><mo>=</mo><mn>0</mn></math>,
 and working through each number from 0 to 60, and using the math operations defined for
     <span class="fat-fp-61">F61</span>:
 
@@ -469,10 +479,10 @@ and working through each number from 0 to 60, and using the math operations defi
         let y2 = i**3 + 9*i + 1;
         let y = field61.sqrt(y2 % 61);
         tr.innerHTML = `
-        <td><math><mrow>
+        <td><math data-alt="math/i-916698.svg 0 0"><mrow>
             <mi>x</mi><mo>=</mo><mn>${i}</mn><mtext>:</mtext>
         </mrow></math></td>
-        <td><math><mrow>
+        <td><math data-alt="math/i-433000.svg 0 0"><mrow>
             <msup><mi>y</mi><mn>2</mn></msup>
             <mo>=</mo>
             <msup><mn>${i}</mn><mn>3</mn></msup><mo>+</mo><mn>9</mn><mo>⋅</mo><mn>${i}</mn>
@@ -480,7 +490,7 @@ and working through each number from 0 to 60, and using the math operations defi
                 <mo>=</mo><mn>${y2 % 61}</mn>
             <mtext>;</mtext>
         </mrow></math></td>
-        <td><math><mrow>
+        <td><math data-alt="math/i-045530.svg 0 0"><mrow>
             <mi>y</mi><mo>=</mo><msqrt><mn>${y2 % 61}</mn></msqrt><mo>=</mo><mtext>
             ${y ? y[0] + ' and ' + y[1] : 'undefined'}
             </mtext>
@@ -518,7 +528,7 @@ the rules of point addition (draw lines between two points, find the curve inter
     to use the rules of finite field math:
 <p>
     To double a point P
-    <math>
+    <math data-alt="math/i-854736.svg 0 0">
         <mrow>
             <mo form="prefix" stretchy="false">(</mo>
             <msub><mi>x</mi><mn>1</mn></msub>
@@ -528,7 +538,7 @@ the rules of point addition (draw lines between two points, find the curve inter
         </mrow>
     </math>
     to get 2P
-    <math>
+    <math data-alt="math/i-670183.svg 0 0">
         <mrow>
             <mo form="prefix" stretchy="false">(</mo>
             <msub><mi>x</mi><mn>2</mn></msub>
@@ -538,7 +548,7 @@ the rules of point addition (draw lines between two points, find the curve inter
         </mrow>
     </math>:
 
-<math display="block">
+<math display="block" data-alt="math/b-264088.svg 0 0">
     <mrow>
         <mi>λ</mi>
         <mo>=</mo>
@@ -563,7 +573,7 @@ the rules of point addition (draw lines between two points, find the curve inter
         </mfrac>
     </mrow>
 </math>
-<math display="block">
+<math display="block" data-alt="math/b-602214.svg 0 0">
     <mrow>
         <msub>
             <mi>x</mi>
@@ -586,7 +596,7 @@ the rules of point addition (draw lines between two points, find the curve inter
         </msub>
     </mrow>
 </math>
-<math display="block">
+<math display="block" data-alt="math/b-969771.svg 0 0">
     <mrow>
         <msub>
             <mi>y</mi>
@@ -614,7 +624,7 @@ the rules of point addition (draw lines between two points, find the curve inter
 </math>
 <p>
     To add two points P
-    <math>
+    <math data-alt="math/i-640848.svg 0 0">
         <mrow>
             <mo form="prefix" stretchy="false">(</mo>
             <msub><mi>x</mi><mn>1</mn></msub>
@@ -624,7 +634,7 @@ the rules of point addition (draw lines between two points, find the curve inter
         </mrow>
     </math>
     and Q
-    <math>
+    <math data-alt="math/i-041425.svg 0 0">
         <mrow>
             <mo form="prefix" stretchy="false">(</mo>
             <msub><mi>x</mi><mn>2</mn></msub>
@@ -634,7 +644,7 @@ the rules of point addition (draw lines between two points, find the curve inter
         </mrow>
     </math>
     to get a third point R
-    <math>
+    <math data-alt="math/i-209933.svg 0 0">
         <mrow>
             <mo form="prefix" stretchy="false">(</mo>
             <msub><mi>x</mi><mn>3</mn></msub>
@@ -644,7 +654,7 @@ the rules of point addition (draw lines between two points, find the curve inter
         </mrow>
     </math>:
 
-<math display="block">
+<math display="block" data-alt="math/b-554474.svg 0 0">
     <mrow>
         <mi>λ</mi>
         <mo>=</mo>
@@ -658,7 +668,7 @@ the rules of point addition (draw lines between two points, find the curve inter
         </mfrac>
     </mrow>
 </math>
-<math display="block">
+<math display="block" data-alt="math/b-115821.svg 0 0">
     <mrow>
         <msub><mi>x</mi><mn>3</mn></msub><mo>=</mo>
         <msup><mi>λ</mi><mn>2</mn></msup>
@@ -668,7 +678,7 @@ the rules of point addition (draw lines between two points, find the curve inter
         <msub><mi>x</mi><mn>2</mn></msub>
     </mrow>
 </math>
-<math display="block">
+<math display="block" data-alt="math/b-211234.svg 0 0">
     <mrow>
         <msub><mi>y</mi><mn>3</mn></msub>
         <mo>=</mo>
