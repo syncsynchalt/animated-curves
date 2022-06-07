@@ -84,12 +84,22 @@ table.results {
     margin-bottom: 1em;
 }
 table.results td {
-    padding-left: 2em;
+    padding-left: 1em;
 }
 
 .math-block {
     text-align: center;
     padding-bottom: 1em;
+}
+.math-block-left {
+    text-align: left;
+    padding-bottom: 1em;
+}
+
+.mathy {
+    font-style: italic;
+    font-family: STIXGeneral, "DejaVu Serif", "DejaVu Sans", Times,
+        "Lucida Sans Unicode", OpenSymbol, "Standard Symbols L", serif;
 }
 
 .pb1 {
@@ -103,4 +113,10 @@ table.results td {
 }
 .pbhalf {
     padding-bottom: 0.5em;
+}
+.phalf {
+    padding: 0.5em 0;
+}
+.ml2 {
+    margin-left: 2em;
 }

@@ -428,6 +428,7 @@ async function runAddDemo(ctx, n, Q, updateCb, drawDoneCb) {
             Q = curve.P();
             ctx['_timeout'] = setTimeout(next, 1.5 * 1000);
         } else {
+            writeEquation(ctx, vals, 1, n, 1 + n);
             Q = await addPoints(ctx, 1, P, n, Q, (nR, R) => {
                 plotNPs(ctx, vals, 'red', nR);
                 if (drawDoneCb) drawDoneCb(nR, R);
@@ -452,7 +453,7 @@ async function runAddDemo(ctx, n, Q, updateCb, drawDoneCb) {
  * @param nr {Number}
  * @param nq {Number}
  */
-function writeAssocEquation(ctx, vals, np, nq, nr) {
+function writeEquation(ctx, vals, np, nq, nr) {
     ctx.save();
     ctx.font = common.mathFont('1.2em');
     ctx.textBaseline = 'bottom';
@@ -491,7 +492,7 @@ async function runAssocDemo(ctx, updateCb, drawDoneCb) {
         while (lastPoints.includes(nU));
         nV = Math.ceil(Math.random() * (8 - nU));
         lastPoints = [nU, nV];
-        writeAssocEquation(ctx, vals, nU, nV, nU + nV);
+        writeEquation(ctx, vals, nU, nV, nU + nV);
         const U = points[nU];
         const V = points[nV];
         const R = await addPoints(ctx, nU, U, nV, V, (nR, R) => {

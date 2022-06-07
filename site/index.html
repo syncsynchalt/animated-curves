@@ -39,7 +39,7 @@
 </p>
 </div>
 
-<h2>Concept 1: Adding points on a curve</h2>
+<h2>Adding points on a curve</h2>
 <p>
     The elliptic curves we're going to use are in this form:
     `y^2 = x^3 + Ax + B`
@@ -68,18 +68,6 @@
     <li>and finally negate the y-value of that point (flip it from positive to negative or vice versa).</li>
     </ul>
 </div>
-<p>We're going to use a shorthand for adding a point to itself multiple times (also called
-    <strong>scalar multiplication</strong>):
-
-<div class="math-block">
-`P+P = 2P`
-<br>
-`P+P+P = 3P`
-<br>
-`P+P+P+P = 4P`
-<br>
-<em>... and so on</em>
-</div>
 
 <figure class="illustration">
 <div class="ill-content">
@@ -92,14 +80,14 @@
     Point addition has two useful properties which we'll need later:
 <ul class="skinny-block">
     <li><strong>commutative</strong>: adding points in any order results in the same point:
-        <div class="math-block">
-        `P + Q + R = R + Q + P = P + R + Q`
+        <div class="text-center mathy phalf">
+        P+Q+R = R+Q+P = P+R+Q
         </div>
     <li><strong>associative</strong>: adding the results of additions results in the same point:
-        <div class="math-block">
-        `P+P+P+P+P = (P+P) + (P+P+P) = 2P + 3P = 5P`
+        <div class="text-center mathy phalf">
+        P+P+P+P+P = (P+P) + (P+P+P) = 2P + 3P = 5P
         <br>
-        `P+P+P+P+P = (P+P+P+P) + (P) = 4P + 1P = 5P`
+        P+P+P+P+P = (P+P+P+P) + (P) = 4P + 1P = 5P
         </div>
     </li>
 </ul>
@@ -114,9 +102,9 @@
 </figure>
 </div>
 
-<h2>Concept 2: Finite field math</h2>
+<h2>Finite field math</h2>
 <div>
-<p>Next let's put the curves aside and introduce a new set of math operations,
+<p>Next let's put curves aside and introduce a new set of math operations,
     the operations of the finite field <span class="fat-fp">Fp</span>.
 
 <p>A finite field is just a set of numbers. In this section we'll set
@@ -130,9 +118,9 @@
 All the math operations below use only those 23 numbers as inputs as outputs. No negative numbers,
     no floating point, and nothing higher than 22.
 
-<h4>Addition and subtraction</h4>
+<h4>Addition / Subtraction</h4>
 <p>
-Adding and subtracting in finite fields is pretty simple. Values of 23 and over will "wrap around"
+Adding and subtracting in finite fields is pretty simple. Values of 23 and greater will wrap around to
 zero, and values below zero will wrap around to 22:
 <canvas class="numline animated" id="canvas-field-add-sub" width="500" height="80"></canvas>
 
@@ -146,15 +134,16 @@ Multiplication is also straightforward. Similar to addition, the result is taken
 
 <h4>Negation</h4>
 <p>
-    You might be familiar with negation meaning flipping a value's sign from positive to negative
-    (or vice versa). Another definition could be finding the value
+You might be used to negation as flipping a value's sign from positive to negative
+    (or vice versa). Another definition would be finding the value
     `\text{-}n` for `n` that satisfies this equation:
     <div class="math-block">
     `n + \text{-}n = 0`
     </div>
 
 <p>
-    In <span class="fat-fp">Fp</span>, we can negate a number by subtracting it from `p`:
+    In <span class="fat-fp">Fp</span>, we can solve the above and negate a number by subtracting
+    it from `p`:
 
 <canvas class="numline animated" id="canvas-field-negate" width="500" height="80"></canvas>
 
@@ -175,11 +164,10 @@ Division is where things become interesting. Let's start by noting
     </div>
 
 <p>
-    Based on the above, you can see that dividing by `n` is the same as multiplying
-    by the term `n^(\text{-}1)`.
+    You can see that dividing by `n` is the same as multiplying by the term `n^(\text{-}1)`.
 
 <p>
-    In the description of multiplication above you can see how it's possible for two
+    In our <span class="fat-fp">Fp</span> multiplication it's possible for two
     positive integers to equal 1 when multiplied together.
     It turns out that for each positive integer in <span class="fat-fp">Fp</span> there is one
     positive integer that acts as this "multiplicative inverse":
@@ -206,8 +194,8 @@ To tie it all together, when working in <span class="fat-fp">Fp</span>
     `sqrt(n) \times sqrt(n) = n`
     </div>
 <p>
-In real numbers there are two solutions to this problem for non-zero numbers (positive and negative).
-Non-zero numbers in <span class="fat-fp">Fp</span> also have two solutions.
+In real numbers there are generally two solutions to this problem (positive and negative).
+In a similar way there are two square root solutions to non-zero numbers in <span class="fat-fp">Fp</span>.
 
     <canvas class="numline animated" id="canvas-field-sqrt" width="500" height="80"></canvas>
 
@@ -217,23 +205,22 @@ Non-zero numbers in <span class="fat-fp">Fp</span> also have two solutions.
     provided <a target="_blank" href="sqrt23.html">in this table</a>.
 </div>
 
-<h2>Concept 3: Elliptic curves <em>plus</em> finite fields</h2>
+<h2>Elliptic curves <em>and</em> finite fields</h2>
 <div>
 <p>
 Now we can combine the two concepts of elliptic curves and finite field math.
-<p>
 Let's start with an elliptic curve equation:
     <div class="math-block">
     `y^2 = x^3 + 9x + 1`
     </div>
-<p>For our finite field we choose the prime number 61:
+<p>For our finite field let's use the prime number 61:
 
     <div class="math-block">
     `\mathbb{F}_61 = {0, 1, 2, …, 60}`
     </div>
 <p>
 We'll also pre-compute the tables for <a href="inverse61.html">division</a> and <a href="sqrt61.html">square roots</a>
-in <span class="fat-fp-61">F61</span>.
+in <span class="fat-fp-61">F61</span> for convenience.
 
 <p>
 What would it look like to plot this elliptic curve on a graph? Starting with `x=0`,
@@ -241,34 +228,33 @@ and working through each number from 0 to 60, and using the math operations defi
     <span class="fat-fp-61">F61</span>:
 
 <table class="results">
-    <tbody id="mult-table-body"></tbody>
     <tr>
-        <td>`x = 0:`</td>
+        <td>`x = 0`:</td>
         <td>`y^2 = 0^3 + 9\cdot0 + 1 = 1 % 61 = 1 =>`
         <td>`y = sqrt(1) = text{1 and 60}`</td>
     </tr>
     <tr>
-        <td>`x = 1:`</td>
+        <td>`x = 1`:</td>
         <td>`y^2 = 1^3 + 9\cdot1 + 1 = 11 % 61 = 11 =>`
         <td>`y = sqrt(11) = text{undefined}`</td>
     </tr>
     <tr>
-        <td>`x = 2:`</td>
+        <td>`x = 2`:</td>
         <td>`y^2 = 2^3 + 9\cdot2 + 1 = 27 % 61 = 27 =>`
         <td>`y = sqrt(27) = text{24 and 37}`</td>
     </tr>
     <tr>
-        <td>`x = 3:`</td>
+        <td>`x = 3`:</td>
         <td>`y^2 = 3^3 + 9\cdot3 + 1 = 55 % 61 = 55 =>`
         <td>`y = sqrt(27) = text{undefined}`</td>
     </tr>
     <tr>
-        <td>`x = 4:`</td>
+        <td>`x = 4`:</td>
         <td>`y^2 = 4^3 + 9\cdot4 + 1 = 101 % 61 = 40 =>`
         <td>`y = sqrt(40) = text{undefined}`</td>
     </tr>
     <tr>
-        <td>`x = 5:`</td>
+        <td>`x = 5`:</td>
         <td>`y^2 = 5^3 + 9\cdot5 + 1 = 171 % 61 = 49 =>`
         <td>`y = sqrt(49) = text{7 and 54}`</td>
     </tr>
@@ -302,7 +288,7 @@ the rules of point addition (draw lines between two points, find the curve inter
 <p>
     To double a point `P` at `(:x_1, y_1:)` to get `2P` at `(:x_2, y_2:)`:
 
-    <div class="math-block text-left ml2">
+    <div class="math-block-left ml2">
     `\lambda = \frac{3x_1^2 + 9}{2y_1}`
     <br>
     `x_2 = \lambda^2 - x_1 - x_1`
@@ -312,7 +298,7 @@ the rules of point addition (draw lines between two points, find the curve inter
 
 <p>
     To add two points `P (:x_1, y_1:)` and `Q (:x_2, y_2:)` to get a third point `R (:x_3, y_3:)`:
-    <div class="math-block text-left ml2">
+    <div class="math-block-left ml2">
     `\lambda = \frac{y_2 - y_1}{x_2 - x_1}`
     <br>
     `x_3 = \lambda^2 - x_1 - x_2`
@@ -325,17 +311,11 @@ the rules of point addition (draw lines between two points, find the curve inter
 
 <script>
     let fs = document.getElementsByClassName('fat-fp')
-    for (let f of fs) {
-        f.innerHTML = '<span>&#x1D53D;<sub>p</sub></span>';
-    }
+    for (let f of fs) f.innerHTML = '<span>&#x1D53D;<sub>p</sub></span>';
     fs = document.getElementsByClassName('fat-fp-23')
-    for (let f of fs) {
-        f.innerHTML = '<span>&#x1D53D;<sub>23</sub></span>';
-    }
+    for (let f of fs) f.innerHTML = '<span>&#x1D53D;<sub>23</sub></span>';
     fs = document.getElementsByClassName('fat-fp-61')
-    for (let f of fs) {
-        f.innerHTML = '<span>&#x1D53D;<sub>61</sub></span>';
-    }
+    for (let f of fs) f.innerHTML = '<span>&#x1D53D;<sub>61</sub></span>';
 </script>
 </body>
 </html>
