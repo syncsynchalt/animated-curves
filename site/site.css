@@ -80,11 +80,16 @@ canvas.numline {
 }
 
 table.results {
-    margin-left: 2em;
+    margin-left: 1em;
     margin-bottom: 1em;
 }
 table.results td {
     padding-left: 2em;
+}
+
+.math-block {
+    text-align: center;
+    padding-bottom: 1em;
 }
 
 .pb1 {
