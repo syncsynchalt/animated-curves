@@ -130,7 +130,12 @@ import * as field from './field-math/field-draw.js';
         common.startVisibleCanvases();
     }
 
-    if (document.readyState === 'complete') {
+    if (window.MathJax?.startup?.defaultPageReady) {
+        console.log('deferring startup until MathJax pageReady');
+        window.MathJax?.startup?.defaultPageReady().then(async () => {
+            await onload();
+        });
+    } else if (document.readyState === 'complete') {
         await onload();
     } else {
         window.onload = onload;
