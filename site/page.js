@@ -91,19 +91,28 @@ import * as field from './field-math/field-draw.js';
     async function curveSetup() {
         const canvas = common.byId('canvas-curve61-static');
         const ctx = common.convertCanvasHiDPI(canvas);
-        await draw.resetGraph(ctx);
+        await draw.resetGraph(ctx,true);
     }
 
-    async function addPSetup() {
-        const canvas = common.byId('canvas-addp');
-        const ctx = common.convertCanvasHiDPI(canvas);
+    async function fCurveSetup() {
+        const canvas1 = common.byId('canvas-addp');
+        const ctx1 = common.convertCanvasHiDPI(canvas1);
 
         let n = 1;
         let Q = undefined;
-        const startDemo = async () => {
-            return draw.runAddPDemo(ctx, n, Q, (nR, R) => { n = nR; Q = R });
+        const startDemo1 = async () => {
+            return draw.runAddPDemo(ctx1, n, Q, (nR, R) => { n = nR; Q = R });
         };
-        await common.addPlayPause(ctx, startDemo, common.cancelAnimation);
+        await common.addPlayPause(ctx1, startDemo1, common.cancelAnimation);
+
+        const canvas2 = common.byId('canvas-double-and-add');
+        const ctx2 = common.convertCanvasHiDPI(canvas2);
+        const startDemo2 = async () => {
+            return draw.runDoubleAddDemo(ctx2, (np) => {
+                common.byId('dbl-add-np').textContent = `${np}`;
+            });
+        };
+        await common.addPlayPause(ctx2, startDemo2, common.cancelAnimation);
     }
 
     async function onload() {
@@ -117,7 +126,7 @@ import * as field from './field-math/field-draw.js';
         await realAssocSetup();
         await fieldSetup();
         await curveSetup();
-        await addPSetup();
+        await fCurveSetup();
         common.startVisibleCanvases();
     }
 
