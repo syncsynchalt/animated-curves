@@ -3,16 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <title>Visualizing Elliptic Curves</title>
-    <script type="module" src="page.js"></script>
+    <script type="module" src="page.js" async></script>
     <link href="site.css" rel="stylesheet">
     <!-- xxx todo grab only what we need -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/css/bootstrap.min.css"
           integrity="sha384-0evHe/X+R7YkIZDRvuzKMRqM+OrBnVFBL6DOitfPri4tjfHxaWutUpFmBp4vmVor"
           rel="stylesheet" crossorigin="anonymous">
-<!--    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/latest.js?config=AM_CHTML"></script>-->
-<!--    <script type="text/x-mathjax-config">-->
-<!--        MathJax.Hub.Config({ CommonHTML: { scale: 90 } });-->
-<!--    </script>-->
+    <script>
+        MathJax = {
+            loader: {load: ['input/asciimath', 'output/chtml']},
+            chtml: { scale: 0.9 }
+        };
+    </script>
+    <script type="text/javascript" id="MathJax-script" async
+            src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/startup.js">
+    </script>
 </head>
 <body class="main-page">
 <div class="container">
@@ -322,7 +327,7 @@ the rules of point addition (draw lines between two points, find the curve inter
     <div class="ill-content">
     <canvas class="animated" id="canvas-double-and-add" width="500" height="400"></canvas>
     </div>
-    <figcaption>Double-and-add method for point <span id="dbl-add-np">127P</span></figcaption>
+    <figcaption>Double-and-add method for point <span id="dbl-add-np">nP</span></figcaption>
 </figure>
 
 </div>

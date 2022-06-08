@@ -708,14 +708,15 @@ async function runAddPDemo(ctx, nQ, Q, updateCb, drawDoneCb) {
 
 function pickGoodDoubleAddNumber() {
     let result = 0;
-    const picks = [0, 0, 0, 1, 1, 1, 1];
+    const picks = [0, 0, 1, 1, 1];
     // noinspection JSCheckFunctionSignatures
     picks.sort(() => { return Math.random() > 0.5 });
-    for (let i = 0; i <= 7; i++) {
+    for (let i = 0; i <= 5; i++) {
         if (picks[i]) {
             result += 2**i;
         }
     }
+    result += Math.random() > 0.5 ? 2 ** 7 : 2 ** 6;
     return result;
 }
 
@@ -751,7 +752,7 @@ async function runDoubleAddDemo(ctx, updateCb, drawDoneCb) {
         }
         if (drawDoneCb) drawDoneCb();
         if (common.canvasIsScrolledIntoView(ctx.canvas)) {
-            ctx['_timeout'] = setTimeout(cycle, 2000);
+            ctx['_timeout'] = setTimeout(cycle, 2500);
         } else {
             ctx.canvas.click();
         }
