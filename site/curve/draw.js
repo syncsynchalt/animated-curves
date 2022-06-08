@@ -270,208 +270,6 @@ function drawAndLabelPoints(ctx, vals, points) {
 }
 
 /**
- * @param ctx {CanvasRenderingContext2D}
- * @param nQ {Number} the nP value of Q
- * @param Q {Point} the current point 'Q', to which 'P' will be added
- * @param drawDoneCb {Function?} optional callback when done drawing
- */
-// xxx todo fold this into addPointsAnimation
-async function addP(ctx, nQ, Q, drawDoneCb) {
-    const vals = preCalcValues(ctx);
-    let start, prev;
-
-    const P = curve.P();
-    if (Q === undefined) {
-        Q = P;
-    } else if (Q === null) {
-        // reset back to P
-        const R = P;
-        resetGraph(ctx, true);
-        drawDot(vals, P.x, P.y, 'red');
-        if (drawDoneCb) {
-            setTimeout(() => { drawDoneCb(R) }, 0);
-        }
-        return R;
-    }
-    const R = curve.pointAdd(P, Q);
-    if (R === null) {
-        return drawInfinity(ctx, P, Q, drawDoneCb);
-    }
-    const negR = curve.negate(R);
-    const slope = misc.getSlope(P, Q);
-
-    const started = {};
-    const finished = {};
-    const duration = {
-        tangent: 500,
-        tanPause: 300,
-        line: 500,
-        linePause: 500,
-        negate: 1000,
-        done: 1000,
-    };
-    const cache = {};
-
-    let markState = (state, timestamp) => {
-        started[state] = started[state] || timestamp;
-        return timestamp - started[state];
-    };
-
-    async function step(timestamp) {
-        if (!start) {
-            start = timestamp;
-        }
-        if (timestamp !== prev) {
-            ctx.beginPath();
-            ctx.save();
-            if (!finished['label']) {
-                markState('label', timestamp);
-                labelPoint(ctx, vals, 1, P, true);
-                if (nQ !== 1) {
-                    labelPoint(ctx, vals, nQ, Q, true);
-                }
-                finished['label'] = timestamp;
-            } else if (!finished['tangent']) {
-                let instate = markState('tangent', timestamp);
-                ctx.beginPath();
-                ctx.lineWidth = 1;
-                ctx.strokeStyle = 'orange';
-                ctx.setLineDash([4, 4]);
-                let mult = instate / duration.tangent;
-                mult = common.easeInOut(mult);
-                let bounds = misc.lineBoxBounds(P, Q);
-                let tanLineForw = bounds[1] - P.x;
-                let tanLineBack = P.x - bounds[0];
-                tanLineForw *= mult;
-                tanLineBack *= mult;
-                ctx.moveTo(...pointToCtx(vals, P.x, P.y));
-                ctx.lineTo(...pointToCtx(vals, P.x + Math.abs(tanLineForw),
-                    P.y + tanLineForw * slope));
-                ctx.moveTo(...pointToCtx(vals, P.x, P.y));
-                ctx.lineTo(...pointToCtx(vals, P.x - Math.abs(tanLineBack),
-                    P.y - tanLineBack * slope));
-                ctx.stroke();
-                drawDot(vals, P.x, P.y, 'black');
-                drawDot(vals, Q.x, Q.y, 'red');
-                if (instate > duration.tangent) {
-                    finished.tangent = timestamp;
-                }
-            } else if (!finished.tanPause) {
-                let instate = markState('tanPause', timestamp);
-                if (instate > duration.tanPause) {
-                    finished.tanPause = timestamp;
-                }
-            } else if (!finished.line) {
-                markState('line', timestamp);
-                if (!cache.lineLastP) {
-                    let _x;
-                    // noinspection JSUnusedAssignment
-                    [cache.lineLastP, _x] = common.orderPointsByX(P, Q);
-                    cache.lineXLeft = misc.findTotalXLength(P, Q, negR);
-                    cache.lineXPerMs = cache.lineXLeft / duration.line || 1;
-                    cache.segmentBudget = 5;
-                }
-
-                ctx.lineWidth = 2;
-                ctx.strokeStyle = 'orange';
-                ctx.setLineDash([]);
-                let todoX = Math.min(cache.lineXPerMs * (timestamp - prev), cache.lineXLeft);
-                let check = 10;
-                let segmentsLen = 0;
-                while (todoX > 0 && segmentsLen < cache.segmentBudget) {
-                    if (check-- < 0) {
-                        break;
-                    }
-                    ctx.beginPath();
-                    ctx.moveTo(...pointToCtx(vals, cache.lineLastP.x, cache.lineLastP.y));
-                    let next = misc.findWrapSegment(cache.lineLastP, slope, todoX,
-                        cache.segmentBudget - segmentsLen);
-                    ctx.lineTo(...pointToCtx(vals, next.x, next.y));
-                    ctx.stroke();
-                    segmentsLen += misc.segmentLen(cache.lineLastP, next);
-
-                    let drawnX = next.x - cache.lineLastP.x;
-                    if (next.y < EPS) {
-                        next.y += field.p;
-                        cache.segmentBudget *= 1.1;
-                    } else if (next.y > field.p - EPS) {
-                        next.y -= field.p;
-                        cache.segmentBudget *= 1.1;
-                    }
-                    if (next.x > field.p - EPS) {
-                        next.x -= field.p;
-                        cache.segmentBudget *= 1.1;
-                    }
-                    cache.lineLastP = next;
-                    cache.lineXLeft -= drawnX;
-                    todoX -= drawnX;
-                }
-                drawDot(vals, P.x, P.y, 'black');
-                drawDot(vals, Q.x, Q.y, 'red');
-                if (cache.lineXLeft <= EPS) {
-                    finished.line = timestamp;
-                    drawDot(vals, negR.x, negR.y, 'orange', +1, 1);
-                }
-            } else if (!finished.linePause) {
-                let instate = markState('linePause', timestamp);
-                if (instate >= duration.linePause) {
-                    finished.linePause = timestamp;
-                }
-            } else if (!finished.negate) {
-                let instate = markState('negate', timestamp);
-                ctx.beginPath();
-                ctx.lineWidth = 2;
-                ctx.strokeStyle = 'red';
-                ctx.setLineDash([3, 2]);
-                if (!cache.negLength) {
-                    cache.negLength = negR.y - R.y;
-                }
-                let mult = instate / duration.negate;
-                mult = Math.min(1, mult);
-                mult = common.easeInOut(mult);
-                ctx.moveTo(...pointToCtx(vals, negR.x, negR.y, true));
-                ctx.lineTo(...pointToCtx(vals, negR.x, negR.y - cache.negLength * mult, true));
-                ctx.stroke();
-                ctx.setLineDash([]);
-                // overdraw to fix red line covering this dot
-                drawDot(vals, negR.x, negR.y, 'orange', +1, 1);
-                if (instate > duration.negate) {
-                    ctx.strokeStyle = 'black';
-                    drawDot(vals, Q.x, Q.y, 'orange');
-                    drawDot(vals, R.x, R.y, 'red', +1, 2);
-                    labelPoint(ctx, vals, nQ+1, R, true);
-                    finished.negate = timestamp;
-                }
-            } else if (!finished.callback) {
-                markState('callback', timestamp);
-                if (drawDoneCb) {
-                    drawDoneCb(R);
-                }
-                finished.callback = timestamp;
-            } else if (!finished.done) {
-                let instate = markState('done', timestamp);
-                if (instate > duration.done) {
-                    finished.done = timestamp;
-                }
-            }
-            ctx.restore();
-        }
-        prev = timestamp;
-
-        if (finished.done) {
-            resetGraph(ctx, true);
-            drawDot(vals, R.x, R.y, 'red');
-            labelPoint(ctx, vals, 1, P, true);
-            labelPoint(ctx, vals, nQ+1, R, true);
-        } else {
-            ctx['_frame'] = requestAnimationFrame(step);
-        }
-    }
-    ctx['_frame'] = requestAnimationFrame(step);
-    return R;
-}
-
-/**
  * Add two points (visually).
  * @param ctx {CanvasRenderingContext2D}
  * @param nP {Number} the base_ multiple of P (for labeling)
@@ -482,6 +280,7 @@ async function addP(ctx, nQ, Q, drawDoneCb) {
  * @param {Object?} options.labels optional list of label:point mappings to label on graph reset.
  * @param {Boolean?} options.coords whether to label coordinates.
  * @param {Boolean?} options.drawPoints whether to draw the points of the curve
+ * @param {Function?} options.updateCb called when P+Q is calculated
  * @return {Promise} completed when animation is finished.
  */
 async function addPointsAnimation(ctx, nP, P, nQ, Q, options) {
@@ -505,6 +304,10 @@ async function addPointsAnimation(ctx, nP, P, nQ, Q, options) {
         }
         const negR = curve.negate(R);
         const slope = misc.getSlope(P, Q);
+
+        if (options?.updateCb) {
+            options.updateCb(R, nP + nQ);
+        }
 
         const started = {};
         const finished = {};
@@ -880,18 +683,18 @@ async function quickDoubles(ctx, limit) {
 async function runAddPDemo(ctx, nQ, Q, updateCb, drawDoneCb) {
     resetGraph(ctx, true);
     let next = async () => {
-        Q = await addP(ctx, nQ, Q, (R) => {
-            if (drawDoneCb) drawDoneCb(nQ+1, R);
-            if (common.canvasIsScrolledIntoView(ctx.canvas)) {
-                ctx['_timeout'] = setTimeout(() => { next() }, 1.5 * 1000);
-                return true;
-            } else {
-                ctx.canvas.click();
-                return false;
-            }
+        Q = await addPointsAnimation(ctx, 1, curve.P(), nQ, Q, {
+            coords: true,
+            labels: {1: curve.P()},
+            updateCb
         });
         nQ++;
-        if (updateCb) updateCb(nQ, Q);
+        if (drawDoneCb) drawDoneCb(nQ, Q);
+        if (common.canvasIsScrolledIntoView(ctx.canvas)) {
+            ctx['_timeout'] = setTimeout(() => { next() }, 1.5 * 1000);
+        } else {
+            ctx.canvas.click();
+        }
     };
     await next();
 }
@@ -948,7 +751,6 @@ export {
     INFINITY,
     P,
     resetGraph,
-    addP,
     runAddPDemo,
     runDoubleAddDemo,
 };
