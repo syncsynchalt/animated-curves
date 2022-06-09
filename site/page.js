@@ -129,6 +129,16 @@ import * as field from './field-math/field-draw.js';
             draw.runExchangeDemo(ctxA, ka, curve61.pointMult(curve61.P(), kb), 'A', 'B');
             draw.runExchangeDemo(ctxB, kb, curve61.pointMult(curve61.P(), ka), 'B', 'A');
         });
+        common.byId('rand-exchange').addEventListener('click', () => {
+            let ka = Math.ceil(Math.random() * 256);
+            let kb = Math.ceil(Math.random() * 256);
+            while (ka === kb) {
+                kb = Math.ceil(Math.random() * 256);
+            }
+            common.byId('alice-key').value = ka;
+            common.byId('bob-key').value = kb;
+            common.byId('go-exchange').click();
+        });
     }
 
     async function onload() {
