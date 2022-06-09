@@ -36,6 +36,10 @@ canvas.animated {
     cursor: pointer;
 }
 
+canvas.animated.no-click {
+    cursor: inherit;
+}
+
 .skinny-block {
     display: block;
     margin: auto 1em;
