@@ -25,6 +25,8 @@
 👋 Hi there!  This is a work in progress, and this URL is only temporary.  Feel free to look around but please don't
     share or publish this page yet. This page might be broken at times, and I promise the complete page will
     be better anyway.
+<p>
+(Going on vacation for a week, will finish the page when back).
 <h2>Consider the curve</h2>
 <div>
 <p>
@@ -232,6 +234,9 @@ We'll also pre-compute the tables for <a href="inverse61.html">division</a> and 
 in <span class="fat-fp-61">F61</span> for convenience.
 
 <p>
+We'll also nominate one of the points on this curve to be the "base point" `P`: `(5,7)`.
+
+<p>
     Let's call the combination of this elliptic curve and the finite field
     <span class="math-fp-61">F61</span> "Curve61".
     What would it look like to plot this curve on a graph? Starting with `x=0`
@@ -296,7 +301,7 @@ the rules of point addition (draw lines between two points, find the curve inter
     sometimes many times. Finding the values algebraically is relatively easy though, just remember
     to use the rules of finite field math:
 <p>
-    To double a point `P` at `(:x_1, y_1:)` to get `2P` at `(:x_2, y_2:)`:
+    To double a point `P` at `(x_1, y_1)` to get `2P` at `(x_2, y_2)`:
 
     <div class="math-block-left ml2">
     `\lambda = \frac{3x_1^2 + 9}{2y_1}`
@@ -307,7 +312,7 @@ the rules of point addition (draw lines between two points, find the curve inter
     </div>
 
 <p>
-    To add two points `P (:x_1, y_1:)` and `Q (:x_2, y_2:)` to get a third point `R (:x_3, y_3:)`:
+    To add two points `P: (x_1, y_1)` and `Q: (x_2, y_2)` to get a third point `R: (x_3, y_3)`:
     <div class="math-block-left ml2">
     `\lambda = \frac{y_2 - y_1}{x_2 - x_1}`
     <br>
@@ -330,6 +335,68 @@ the rules of point addition (draw lines between two points, find the curve inter
     <figcaption>Double-and-add method for point <span id="dbl-add-np">nP</span></figcaption>
 </figure>
 
+</div>
+
+<h2>Key Exchange</h2>
+<div>
+<p>
+Now we have enough to start doing some useful cryptographic work. In particular, we're going to want to
+do a key exchange with Curve61, much in the same way that TLS 1.3 does a key exchange with Curve25519.
+
+<p>
+Alice and Bob want to start a private conversation. To do this, they're going to agree on a number without
+any eavesdroppers being able to tell what the number is. With an agreed-on number, they can use
+one of the many fast and secure ciphers (such as AES) to encrypt their conversation.
+
+<p>
+The process looks like this:
+<ul>
+    <li>Alice and Bob agree to use Curve61, described in the section above.
+    <li>Alice picks a random number `k_a`
+    <li>Alice computes the coordinates of `k_(a)P` and sends it to Bob as `A`
+    <li>Bob picks a random number `k_b`
+    <li>Bob computes the coordinates of `k_(b)P` and sends it to Alice as `B`
+    <li>Alice computes the coordinates of `k_(a)B`, which is `k_(a)(k_(b)P)`
+    <li>Bob computes the coordinates of `k_(b)A`, which is `k_(b)(k_(a)P)`
+</ul>
+
+<p>Because point addition on Curve61 is associative, both `k_b(k_aP)` and `k_a(k_bP)` are the same
+point: they're just the base point added to itself `k_a \times k_b` times.  Since they're the
+same point, both Alice and Bob have agreed on the same number: the coordinates of `k_ak_bP`.
+
+<p>
+Enter values for Bob and Alice's private keys below and watch a key exchange occur:
+
+<form class="row row-cols-sm-auto g-3 align-items-center" onsubmit="return false">
+    <div class="col-12">
+    <div class="input-group input-group-sm">
+    <label for="alice-key" class="col-form-label col-form-label-sm">k<sub>a</sub>&nbsp;</label>
+    <input type="text" class="form-control form-control-sm" id="alice-key" placeholder="Alice's key">
+    </div>
+    </div>
+
+    <div class="col-12">
+    <div class="input-group input-group-sm">
+    <label for="bob-key" class="col-form-label col-form-label-sm">k<sub>b</sub>&nbsp;</label>
+    <input type="text" class="form-control form-control-sm" id="bob-key" placeholder="Bob's key">
+    </div>
+    </div>
+
+    <div class="col-12">
+    <button type="submit" class="btn btn-primary btn-sm" id="go-exchange">Go</button>
+    </div>
+
+</form>
+
+<figure class="illustration">
+    <div class="ill-content">
+    <div>Alice:</div>
+    <canvas class="animated" id="canvas-alice" width="500" height="300"></canvas>
+    <div>Bob:</div>
+    <canvas class="animated" id="canvas-bob" width="500" height="300"></canvas>
+    </div>
+    <figcaption>A key exchange</figcaption>
+</figure>
 </div>
 
 </div> <!-- container -->

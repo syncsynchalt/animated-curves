@@ -1,5 +1,6 @@
 import * as draw25519 from './curve25519/draw-25519.js';
 import * as draw from './curve/draw.js';
+import * as curve61 from './curve/curve.js';
 import * as sample from './ec-samples/sample-draw.js';
 import * as real from './real-curve/real-draw.js';
 import * as common from './common.js';
@@ -115,6 +116,21 @@ import * as field from './field-math/field-draw.js';
         await common.addPlayPause(ctx2, startDemo2, common.cancelAnimation);
     }
 
+    async function exchangeSetup() {
+        const canvasA = common.byId('canvas-alice');
+        const ctxA = common.convertCanvasHiDPI(canvasA);
+        const canvasB = common.byId('canvas-bob');
+        const ctxB = common.convertCanvasHiDPI(canvasB);
+
+        common.byId('go-exchange').addEventListener('click', () => {
+            const ka = common.byId('alice-key')['value'];
+            const kb = common.byId('bob-key')['value'];
+
+            draw.runExchangeDemo(ctxA, ka, curve61.pointMult(curve61.P(), kb), 'A', 'B');
+            draw.runExchangeDemo(ctxB, kb, curve61.pointMult(curve61.P(), ka), 'B', 'A');
+        });
+    }
+
     async function onload() {
         while (!window.requestAnimationFrame) {
             alert('No support for requestAnimationFrame detected!');
@@ -127,11 +143,11 @@ import * as field from './field-math/field-draw.js';
         await fieldSetup();
         await curveSetup();
         await fCurveSetup();
+        await exchangeSetup();
         common.startVisibleCanvases();
     }
 
     if (window.MathJax?.startup?.defaultPageReady) {
-        console.log('deferring startup until MathJax pageReady');
         window.MathJax?.startup?.defaultPageReady().then(async () => {
             await onload();
         });

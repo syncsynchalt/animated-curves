@@ -218,9 +218,12 @@ function drawCurve(ctx) {
  * @param vals {PreCalcVals}
  * @param num {Number} the label to write
  * @param P {Point} the point to label
- * @param coords {Boolean?} whether to also label the coordinates
+ * @param options {Object?}
+ * @param options.coords {Boolean?} whether to also label the coordinates
+ * @param options.label {String?} the label to use for points (default 'P')
  */
-function labelPoint(ctx, vals, num, P, coords) {
+function labelPoint(ctx, vals, num, P, options) {
+    const baseLabel = options?.label || 'P';
     ctx.save();
     ctx.beginPath();
     const index = `${P.x},${P.y}`;
@@ -236,11 +239,11 @@ function labelPoint(ctx, vals, num, P, coords) {
     ctx.textAlign = dir[0] === -1 ? 'right' : 'left';
     ctx.textBaseline = dir[1] === -1 ? 'bottom' : 'top';
     ctx.lineWidth = 4;
-    const label = num === 1 ? 'P' : `${num}P`;
+    const label = num === 1 ? baseLabel : `${num}${baseLabel}`;
     ctx.strokeText(label, pt[0]+3*dir[0], pt[1]+3*dir[1]);
     ctx.fillText(label, pt[0]+3*dir[0], pt[1]+3*dir[1]);
 
-    if (coords) {
+    if (options?.coords) {
         let coordLabel = `(${P.x}, ${P.y})`;
         ctx.font = '12px sans';
         const flipDir = [dir[0]*-1, dir[1]*-1];
@@ -261,11 +264,14 @@ function labelPoint(ctx, vals, num, P, coords) {
  * @param ctx {CanvasRenderingContext2D}
  * @param vals {PreCalcVals}
  * @param points {Object} mapping of label => point to label
+ * @param options {Object?}
+ * @param {String?} options.label label for base point (default 'P')
+ * @param {Boolean?} options.coords whether to label coordinates
  */
-function drawAndLabelPoints(ctx, vals, points) {
+function drawAndLabelPoints(ctx, vals, points, options) {
     for (const [num, point] of Object.entries(points)) {
         drawDot(vals, point.x, point.y, 'black');
-        labelPoint(ctx, vals, Number(num), point);
+        labelPoint(ctx, vals, Number(num), point, options);
     }
 }
 
@@ -278,6 +284,7 @@ function drawAndLabelPoints(ctx, vals, points) {
  * @param Q {Point}
  * @param options {Object?} optional list of options
  * @param {Object?} options.labels optional list of label:point mappings to label on graph reset.
+ * @param {String?} options.basePointLabel label to use for base point (default 'P')
  * @param {Boolean?} options.coords whether to label coordinates.
  * @param {Boolean?} options.drawPoints whether to draw the points of the curve
  * @param {Function?} options.drawDoneCb called when animation is finished
@@ -285,6 +292,7 @@ function drawAndLabelPoints(ctx, vals, points) {
  */
 async function addPointsAnimation(ctx, nP, P, nQ, Q, options) {
     const vals = preCalcValues(ctx);
+    const labelOptions = {coords: options?.coords, label: options?.basePointLabel};
     let start, prev;
 
     if (Q === undefined) {
@@ -294,7 +302,9 @@ async function addPointsAnimation(ctx, nP, P, nQ, Q, options) {
         // reset back to P
         const R = P;
         resetGraph(ctx, options?.drawPoints);
-        if (options.labels) drawAndLabelPoints(ctx, vals, options.labels);
+        if (options.labels) {
+            drawAndLabelPoints(ctx, vals, options?.labels, {label: options?.basePointLabel});
+        }
         drawDot(vals, P.x, P.y, 'red');
         return setTimeout(() => {
             if (options?.drawDoneCb) options.drawDoneCb(nP+nQ, R);
@@ -336,9 +346,9 @@ async function addPointsAnimation(ctx, nP, P, nQ, Q, options) {
             ctx.save();
             if (!finished['label']) {
                 markState('label', timestamp);
-                labelPoint(ctx, vals, nP, P, options?.coords);
+                labelPoint(ctx, vals, nP, P, labelOptions);
                 if (nQ !== nP) {
-                    labelPoint(ctx, vals, nQ, Q, options?.coords);
+                    labelPoint(ctx, vals, nQ, Q, labelOptions);
                 }
                 finished['label'] = timestamp;
             } else if (!finished['tangent']) {
@@ -449,7 +459,7 @@ async function addPointsAnimation(ctx, nP, P, nQ, Q, options) {
                     ctx.strokeStyle = 'black';
                     drawDot(vals, Q.x, Q.y, 'orange');
                     drawDot(vals, R.x, R.y, 'red', +1, 2);
-                    labelPoint(ctx, vals, nP+nQ, R, options?.coords);
+                    labelPoint(ctx, vals, nP+nQ, R, labelOptions);
                     finished.negate = timestamp;
                 }
             } else if (!finished.done) {
@@ -464,10 +474,12 @@ async function addPointsAnimation(ctx, nP, P, nQ, Q, options) {
 
         if (finished.done) {
             resetGraph(ctx, options?.drawPoints);
-            if (options?.labels) drawAndLabelPoints(ctx, vals, options?.labels);
+            if (options?.labels) {
+                drawAndLabelPoints(ctx, vals, options?.labels, labelOptions);
+            }
             drawDot(vals, R.x, R.y, 'red');
-            labelPoint(ctx, vals, nP, P, options?.coords);
-            labelPoint(ctx, vals, nP+nQ, R, options?.coords);
+            labelPoint(ctx, vals, nP, P, labelOptions);
+            labelPoint(ctx, vals, nP+nQ, R, labelOptions);
             if (options?.drawDoneCb) {
                 options.drawDoneCb(nR, R);
             }
@@ -598,15 +610,19 @@ async function drawInfinity(ctx, P, Q, drawDoneCb) {
  * Quickly animate the calculation of P, 2P, 4P, ... to limitP
  * @param ctx {CanvasRenderingContext2D}
  * @param limit {Number} the highest nP to show
+ * @param basePoint {Point?} the base point (default P)
+ * @param basePointLabel {String?} the label for the base point (default 'P')
  */
-async function quickDoubles(ctx, limit) {
+async function quickDoubles(ctx, limit, basePoint, basePointLabel) {
+    basePoint = basePoint || curve.P();
+    basePointLabel = basePointLabel || 'P';
     const vals = preCalcValues(ctx);
     let start, prev;
 
     let workingOn = 2;
     const pValues = [];
     for (let n = 1; n <= limit; n *= 2) {
-        pValues[n] = curve.pointMult(curve.P(), n);
+        pValues[n] = curve.pointMult(basePoint, n);
     }
     const prevPoints = {1: pValues[1]};
 
@@ -643,13 +659,13 @@ async function quickDoubles(ctx, limit) {
                         y: lastPoint.y + (thisPoint.y - lastPoint.y) * mult,
                     };
                     resetGraph(ctx);
-                    drawAndLabelPoints(ctx, vals, prevPoints);
+                    drawAndLabelPoints(ctx, vals, prevPoints, {label: basePointLabel});
                     drawDot(vals, midPoint.x, midPoint.y, 'orange');
                     if (mult >= 1.0) {
                         finished[workingOn] = timestamp;
                         prevPoints[workingOn] = pValues[workingOn];
                         resetGraph(ctx);
-                        drawAndLabelPoints(ctx, vals, prevPoints);
+                        drawAndLabelPoints(ctx, vals, prevPoints, {label: basePointLabel});
                     }
                 } else {
                     let instate = markState(`${workingOn}-pause`, timestamp);
@@ -720,36 +736,55 @@ function pickGoodDoubleAddNumber() {
     return result;
 }
 
+/**
+ * Animate a double-and-add.
+ * @param ctx {CanvasRenderingContext2D}
+ * @param n {Number} number of points to
+ * @param P {Point} base point
+ * @param baseLabel {String?} the label for base point (default 'P')
+ * @return {Promise<Point>} the calculated point
+ */
+async function doubleAndAddAnimation(ctx, n, P, baseLabel) {
+    resetGraph(ctx);
+    baseLabel = baseLabel || 'P';
+
+    return new Promise(success => {
+        const minBits = Math.floor(Math.log2(n));
+        quickDoubles(ctx, 2**minBits, P, baseLabel).then(async () => {
+            const points = {};
+            let runningTotal = 0;
+            for (let exp = 0; exp <= minBits; exp++) {
+                points[2**exp] = curve.pointMult(P, 2**exp);
+            }
+            for (let exp = 0, x = n; x !== 0; exp++, x >>= 1) {
+                if ((x & 1) !== 0) {
+                    const thisBit = 2**exp;
+                    if (runningTotal) {
+                        const tot = runningTotal;
+                        await new Promise(s => {
+                            addPointsAnimation(ctx, thisBit, points[thisBit], tot, points[tot], {
+                                basePointLabel: baseLabel,
+                                labels: points,
+                                drawDoneCb: () => { s() }
+                            });
+                        });
+                    }
+                    runningTotal += thisBit;
+                    points[runningTotal] = curve.pointMult(P, runningTotal);
+                }
+            }
+            success(points[runningTotal]) ;
+        });
+    });
+}
+
 async function runDoubleAddDemo(ctx, updateCb, drawDoneCb) {
     resetGraph(ctx);
 
     let cycle = async () => {
         const numToReach = pickGoodDoubleAddNumber();
         if (updateCb) updateCb(numToReach);
-        const minBits = Math.floor(Math.log2(numToReach));
-        await quickDoubles(ctx, 2**minBits);
-
-        const points = {};
-        let runningTotal = 0;
-        for (let exp = 0; exp <= minBits; exp++) {
-            points[2**exp] = curve.pointMult(curve.P(), 2**exp);
-        }
-        for (let exp = 0, x = numToReach; x !== 0; exp++, x >>= 1) {
-            if ((x & 1) !== 0) {
-                const thisBit = 2**exp;
-                if (runningTotal) {
-                    const tot = runningTotal;
-                    await new Promise(success => {
-                        addPointsAnimation(ctx, thisBit, points[thisBit], tot, points[tot], {
-                            labels: points,
-                            drawDoneCb: () => { success() }
-                        });
-                    });
-                }
-                runningTotal += thisBit;
-                points[runningTotal] = curve.pointMult(curve.P(), runningTotal);
-            }
-        }
+        await doubleAndAddAnimation(ctx, numToReach, P());
         if (drawDoneCb) drawDoneCb();
         if (common.canvasIsScrolledIntoView(ctx.canvas)) {
             ctx['_timeout'] = setTimeout(cycle, 2500);
@@ -760,10 +795,32 @@ async function runDoubleAddDemo(ctx, updateCb, drawDoneCb) {
     await cycle();
 }
 
+/**
+ * Run the 'key exchange' demo.
+ * @param ctx {CanvasRenderingContext2D}
+ * @param privKey {Number} private key
+ * @param pubKey {Point} public key of other party
+ * @param myLabel {String} label for my pubkey
+ * @param theirLabel {String} label for their pubkey
+ */
+async function runExchangeDemo(ctx, privKey, pubKey, myLabel, theirLabel) {
+    const vals = preCalcValues(ctx);
+    common.cancelAnimation(ctx);
+
+    const R1 = await doubleAndAddAnimation(ctx, privKey, P(), 'P');
+    resetGraph(ctx);
+    drawAndLabelPoints(ctx, vals, {1: R1}, {label: myLabel, coords: true});
+    await new Promise(success => {setTimeout(() => { success() }, 3000)});
+    const R2 = await doubleAndAddAnimation(ctx, privKey, pubKey, theirLabel);
+    resetGraph(ctx);
+    drawAndLabelPoints(ctx, vals, {[privKey]: R2}, {label: theirLabel, coords: true});
+}
+
 export {
     INFINITY,
     P,
     resetGraph,
     runAddPDemo,
     runDoubleAddDemo,
+    runExchangeDemo,
 };
