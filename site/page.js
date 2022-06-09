@@ -126,8 +126,10 @@ import * as field from './field-math/field-draw.js';
             const ka = common.byId('alice-key')['value'];
             const kb = common.byId('bob-key')['value'];
 
-            draw.runExchangeDemo(ctxA, ka, curve61.pointMult(curve61.P(), kb), 'A', 'B');
-            draw.runExchangeDemo(ctxB, kb, curve61.pointMult(curve61.P(), ka), 'B', 'A');
+            draw.runExchangeDemo(ctxA, ka, curve61.pointMult(curve61.P(), kb),
+                'A', 'B', 'Alice', common.byId('alice-desc'));
+            draw.runExchangeDemo(ctxB, kb, curve61.pointMult(curve61.P(), ka),
+                'B', 'A', 'Bob', common.byId('bob-desc'));
         });
         common.byId('rand-exchange').addEventListener('click', () => {
             let ka = Math.ceil(Math.random() * 256);

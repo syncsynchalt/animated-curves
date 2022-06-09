@@ -802,17 +802,23 @@ async function runDoubleAddDemo(ctx, updateCb, drawDoneCb) {
  * @param pubKey {Point} public key of other party
  * @param myLabel {String} label for my pubkey
  * @param theirLabel {String} label for their pubkey
+ * @param actor {String} actor name
+ * @param actorTag {HTMLDivElement} actor description tag
  */
-async function runExchangeDemo(ctx, privKey, pubKey, myLabel, theirLabel) {
+async function runExchangeDemo(ctx, privKey, pubKey, myLabel, theirLabel, actor, actorTag) {
     const vals = preCalcValues(ctx);
     common.cancelAnimation(ctx);
 
+    actorTag.textContent = `${actor} multiplies P by their private key, ${privKey}:`;
     const R1 = await doubleAndAddAnimation(ctx, privKey, P(), 'P');
+    actorTag.textContent = `${actor} gives this public key (${myLabel}) to the other party.`;
     resetGraph(ctx);
     drawAndLabelPoints(ctx, vals, {1: R1}, {label: myLabel, coords: true});
-    await new Promise(success => {setTimeout(() => { success() }, 3000)});
+    await new Promise(success => {setTimeout(() => { success() }, 5000)});
+    actorTag.textContent = `${actor} multiplies ${theirLabel} by their private key, ${privKey}:`;
     const R2 = await doubleAndAddAnimation(ctx, privKey, pubKey, theirLabel);
     resetGraph(ctx);
+    actorTag.textContent = `${actor} has found the shared secret: ${R2.x},${R2.y}`;
     drawAndLabelPoints(ctx, vals, {[privKey]: R2}, {label: theirLabel, coords: true});
 }
 
