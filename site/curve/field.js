@@ -23,6 +23,10 @@ function extended_euclidean_algorithm(a, b) {
     let tmp = undefined;
 
     while (r !== 0) {
+        if (Number.isNaN(r)) {
+            throw Error('Euclid found a NaN');
+        }
+
         let quotient = Math.floor(old_r / r);
 
         tmp = old_r - (quotient * r);

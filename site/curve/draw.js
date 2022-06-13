@@ -278,7 +278,7 @@ function drawAndLabelPoints(ctx, vals, points, options) {
 /**
  * Add two points (visually).
  * @param ctx {CanvasRenderingContext2D}
- * @param nP {Number} the base_ multiple of P (for labeling)
+ * @param nP {Number} the base-P multiple of P (for labeling)
  * @param P {Point}
  * @param nQ {Number} the base-P multiple of Q (for labeling)
  * @param Q {Point}
@@ -288,7 +288,7 @@ function drawAndLabelPoints(ctx, vals, points, options) {
  * @param {Boolean?} options.coords whether to label coordinates.
  * @param {Boolean?} options.drawPoints whether to draw the points of the curve
  * @param {Function?} options.drawDoneCb called when animation is finished
- * @return {Promise} completed when animation is finished.
+ * @return {Point} the result of adding P and Q: R
  */
 async function addPointsAnimation(ctx, nP, P, nQ, Q, options) {
     const vals = preCalcValues(ctx);
@@ -306,13 +306,15 @@ async function addPointsAnimation(ctx, nP, P, nQ, Q, options) {
             drawAndLabelPoints(ctx, vals, options?.labels, {label: options?.basePointLabel});
         }
         drawDot(vals, P.x, P.y, 'red');
-        return setTimeout(() => {
+        // preserve the expected ordering that this function returns, _then_ animation finishes.
+        setTimeout(() => {
             if (options?.drawDoneCb) options.drawDoneCb(nP+nQ, R);
         }, 0);
+        return P;
     }
     const R = curve.pointAdd(P, Q);
     if (R === null) {
-        return drawInfinity(ctx, P, Q, (R) => {
+        return drawInfinity(ctx, nP, P, nQ, Q, options, (R) => {
             if (options?.drawDoneCb) options.drawDoneCb(nP+nQ, R);
         });
     }
@@ -493,12 +495,17 @@ async function addPointsAnimation(ctx, nP, P, nQ, Q, options) {
 
 /**
  * @param ctx {CanvasRenderingContext2D}
+ * @param nP {Number} the base-P multiple of P (for labeling)
  * @param P {Point} the current point 'P'
+ * @param nQ {Number} the base-P multiple of Q (for labeling)
  * @param Q {Point} the current point 'Q' (assumed has same x-coord as P)
+ * @param options {Object?} optional list of options
  * @param drawDoneCb {Function?} optional callback when done drawing
+ * @return {Point} the point P + Q (which should always be null (infinity))
  */
-async function drawInfinity(ctx, P, Q, drawDoneCb) {
+async function drawInfinity(ctx, nP, P, nQ, Q, options, drawDoneCb) {
     const vals = preCalcValues(ctx);
+    const labelOptions = {coords: options?.coords, label: options?.basePointLabel};
     let start, prev;
     const R = null;
 
@@ -538,7 +545,14 @@ async function drawInfinity(ctx, P, Q, drawDoneCb) {
         if (timestamp !== prev) {
             ctx.beginPath();
             ctx.save();
-            if (!finished['tangent']) {
+            if (!finished.label) {
+                markState('label', timestamp);
+                labelPoint(ctx, vals, nP, P, labelOptions);
+                if (nQ !== nP) {
+                    labelPoint(ctx, vals, nQ, Q, labelOptions);
+                }
+                finished.label = timestamp;
+            } else if (!finished.tangent) {
                 let instate = markState('tangent', timestamp);
                 ctx.strokeStyle = 'orange';
                 ctx.lineWidth = 1;
