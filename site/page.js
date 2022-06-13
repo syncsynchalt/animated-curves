@@ -173,6 +173,7 @@ import * as field from './field-math/field-draw.js';
             }
             common.byId('alice-key').value = ka;
             common.byId('bob-key').value = kb;
+            formCheck();
             common.byId('go-exchange').click();
         });
     }
