@@ -1,7 +1,5 @@
 /**
- * Get element by ID.
- * @param id {String}
- * @return {HTMLElement | null}
+ * @alias document.getElementById
  */
 const byId = (id) => { return document.getElementById(id) };
 
@@ -68,7 +66,14 @@ function convertCanvasHiDPI(canvas) {
     return ctx;
 }
 
+/**
+ * Check whether the user can currently see the canvas (i.e. whether to continue an animation, or pause)
+ * @param canvas {HTMLCanvasElement}
+ */
 function canvasIsScrolledIntoView(canvas) {
+    if (canvas.dataset.visible === 'always') {
+        return true;
+    }
     const rect = canvas.getBoundingClientRect();
     const vh = window.innerHeight || document.documentElement.clientHeight;
     return (rect.top >= 0 && rect.top <= vh) ||
@@ -228,6 +233,15 @@ function startVisibleCanvases() {
     }
 }
 
+/**
+ * Sleep the given number of milliseconds.
+ * @param ms {Number} milliseconds to sleep
+ * @return {Promise}
+ */
+function sleep(ms) {
+    return new Promise(resolve => { setTimeout(resolve, ms) });
+}
+
 export {
     byId,
     range,
@@ -240,4 +254,5 @@ export {
     cancelAnimation,
     pickLabelDirection,
     startVisibleCanvases,
+    sleep,
 };

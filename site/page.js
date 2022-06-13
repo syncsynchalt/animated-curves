@@ -122,14 +122,48 @@ import * as field from './field-math/field-draw.js';
         const canvasB = common.byId('canvas-bob');
         const ctxB = common.convertCanvasHiDPI(canvasB);
 
-        common.byId('go-exchange').addEventListener('click', () => {
-            const ka = common.byId('alice-key')['value'];
-            const kb = common.byId('bob-key')['value'];
+        let formCheck = () => {
+            const goButton = common.byId('go-exchange'),
+                aliceInput = common.byId('alice-key'),
+                bobInput = common.byId('bob-key');
+            aliceInput.value = aliceInput.value.replaceAll(/\D/g, '');
+            bobInput.value = bobInput.value.replaceAll(/\D/g, '');
+            if (aliceInput.validity.valid && bobInput.validity.valid) {
+                goButton.removeAttribute('disabled');
+            } else {
+                goButton.setAttribute('disabled', 'disabled');
+            }
+        };
+        common.byId('alice-key').onkeyup = formCheck;
+        common.byId('bob-key').onkeyup = formCheck;
 
-            draw.runExchangeDemo(ctxA, ka, curve61.pointMult(curve61.P(), kb),
-                'A', 'B', 'Alice', common.byId('alice-desc'));
-            draw.runExchangeDemo(ctxB, kb, curve61.pointMult(curve61.P(), ka),
-                'B', 'A', 'Bob', common.byId('bob-desc'));
+        function tweakValues() {
+            let ka = common.byId('alice-key').value;
+            let kb = common.byId('bob-key').value;
+            let changed;
+            do {
+                changed = false;
+                while (ka % curve61.basePointOrder === 0) { ka++; changed = true }
+                while (kb % curve61.basePointOrder === 0) { kb++; changed = true }
+                while ((ka * kb) % curve61.basePointOrder === 0) { ka++; changed = true }
+            } while (changed);
+            common.byId('alice-key').value = ka;
+            common.byId('bob-key').value = kb;
+        }
+
+        common.byId('go-exchange').addEventListener('click', async () => {
+            tweakValues();
+            const ka = common.byId('alice-key').value;
+            const kb = common.byId('bob-key').value;
+
+            const waitA = draw.runExchangePubkeyDemo(ctxA, ka, 'A', 'Alice', common.byId('alice-desc'));
+            const waitB = draw.runExchangePubkeyDemo(ctxB, kb, 'B', 'Bob', common.byId('bob-desc'));
+            const A = await waitA;
+            const B = await waitB;
+            await common.sleep(2000);
+            const _a = draw.runExchangeMultDemo(ctxA, ka, B, 'B', 'Alice', common.byId('alice-desc'));
+            const _b = draw.runExchangeMultDemo(ctxB, kb, A, 'A', 'Bob', common.byId('bob-desc'));
+            await Promise.all([_a, _b]);
         });
         common.byId('rand-exchange').addEventListener('click', () => {
             let ka = Math.ceil(Math.random() * 256);

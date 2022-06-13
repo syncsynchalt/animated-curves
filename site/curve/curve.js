@@ -9,6 +9,7 @@ import * as field from './field.js';
 let curveA = 9;
 let curveB = 1;
 let basePointX = 5;
+let basePointOrder = 73;
 
 /**
  * @typedef Point {{x: Number, y: Number}}
@@ -138,6 +139,7 @@ function tangent(P) {
 
 export {
     setCurveParams,
+    basePointOrder,
     P,
     Y,
     pointDouble,

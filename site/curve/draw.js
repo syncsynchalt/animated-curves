@@ -584,10 +584,6 @@ async function drawInfinity(ctx, P, Q, drawDoneCb) {
                 ctx.fillText(INFINITY, left, down);
                 ctx.strokeText(INFINITY, left, down);
                 finished.infinite = timestamp;
-            } else if (!finished.callback) {
-                markState('callback', timestamp);
-                if (drawDoneCb) drawDoneCb(R);
-                finished.callback = timestamp;
             } else if (!finished.done) {
                 let instate = markState('done', timestamp);
                 if (instate > duration.done) {
@@ -598,7 +594,9 @@ async function drawInfinity(ctx, P, Q, drawDoneCb) {
         }
         prev = timestamp;
 
-        if (!finished.done) {
+        if (finished.done) {
+            if (drawDoneCb) drawDoneCb(R);
+        } else {
             ctx['_frame'] = requestAnimationFrame(step);
         }
     }
@@ -645,6 +643,9 @@ async function quickDoubles(ctx, limit, basePoint, basePointLabel) {
                 start = timestamp;
             }
             if (timestamp !== prev) {
+                if (workingOn > limit) {
+                    return success();
+                }
                 ctx.beginPath();
                 ctx.save();
                 if (!finished[workingOn]) {
@@ -677,10 +678,6 @@ async function quickDoubles(ctx, limit, basePoint, basePointLabel) {
                 ctx.restore();
             }
             prev = timestamp;
-
-            if (workingOn > limit) {
-                return success();
-            }
 
             if (common.canvasIsScrolledIntoView(ctx.canvas)) {
                 ctx['_frame'] = requestAnimationFrame(step);
@@ -796,29 +793,43 @@ async function runDoubleAddDemo(ctx, updateCb, drawDoneCb) {
 }
 
 /**
- * Run the 'key exchange' demo.
+ * Run the first half of the 'key exchange' demo.
+ * @param ctx {CanvasRenderingContext2D}
+ * @param privKey {Number} private key
+ * @param myLabel {String} label for my pubkey
+ * @param actor {String} actor name
+ * @param actorTag {HTMLDivElement} actor description tag
+ */
+async function runExchangePubkeyDemo(ctx, privKey, myLabel, actor, actorTag) {
+    const vals = preCalcValues(ctx);
+    common.cancelAnimation(ctx);
+
+    actorTag.textContent = `${actor} multiplies P by their private key (${privKey})` +
+        ` to find their public key, ${myLabel}:`;
+    const pubkey = await doubleAndAddAnimation(ctx, privKey, P(), 'P');
+    actorTag.textContent = `${actor} gives their public key (${myLabel}) to the other party.`;
+    resetGraph(ctx);
+    drawAndLabelPoints(ctx, vals, {1: pubkey}, {label: myLabel, coords: true});
+    return pubkey;
+}
+
+/**
+ * Run the second half of the 'key exchange' demo.
  * @param ctx {CanvasRenderingContext2D}
  * @param privKey {Number} private key
  * @param pubKey {Point} public key of other party
- * @param myLabel {String} label for my pubkey
  * @param theirLabel {String} label for their pubkey
  * @param actor {String} actor name
  * @param actorTag {HTMLDivElement} actor description tag
  */
-async function runExchangeDemo(ctx, privKey, pubKey, myLabel, theirLabel, actor, actorTag) {
+async function runExchangeMultDemo(ctx, privKey, pubKey, theirLabel, actor, actorTag) {
     const vals = preCalcValues(ctx);
     common.cancelAnimation(ctx);
 
-    actorTag.textContent = `${actor} multiplies P by their private key, ${privKey}:`;
-    const R1 = await doubleAndAddAnimation(ctx, privKey, P(), 'P');
-    actorTag.textContent = `${actor} gives this public key (${myLabel}) to the other party.`;
-    resetGraph(ctx);
-    drawAndLabelPoints(ctx, vals, {1: R1}, {label: myLabel, coords: true});
-    await new Promise(success => {setTimeout(() => { success() }, 5000)});
-    actorTag.textContent = `${actor} multiplies ${theirLabel} by their private key, ${privKey}:`;
+    actorTag.textContent = `${actor} multiplies ${theirLabel} by their private key (${privKey}):`;
     const R2 = await doubleAndAddAnimation(ctx, privKey, pubKey, theirLabel);
     resetGraph(ctx);
-    actorTag.textContent = `${actor} has found the shared secret: ${R2.x},${R2.y}`;
+    actorTag.textContent = `${actor} has found the shared secret: (${R2.x}, ${R2.y})`;
     drawAndLabelPoints(ctx, vals, {[privKey]: R2}, {label: theirLabel, coords: true});
 }
 
@@ -828,5 +839,6 @@ export {
     resetGraph,
     runAddPDemo,
     runDoubleAddDemo,
-    runExchangeDemo,
+    runExchangePubkeyDemo,
+    runExchangeMultDemo,
 };

@@ -345,7 +345,7 @@ the rules of point addition (draw lines between two points, find the curve inter
 
 <p>
     Alice and Bob want to start a private conversation. To do this, they're going to agree on a number without
-    any eavesdroppers being able to tell what the number is. With an agreed-on number, they can
+    any eavesdroppers being able to tell what the number is. With an agreed-upon number they can
     derive a key for one of the many fast and secure ciphers (such as AES) and encrypt their conversation.
 
 <p>
@@ -365,39 +365,40 @@ point: they're just the base point added to itself `k_a \times k_b` times.  Sinc
 same point, both Alice and Bob have agreed on the same number: the coordinates of `k_ak_bP`.
 
 <p>
-Enter values for Bob and Alice's private keys below and watch a key exchange occur:
+Enter numbers for Bob and Alice's private keys below and watch a key exchange occur:
 
 <form class="row row-cols-sm-auto g-3 align-items-center" onsubmit="return false">
     <div class="col-12">
     <div class="input-group input-group-sm">
     <label for="alice-key" class="col-form-label col-form-label-sm">k<sub>a</sub>&nbsp;</label>
-    <input type="text" class="form-control form-control-sm" id="alice-key" placeholder="Alice's key">
+    <input type="text" class="form-control form-control-sm" id="alice-key"
+           required pattern="[1-9][0-9]*" placeholder="Alice's key">
     </div>
     </div>
 
     <div class="col-12">
     <div class="input-group input-group-sm">
     <label for="bob-key" class="col-form-label col-form-label-sm">k<sub>b</sub>&nbsp;</label>
-    <input type="text" class="form-control form-control-sm" id="bob-key" placeholder="Bob's key">
+    <input type="text" class="form-control form-control-sm" id="bob-key"
+           required pattern="[1-9][0-9]*" placeholder="Bob's key">
     </div>
     </div>
 
     <div class="col-12">
-    <button type="submit" class="btn btn-primary btn-sm" id="go-exchange">Go</button>
+    <button type="submit" class="btn btn-primary btn-sm" id="go-exchange" disabled>Go</button>
     </div>
     <div class="col-12">
-    <button type="submit" class="btn btn-primary btn-sm" id="rand-exchange">Rand</button>
+    <button type="submit" class="btn btn-primary btn-sm" id="rand-exchange">Random</button>
     </div>
 </form>
 
 <figure class="illustration">
     <div class="ill-content">
     <div id="alice-desc">Alice:</div>
-    <canvas class="animated no-click" id="canvas-alice" width="500" height="300"></canvas>
+    <canvas class="animated no-click" id="canvas-alice" width="500" height="300" data-visible=always></canvas>
     <div id="bob-desc">Bob:</div>
-    <canvas class="animated no-click" id="canvas-bob" width="500" height="300"></canvas>
+    <canvas class="animated no-click" id="canvas-bob" width="500" height="300" data-visible=always></canvas>
     </div>
-    <figcaption>A key exchange</figcaption>
 </figure>
 </div>
 
