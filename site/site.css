@@ -47,8 +47,8 @@ canvas.animated.no-click {
 
 button {
     touch-action: manipulation;
-    user-select: none;
     -webkit-user-select: none;
+    user-select: none;
 }
 
 canvas.numline {
@@ -123,4 +123,12 @@ table.results td {
 }
 .ml2 {
     margin-left: 2em;
+}
+
+.no-vis-link, .no-vis-link:hover {
+    -webkit-user-select: text;
+    user-select: text;
+    text-decoration: none;
+    color: inherit;
+    /*cursor: text;*/
 }
