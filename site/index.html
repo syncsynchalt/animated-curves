@@ -25,7 +25,7 @@
 👋 Hi there!  This is a work in progress, and this URL is only temporary.  Feel free to look around but please don't
     share or publish this page yet. This page might be broken at times, and I promise the complete page will
     be better anyway.
-<h2>Consider the curve</h2>
+<h1>Visualizing Elliptic Curve Cryptography</h1>
 <div>
 <p>
     Every TLS 1.3 session starts with a key exchange
@@ -285,7 +285,7 @@ The resulting graph looks like this:
 </figure>
 
 <p>
-We can add points on this curve, using the math of <span class="fat-fp-61">F61</span> and
+We can still add points on this curve, using the math of <span class="fat-fp-61">F61</span> and
 the rules of point addition (draw lines between two points, find the curve intersection, negate the point):
 
 <figure class="illustration">
@@ -400,15 +400,63 @@ Enter numbers for Bob and Alice's private keys below and watch a key exchange oc
 </figure>
 </div>
 
+<h2>Back to the real curve</h2>
+
+<p>
+We've played around with a toy curve, and you've seen what it means to add points or perform a key exchange.
+But how does this compare to real curves used in real cryptography?
+
+<p>
+The most common curve used for key exchange is Curve25519. That curve has a simple equation:
+<div class="math-block">
+`y^2 = x^3 + 486662x^2 + x`
+</div>
+
+<p>
+    Where our toy curve used <span class="fat-fp-61">F61</span>, a field with 61 numbers in it,
+    Curve25519 uses `\mathbb{F}_(2^255\text{-}19)`. The prime number used for that field,
+    `2^255-19`, is a 77-digit number. Other than the size, the field looks the same as the one
+    we've been using:
+<div class="math-block">
+`\mathbb{F}_(2^255\text{-}19) = {0, 1, 2, …, 2^255-21, 2^255-20}`
+</div>
+
+<p>
+    Where our toy curve used a base point that can only be added to itself 73 times before repeating,
+    `\mathbb{F}_(2^255\text{-}19)` uses a base point that can be added to itself over
+    `2^252` times before repeating.
+
+<p>
+    When peers use Curve25519 to perform key exchange, they select a random 256-bit number (though 5 of those
+    bits are then overridden; see <a href="https://x25519.ulfheim.net">my X25519 site</a> for more details). That's
+    `2^251` possible point multiplications for an attacker to guess at, which is a 76-digit number.
+
+<p>
+    Much like the toy curve we've been using, we can add and double points on Curve25519. Using that we
+    can perform a key exchange in the same way as explained above. Because the curve equation is
+    different the formula for adding and doubling is also different, see
+    <a href="https://en.wikipedia.org/wiki/Montgomery_curve">Wikipedia</a> for details.
+
+<p>
+    For more information on Curve25519, including the reason for the choice of curve equation, the prime
+    number used for <span class="fat-fp">Fp</span>, and the exact details of key exchange I can recommend
+    <a href="https://cr.yp.to/ecdh/curve25519-20060209.pdf">the author's paper</a> and also
+    <a href="https://martin.kleppmann.com/papers/curve25519.pdf">this technical analysis</a>.
+    Most of these details are streamlining of the concepts listed on this page to keep the exchange
+    mechanism secure and performant, and should not fundamentally conflict with what's explained here.
+
+<h2>Epilogue</h2>
+
+<p>
+    The code for this project can be found
+    <a href="https://github.com/syncsynchalt/viz-curves">on GitHub</a>.
+
+<p>
+    I hope you found this page useful or at least interesting! If so let me know via Twitter
+    <a href="https://twitter.com/xargsnotbombs">@XargsNotBombs</a>.
+
 </div> <!-- container -->
 
-<script>
-    let fs = document.getElementsByClassName('fat-fp')
-    for (let f of fs) f.innerHTML = '<span>&#x1D53D;<sub>p</sub></span>';
-    fs = document.getElementsByClassName('fat-fp-23')
-    for (let f of fs) f.innerHTML = '<span>&#x1D53D;<sub>23</sub></span>';
-    fs = document.getElementsByClassName('fat-fp-61')
-    for (let f of fs) f.innerHTML = '<span>&#x1D53D;<sub>61</sub></span>';
-</script>
+<script type="module" src="fixups.js"></script>
 </body>
 </html>
