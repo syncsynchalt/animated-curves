@@ -237,6 +237,7 @@ async function addP(ctx, n, Q, drawDoneCb) {
         negate: 300,
         done: 100,
     };
+    let lastDot;
 
     let markState = (state, timestamp) => {
         started[state] = started[state] || timestamp;
@@ -262,39 +263,36 @@ async function addP(ctx, n, Q, drawDoneCb) {
                 ctx.beginPath();
                 let mult = instate / duration.line;
                 mult = common.easeInOut(mult);
-                let primMult, secMult;
+                let dot;
                 if (mult < primRatio) {
-                    primMult = mult / primRatio;
-                    secMult = 0.0;
+                    const primMult = mult / primRatio;
+                    dot = {
+                        x: slopP.x + primMult * (primRight.x - slopP.x),
+                        y: slopP.y + primMult * (primRight.y - slopP.y),
+                    };
                 } else {
-                    primMult = 1.0;
-                    secMult = (mult - primRatio) / (1 - primRatio);
+                    const secMult = (mult - primRatio) / (1 - primRatio);
+                    dot = {
+                        x: secLeft.x + secMult * (slopNR.x - secLeft.x),
+                        y: secLeft.y + secMult * (slopNR.y - secLeft.y),
+                    };
                 }
-                let primLineEnd = {
-                    x: slopP.x + primMult * (primRight.x - slopP.x),
-                    y: slopP.y + primMult * (primRight.y - slopP.y),
-                };
-                let secLineEnd = {
-                    x: secLeft.x + secMult * (slopNR.x - secLeft.x),
-                    y: secLeft.y + secMult * (slopNR.y - secLeft.y),
-                };
-                ctx.lineWidth = 1;
-                ctx.strokeStyle = 'orange';
-                ctx.setLineDash([4, 4]);
-                ctx.moveTo(...pointToCtx(vals, P.x, P.y));
-                ctx.lineTo(...pointToCtx(vals, primLineEnd.x, primLineEnd.y));
-                if (secMult) {
-                    ctx.moveTo(...pointToCtx(vals, secLeft.x, secLeft.y));
-                    ctx.lineTo(...pointToCtx(vals, secLineEnd.x, secLineEnd.y));
+                if (lastDot) {
+                    // overdraw old point to clear it
+                    drawDot(vals, lastDot.x, lastDot.y, 'white', 0, 2, 'white');
+                    drawAxisLines(ctx, vals);
+                    labelPoint(ctx, vals, n, Q.x, Q.y);
                 }
-                ctx.stroke();
+                drawDot(vals, Q.x, Q.y, 'black');
+                drawDot(vals, dot.x, dot.y, 'gray', 0, 0);
+                lastDot = dot;
 
                 if (instate > duration.line) {
-                    drawDot(vals, Q.x, Q.y, 'black');
                     drawDot(vals, negR.x, negR.y, 'red');
                     finished.line = timestamp;
                 }
             } else if (!finished.linePause) {
+                // xxx consider getting rid of
                 let instate = markState('linePause', timestamp);
                 if (instate > duration.linePause) {
                     finished.linePause = timestamp;
@@ -303,16 +301,21 @@ async function addP(ctx, n, Q, drawDoneCb) {
                 let instate = markState('negate', timestamp);
                 let mult = instate / duration.negate;
                 mult = common.easeInOut(mult);
-                ctx.beginPath();
-                ctx.lineWidth = 2;
-                ctx.strokeStyle = 'red';
-                ctx.setLineDash([3, 2]);
-                ctx.moveTo(...pointToCtx(vals, slopNR.x, slopNR.y, true));
-                ctx.lineTo(...pointToCtx(vals, slopNR.x, slopNR.y - negLength * mult, true));
-                ctx.stroke();
-                ctx.setLineDash([]);
+
+                if (lastDot) {
+                    // overdraw old point to clear it
+                    drawDot(vals, lastDot.x, lastDot.y, 'white', 0, 2, 'white');
+                    drawAxisLines(ctx, vals);
+                    labelPoint(ctx, vals, n, Q.x, Q.y);
+                }
+                drawDot(vals, slopNR.x, slopNR.y, 'red', 0, 0);
+                const dot = {x: slopNR.x, y: slopNR.y - negLength * mult};
+                drawDot(vals, dot.x, dot.y, 'red');
+                lastDot = dot;
+
                 if (instate > duration.negate) {
                     finished.negate = timestamp;
+                    drawDot(vals, slopNR.x, slopNR.y, 'white', 1, 0);
                     drawDot(vals, R.x, R.y, 'red', 0.5);
                     labelPoint(ctx, vals, n+1, R.x, R.y);
                     writeCoordinates(ctx, vals, R.x, R.y);
