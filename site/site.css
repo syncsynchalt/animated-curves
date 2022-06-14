@@ -125,10 +125,11 @@ table.results td {
     margin-left: 2em;
 }
 
-.no-vis-link, .no-vis-link:hover {
-    -webkit-user-select: text;
-    user-select: text;
+.heading-link, .heading-link:hover {
+    position: relative;
+    top: -0.1em;
+    font-size: 0.8em;
+    margin-right: 5px;
     text-decoration: none;
-    color: inherit;
-    /*cursor: text;*/
+    color: #999;
 }

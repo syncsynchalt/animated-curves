@@ -157,8 +157,8 @@ import * as field from './field-math/field-draw.js';
             const kb = common.byId('bob-key').value;
 
             const waitA = draw.runExchangePubkeyDemo(ctxA, ka, 'A', 'Alice', common.byId('alice-desc'));
-            const waitB = draw.runExchangePubkeyDemo(ctxB, kb, 'B', 'Bob', common.byId('bob-desc'));
             const A = await waitA;
+            const waitB = draw.runExchangePubkeyDemo(ctxB, kb, 'B', 'Bob', common.byId('bob-desc'));
             const B = await waitB;
             await common.sleep(2000);
             const _a = draw.runExchangeMultDemo(ctxA, ka, B, 'B', 'Alice', common.byId('alice-desc'));

@@ -19,21 +19,21 @@
 
     // make all headers bookmark-able
     let linksUsed = {};
-    for (let i of [1, 2, 3, 4, 5, 6]) {
+    for (let i of [2, 3, 4, 5, 6]) {
         let hTags = document.getElementsByTagName(`h${i}`);
         for (let tag of hTags) {
-            const wrap = document.createElement('a');
-            wrap.classList.add('no-vis-link');
+            const appendTag = document.createElement('a');
+            appendTag.innerHTML = '⌗';
+            appendTag.classList.add('heading-link');
             let link = tag.textContent.toLowerCase()
                 .replaceAll(/[^a-z\d]/g, '-')
                 .replaceAll(/-+/g, '-')
                 .replaceAll(/^-|-$/g, '');
             while (linksUsed[link]) link += '-dup';
             linksUsed[link] = 1;
-            wrap.href = `#${link}`;
+            appendTag.href = `#${link}`;
             tag.id = link;
-            tag.parentNode.replaceChild(wrap, tag);
-            wrap.appendChild(tag);
+            tag.insertBefore(appendTag, tag.firstChild);
         }
     }
 })();

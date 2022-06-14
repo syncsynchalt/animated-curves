@@ -54,8 +54,8 @@
 <body class="main-page">
 <div class="container">
 <p>
-👋 Hi there!  This is a work in progress, and this URL is only temporary.  Feel free to look around but please don't
-    share or publish this page yet. This page might be broken at times, and I promise the complete page will
+👋 Hi there!  This is a work in progress.  Feel free to look around but please don't share or publish
+    this page yet. This page might be broken at times, and I promise the complete page will
     be better anyway.
 <h1>Visualizing Elliptic Curve Cryptography</h1>
 <div>
@@ -190,7 +190,7 @@ You might be used to negation as flipping a value's sign from positive to negati
 
 <h4>Division (multiplicative inverse)</h4>
 <p>
-Division is where things become interesting. Let's start by noting
+In field math division is defined by the idea
     that any non-zero number divided by itself is 1:
     <div class="math-block">
     `\frac{n}{n} = 1`
@@ -205,7 +205,7 @@ Division is where things become interesting. Let's start by noting
     </div>
 
 <p>
-    You can see that dividing by `n` is the same as multiplying by the term `n^(\text{-}1)`.
+    You can see that dividing by `n` is the same as multiplying by the value `n^(\text{-}1)`.
 
 <p>
     In our <span class="fat-fp">Fp</span> multiplication it's possible for two
@@ -254,21 +254,27 @@ Let's start with an elliptic curve equation:
     <div class="math-block">
     `y^2 = x^3 + 9x + 1`
     </div>
+
 <p>For our finite field let's use the prime number 61:
 
     <div class="math-block">
     `\mathbb{F}_61 = {0, 1, 2, …, 60}`
     </div>
-<p>
-We'll also pre-compute the tables for <a href="inverse61.html">division</a> and <a href="sqrt61.html">square roots</a>
-in <span class="fat-fp-61">F61</span> for convenience.
+
 
 <p>
-We'll also nominate one of the points on this curve to be the "base point" `P`: `(5,7)`.
+    The tables for <a href="inverse61.html">division</a>
+    and <a href="sqrt61.html">square roots</a>
+    in <span class="fat-fp-61">F61</span> are pre-computed for convenience.
 
 <p>
-    Let's call the combination of this elliptic curve and the finite field
-    <span class="math-fp-61">F61</span> "Curve61".
+    Lastly, we'll nominate one of the points on this curve to be the "base point":
+    <div class="math-block">
+    `P = (5,7)`
+    </div>
+
+<p>
+    Let's call the combination of the above elliptic curve and finite field "Curve61".
     What would it look like to plot this curve on a graph? Starting with `x=0`
     and working through each number from 0 to 60, using the math operations we defined above:
 
@@ -318,7 +324,7 @@ The resulting graph looks like this:
 
 <p>
 We can still add points on this curve, using the math of <span class="fat-fp-61">F61</span> and
-the rules of point addition (draw lines between two points, find the curve intersection, negate the point):
+the rules of point addition: draw lines between two points, find the curve intersection, then negate the point.
 
 <figure class="illustration">
 <div class="ill-content">
@@ -330,16 +336,6 @@ the rules of point addition (draw lines between two points, find the curve inter
 <p>This animation shows lines wrapping from 61 to 0 (the modulus effect shown visually),
     sometimes many times. Finding the values algebraically is relatively easy though, just remember
     to use the rules of finite field math:
-<p>
-    To double a point `P` at `(x_1, y_1)` to get `2P` at `(x_2, y_2)`:
-
-    <div class="math-block-left ml2">
-    `\lambda = \frac{3x_1^2 + 9}{2y_1}`
-    <br>
-    `x_2 = \lambda^2 - x_1 - x_1`
-    <br>
-    `y_2 = \lambda(x_1 - x_2) - y_1`
-    </div>
 
 <p>
     To add two points `P: (x_1, y_1)` and `Q: (x_2, y_2)` to get a third point `R: (x_3, y_3)`:
@@ -350,6 +346,14 @@ the rules of point addition (draw lines between two points, find the curve inter
     <br>
     `y_3 = \lambda(x_1 - x_3) - y_1`
     </div>
+
+<p>
+    If `P` and `Q` are the same point, then adding them is called "doubling" the point.
+    The formula for this is the same, but the slope (lambda) is the curve tangent:
+
+<div class="math-block-left ml2">
+`\lambda = \frac{3x_1^2 + 9}{2y_1}`
+</div>
 
 <p>
     We can get to arbitrarily large multiples of `P` quickly using a "double-and-add" method:

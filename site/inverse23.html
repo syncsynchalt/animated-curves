@@ -8,8 +8,12 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/css/bootstrap.min.css"
           integrity="sha384-0evHe/X+R7YkIZDRvuzKMRqM+OrBnVFBL6DOitfPri4tjfHxaWutUpFmBp4vmVor"
           rel="stylesheet" crossorigin="anonymous">
-    <script>
-    </script>
+    <style>
+        table {
+            max-width: 700px;
+            margin: 0 auto;
+        }
+    </style>
 </head>
 <body>
 <div class="container">
@@ -17,8 +21,9 @@
 <table id="inv-table" class="table table-hover table-bordered table-sm">
     <thead>
     <tr>
-        <th class="text-center fst-italic">n</th>
-        <th class="text-center fst-italic">n<sup>-1</sup></th>
+        <th class="text-center fst-italic" style="width: 30%">n</th>
+        <th class="text-center fst-italic" style="width: 30%">n<sup>-1</sup></th>
+        <th class="text-center fst-italic" style="width: 40%">relation</th>
     </tr>
     </thead>
     <tbody id="inv-table-body">
@@ -54,6 +59,9 @@
             <td class="text-center">${i}</td>
             <td class="text-center copy-action" onclick="copyPasteClick(this, '${inv}')">
                 <span>${inv}</span>
+            </td>
+            <td class="text-center">
+                <span>${i} &times; ${inv} = ${i * inv} % ${fmath.p} = 1</span>
             </td>
         `;
         tb.appendChild(tr);
