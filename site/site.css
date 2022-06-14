@@ -6,6 +6,8 @@ h1 {
     max-width: 600px;
     background-color: #faf1e8;
     box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
+    margin-top: 1em;
+    margin-bottom: 1em;
 }
 
 .illustration {
@@ -35,8 +37,8 @@ h1 {
 
 canvas.animated {
     touch-action: manipulation;
-    user-select: none;
     -webkit-user-select: none;
+    user-select: none;
     cursor: pointer;
 }
 

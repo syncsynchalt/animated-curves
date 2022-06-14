@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"/>
     <meta name="format-detection" content="telephone=no"/>
     <meta name="title" content="Visualizing Elliptic Curves"/>
-    <meta name="description" content="Learn elliptic curve cryptography via animated examples on a toy curve"/>
+    <meta name="description" content="Learn elliptic curve cryptography with animated examples on a toy curve"/>
 
     <link href="site.css" rel="stylesheet">
     <!-- xxx todo grab only what we need -->
@@ -18,7 +18,7 @@
     <meta property="og:url" content="https://curves.ulfheim.net/">
     <meta property="og:type" content="website">
     <meta property="og:title" content="Visualizing Elliptic Curves">
-    <meta property="og:description" content="Learn elliptic curve cryptography via animated examples on a toy curve">
+    <meta property="og:description" content="Learn elliptic curve cryptography with animated examples on a toy curve">
     <meta property="og:image" content="https://curves.ulfheim.net/og.png">
 
     <!-- Twitter Meta Tags -->
@@ -26,7 +26,7 @@
     <meta property="twitter:domain" content="curves.ulfheim.net">
     <meta property="twitter:url" content="https://curves.ulfheim.net/">
     <meta name="twitter:title" content="Visualizing Elliptic Curves">
-    <meta name="twitter:description" content="Learn elliptic curve cryptography via animated examples on a toy curve">
+    <meta name="twitter:description" content="Learn elliptic curve cryptography with animated examples on a toy curve">
     <meta name="twitter:image" content="https://curves.ulfheim.net/og.png">
 
     <!-- favicons -->
@@ -255,8 +255,8 @@ Let's start with an elliptic curve equation:
 
 
 <p>
-    The tables for <a href="inverse61.html">division</a>
-    and <a href="sqrt61.html">square roots</a>
+    The tables for <a href="inverse61.html" target=_blank>division</a>
+    and <a href="sqrt61.html" target=_blank>square roots</a>
     in <span class="fat-fp-61">F61</span> are pre-computed for convenience.
 
 <p>
@@ -447,7 +447,7 @@ The most common curve used for key exchange is Curve25519. That curve has a simp
 <p>
     Where our toy curve used <span class="fat-fp-61">F61</span>, a field with 61 numbers in it,
     Curve25519 uses `\mathbb{F}_(2^255\text{-}19)`. The prime number used for that field,
-    `2^255-19`, is a 77-digit number. Other than the size, the field looks the same as the one
+    `2^255-19`, is a very large (77-digit) number. Other than the size, the field looks the same as the one
     we've been using:
 <div class="math-block">
 `\mathbb{F}_(2^255\text{-}19) = {0, 1, 2, …, 2^255-21, 2^255-20}`
@@ -461,7 +461,7 @@ The most common curve used for key exchange is Curve25519. That curve has a simp
 <p>
     When peers use Curve25519 to perform key exchange, they select a random 256-bit number (though 5 of those
     bits are then overridden; see <a href="https://x25519.ulfheim.net">my X25519 site</a> for more details). That's
-    `2^251` possible point multiplications for an attacker to guess at, which is a 76-digit number.
+    `2^251` possible point multiplications for an attacker to guess at, which is a very large (76-digit) number.
 
 <p>
     Much like the toy curve we've been using, we can add and double points on Curve25519, though
@@ -485,7 +485,7 @@ The most common curve used for key exchange is Curve25519. That curve has a simp
     <a href="https://github.com/syncsynchalt/viz-curves">on GitHub</a>.
 
 <p>
-    I hope you found this page useful or at least interesting! If so let me know via Twitter
+    I hope you found this page useful or at least interesting! If so let me know at
     <a href="https://twitter.com/xargsnotbombs">@XargsNotBombs</a>.
 
 </div> <!-- container -->
