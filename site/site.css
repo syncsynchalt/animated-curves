@@ -3,11 +3,19 @@ h1 {
 }
 
 .main-page .container {
+    width: 600px;
     max-width: 600px;
-    background-color: #faf1e8;
-    box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
-    margin-top: 1em;
-    margin-bottom: 1em;
+    background-color: linen;
+    box-shadow: 0 0 3px rgba(0, 0, 0, 0.3);
+    border-radius: 0.5em;
+    margin-top: 5px;
+    margin-bottom: 5px;
+    text-overflow: clip;
+}
+
+.container *:last-child {
+    padding-bottom: 0.5em;
+    margin-bottom: 0;
 }
 
 .illustration {
@@ -48,7 +56,7 @@ canvas.animated.no-click {
 
 .skinny-block {
     display: block;
-    margin: auto 1em;
+    margin: auto 2em;
 }
 
 button {
@@ -90,8 +98,8 @@ canvas.numline {
 }
 
 table.results {
-    margin-left: 1em;
-    margin-bottom: 1em;
+    margin: 0 auto 1em;
+    font-size: 0.9em;
 }
 table.results td {
     padding-left: 1em;
@@ -140,4 +148,19 @@ table.results td {
     color: rgba(0, 0, 0, 0.3);
     font-family: "Trebuchet MS", sans-serif;
     font-style: italic;
+}
+
+@media (max-width: 600px) {
+    .main-page .container {
+        /* get rid of the border fluff, too wasteful */
+        width: 550px !important;
+        max-width: 550px !important;
+        box-shadow: none;
+        border-radius: unset;
+        margin: 0;
+    }
+    .heading-link {
+        /* too distracting on mobile */
+        pointer-events: none;
+    }
 }
