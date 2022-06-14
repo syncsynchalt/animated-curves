@@ -1,6 +1,6 @@
 import * as draw25519 from './curve25519/draw-25519.js';
-import * as draw from './curve/draw.js';
-import * as curve61 from './curve/curve.js';
+import * as draw from './curve61/draw.js';
+import * as curve61 from './curve61/curve.js';
 import * as sample from './ec-samples/sample-draw.js';
 import * as real from './real-curve/real-draw.js';
 import * as common from './common.js';
