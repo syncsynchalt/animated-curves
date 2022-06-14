@@ -107,11 +107,11 @@ table.results td {
 
 .math-block {
     text-align: center;
-    padding-bottom: 1em;
+    margin-bottom: 1em;
 }
 .math-block-left {
     text-align: left;
-    padding-bottom: 1em;
+    margin-bottom: 1em;
 }
 
 .mathy {
@@ -138,8 +138,8 @@ table.results td {
 .phalf {
     padding: 0.5em 0;
 }
-.ml2 {
-    margin-left: 2em;
+.ml3 {
+    margin-left: 3em;
 }
 
 .heading-link, .heading-link:hover {

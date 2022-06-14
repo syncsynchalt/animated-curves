@@ -54,7 +54,7 @@
 <body class="main-page">
 <div class="container">
 <p>
-👋 Hi there!  This is a work in progress.  Feel free to look around but please don't share or publish
+    👋 Hi there!  This is a work in progress.  Feel free to look around but please don't share or publish
     this page yet. This page might be broken at times, and I promise the complete page will
     be better anyway.
 <h1>Visualizing Elliptic Curve Cryptography</h1>
@@ -66,9 +66,9 @@
     to itself over and over again:
 </p>
 <figure class="illustration">
-<div class="ill-content">
+    <div class="ill-content">
     <canvas id="canvas-curve25519" class="animated" width="500" height="300"></canvas>
-</div>
+    </div>
     <figcaption>Curve25519 point addition</figcaption>
 </figure>
 <p>
@@ -80,12 +80,12 @@
 <p>
     The elliptic curves we're going to use are in this form:
     `y^2 = x^3 + Ax + B`
-<br>
+    <br>
 
 <figure class="illustration">
-<div class="ill-content">
-<canvas id="canvas-ec-sample" class="animated" width="500" height="300"></canvas>
-</div>
+    <div class="ill-content">
+    <canvas id="canvas-ec-sample" class="animated" width="500" height="300"></canvas>
+    </div>
     <figcaption>Examples of elliptic curves</figcaption>
 </figure>
 
@@ -94,20 +94,20 @@
     curve to yield a third point (also on the curve).
 
 <div class="skinny-block">
-    <strong>Point addition:</strong>
-    <ul>
+<strong>Point addition:</strong>
+<ul>
     <li>draw a line between the two points
-    (or if you're adding a point to itself, make a line tangent to the curve at that
-    point),</li>
+        (or if you're adding a point to itself, make a line tangent to the curve at that
+        point),</li>
     <li>find where that line intersects the curve,</li>
     <li>and finally negate the y-value of that point (flip it from positive to negative or vice versa).</li>
-    </ul>
+</ul>
 </div> <!-- skinny-block -->
 
 <figure class="illustration">
-<div class="ill-content">
-<canvas id="canvas-real-add" class="animated" height="400" width="500"></canvas>
-</div>
+    <div class="ill-content">
+    <canvas id="canvas-real-add" class="animated" height="400" width="500"></canvas>
+    </div>
     <figcaption>Repeated addition of a point P</figcaption>
 </figure>
 
@@ -119,20 +119,20 @@
         P+Q+R = R+Q+P = P+R+Q
         </div>
     <li><strong>associative</strong>: addition of additions has the same result as adding the points individually:
-        <div class="text-center mathy phalf">
-        P+P+P+P+P = (P+P) + (P+P+P) = 2P + 3P = 5P
-        <br>
-        P+P+P+P+P = (P+P+P+P) + (P) = 4P + 1P = 5P
-        </div>
-    </li>
+    <div class="text-center mathy phalf">
+    P+P+P+P+P = (P+P) + (P+P+P) = 2P + 3P = 5P
+    <br>
+    P+P+P+P+P = (P+P+P+P) + (P) = 4P + 1P = 5P
+    </div>
+</li>
 </ul>
 <p>See the animation below which adds points in random order.
     The result is always the expected point.</p>
 
 <figure class="illustration">
-<div class="ill-content">
-<canvas id="canvas-real-assoc" class="animated" width="500" height="400"></canvas>
-</div>
+    <div class="ill-content">
+    <canvas id="canvas-real-assoc" class="animated" width="500" height="400"></canvas>
+    </div>
     <figcaption>Point addition is associative and commutative</figcaption>
 </figure>
 
@@ -143,71 +143,70 @@
 <p>A finite field is just a set of numbers. In this section we'll set
     `p` to 23 (a prime number). The finite field <span class="fat-fp-23">F23</span> is the list
     of numbers 0 through 22:
-    <div class="math-block">
-        `\mathbb{F}_23 = {0, 1, 2, …, 22}`
-    </div>
+<div class="math-block">
+`\mathbb{F}_23 = {0, 1, 2, …, 22}`
+</div>
 
 <p>
-All the math operations below use only those 23 numbers as inputs as outputs. No negative numbers,
+    All the math operations below use only those 23 numbers as inputs as outputs. No negative numbers,
     no floating point, and nothing higher than 22.
 
 <h4>Addition / Subtraction</h4>
 <p>
-Adding and subtracting in finite fields is pretty simple. Values of 23 and greater will wrap around to
-zero, and values below zero will wrap around to 22:
-<canvas class="numline animated" id="canvas-field-add-sub" width="500" height="80"></canvas>
+    Adding and subtracting in finite fields is pretty simple. Values of 23 and greater will wrap around to
+    zero, and values below zero will wrap around to 22:
+    <canvas class="numline animated" id="canvas-field-add-sub" width="500" height="80"></canvas>
 
 <p>You might also know this as "modulo 23", or as the remainder after dividing a number by 23.
 
 <h4>Multiplication</h4>
 <p>
-Multiplication is also straightforward. Similar to addition, the result is taken modulo 23:
+    Multiplication is also straightforward. Similar to addition, the result is taken modulo 23:
 
-<canvas class="numline animated" id="canvas-field-mult" width="500" height="80"></canvas>
+    <canvas class="numline animated" id="canvas-field-mult" width="500" height="80"></canvas>
 
 <h4>Negation</h4>
 <p>
-You might be used to negation as flipping a value's sign from positive to negative
+    You might be used to negation as flipping a value's sign from positive to negative
     (or vice versa). Another definition would be finding the value
     `\text{-}n` for `n` that satisfies this equation:
-    <div class="math-block">
-    `n + \text{-}n = 0`
-    </div>
+<div class="math-block">
+`n + \text{-}n = 0`
+</div>
 
 <p>
     In <span class="fat-fp">Fp</span>, we can solve the above and negate a number by subtracting
     it from `p`:
 
-<canvas class="numline animated" id="canvas-field-negate" width="500" height="80"></canvas>
+    <canvas class="numline animated" id="canvas-field-negate" width="500" height="80"></canvas>
 
 <h4>Division (multiplicative inverse)</h4>
 <p>
-In <span class="fat-fp">Fp</span> division is defined by the idea
+    In <span class="fat-fp">Fp</span> division is defined around the relation
     that any non-zero number divided by itself is 1:
-    <div class="math-block">
-    `\frac{n}{n} = 1`
-    </div>
+<div class="math-block">
+`\frac{n}{n} = 1`
+</div>
 <p>Or if we expand some terms:
-    <div class="math-block">
-    `n \cdot \frac{1}{n} = 1`
-    </div>
+<div class="math-block">
+`n \cdot \frac{1}{n} = 1`
+</div>
 <p>Let's use a different notation for `1//n` which is easier to fit on a line:
-    <div class="math-block">
-    `n \cdot n^(\text{-}1) = 1`
-    </div>
+<div class="math-block">
+`n \cdot n^(\text{-}1) = 1`
+</div>
 
-<p>
-    You can see that dividing by `n` is the same as multiplying by the value `n^(\text{-}1)`.
+<p>You can see that dividing by `n` is the same as multiplying by the value `n^(\text{-}1)`.
 
 <p>
     In our <span class="fat-fp">Fp</span> multiplication it's possible for two
     positive integers to equal 1 when multiplied together.
     It turns out that for each positive integer in <span class="fat-fp">Fp</span> there is one
     positive integer that acts as this "multiplicative inverse":
-<canvas class="numline animated" id="canvas-field-div" width="500" height="80"></canvas>
+    <canvas class="numline animated" id="canvas-field-div" width="500" height="80"></canvas>
 
 <p>
-To tie it all together, when working in <span class="fat-fp">Fp</span>
+    To tie it all together, when working in <span class="fat-fp">Fp</span>
     any time we need to divide by a number `n` we will instead
     multiply by its multiplicative inverse `n^(\text{-}1)`,
     the number which satisfies the equation `n \cdot n^(\text{-}1) = 1`.
@@ -223,11 +222,11 @@ To tie it all together, when working in <span class="fat-fp">Fp</span>
     as a number in <span class="fat-fp">Fp</span>
     which satisfies this equation:
 
-    <div class="math-block pb0">
-    `sqrt(n) \times sqrt(n) = n`
-    </div>
+<div class="math-block pb0">
+`sqrt(n) \times sqrt(n) = n`
+</div>
 
-    <canvas class="numline animated" id="canvas-field-sqrt" width="500" height="80"></canvas>
+<canvas class="numline animated" id="canvas-field-sqrt" width="500" height="80"></canvas>
 
 <p>
     In real numbers there are two square roots for every non-zero number (positive and negative).
@@ -240,17 +239,17 @@ To tie it all together, when working in <span class="fat-fp">Fp</span>
 
 <h2>Elliptic curves <em>and</em> finite fields</h2>
 <p>
-Now we can combine the two concepts of elliptic curves and finite field math.
-Let's start with an elliptic curve equation:
-    <div class="math-block">
-    `y^2 = x^3 + 9x + 1`
-    </div>
+    Now we can combine the two concepts of elliptic curves and finite field math.
+    Let's start with an elliptic curve equation:
+<div class="math-block">
+`y^2 = x^3 + 9x + 1`
+</div>
 
 <p>For our finite field let's use the prime number 61:
 
-    <div class="math-block">
-    `\mathbb{F}_61 = {0, 1, 2, …, 60}`
-    </div>
+<div class="math-block">
+`\mathbb{F}_61 = {0, 1, 2, …, 60}`
+</div>
 
 
 <p>
@@ -260,9 +259,9 @@ Let's start with an elliptic curve equation:
 
 <p>
     Finally, we'll nominate one of the points on this curve to be the "base point":
-    <div class="math-block">
-    `P = (5,7)`
-    </div>
+<div class="math-block">
+`P = (5,7)`
+</div>
 
 <p>
     Let's call the combination of the definitions above "Curve61".
@@ -301,52 +300,52 @@ Let's start with an elliptic curve equation:
         <td>`y = sqrt(49) = ` 7 and 54</td>
     </tr>
     <tr>
-    <td colspan=3>... and so on</td>
+        <td colspan=3>... and so on</td>
 </table>
 
 <p>
-The resulting graph looks like this:
+    The resulting graph looks like this:
 <figure class="illustration">
-<div class="ill-content">
+    <div class="ill-content">
     <canvas id="canvas-curve61-static" width="500" height="400"></canvas>
-</div>
+    </div>
     <figcaption>An elliptic curve plotted in <span class="fat-fp-61">Fp</span></figcaption>
 </figure>
 
 <h4>Point Addition</h4>
 <p>
-We can still add points on this curve, using the math of <span class="fat-fp-61">F61</span> and
-the rules of point addition: draw lines between two points, find the curve intersection, then negate the point.
+    We can still add points on this curve, using the math of <span class="fat-fp-61">F61</span> and
+    the rules of point addition: draw lines between two points, find the curve intersection, then negate the point.
 
 <figure class="illustration">
-<div class="ill-content">
+    <div class="ill-content">
     <canvas class="animated" id="canvas-addp" width="500" height="400"></canvas>
-</div>
+    </div>
     <figcaption>Curve61 point addition</figcaption>
 </figure>
 
-<p>This animation shows lines wrapping from 61 to 0, sometimes many times, before intersection
+<p>This animation shows finite field math wrapping from 61 to 0, sometimes many times, before intersection
     with a curve point. Finding the values algebraically is relatively easy, just remember to
     use the rules of finite field math:
 
 <div class="skinny-block">
 <p>
     To add two points `P: (x_1, y_1)` and `Q: (x_2, y_2)` to get a third point `R: (x_3, y_3)`:
-    <div class="math-block-left ml2">
-    `\lambda = \frac{y_2 - y_1}{x_2 - x_1}`
-    <br>
-    `x_3 = \lambda^2 - x_1 - x_2`
-    <br>
-    `y_3 = \lambda(x_1 - x_3) - y_1`
-    </div>
+<div class="math-block-left ml3">
+`\lambda = \frac{y_2 - y_1}{x_2 - x_1}`
+<br>
+`x_3 = \lambda^2 - x_1 - x_2`
+<br>
+`y_3 = \lambda(x_1 - x_3) - y_1`
+</div>
 
 <p>
     If `P` and `Q` are the same point, then adding them is called "doubling" the point.
     The formula for this is the same, but the slope (lambda) is the curve tangent:
 
-    <div class="math-block-left ml2">
-    `\lambda = \frac{3x_1^2 + 9}{2y_1}`
-    </div>
+<div class="math-block-left ml3">
+`\lambda = \frac{3x_1^2 + 9}{2y_1}`
+</div>
 </div> <!-- skinny-block -->
 
 <h4>Efficient Point Multiplication</h4>
@@ -357,15 +356,15 @@ the rules of point addition: draw lines between two points, find the curve inter
 
 <p>
     We can get to arbitrarily large multiplication of `P` quickly using a "double-and-add" method:
-<ul class="ml2">
+<ul>
     <li>Repeatedly double `P` to get `\{2P, 4P, 8P, 16P, 32P, …\}`</li>
     <li>Add combinations of the above points to get any needed multiple of `P`</li>
 </ul>
 
 <figure class="illustration">
-<div class="ill-content">
+    <div class="ill-content">
     <canvas class="animated" id="canvas-double-and-add" width="500" height="400"></canvas>
-</div>
+    </div>
     <figcaption>Double-and-add method for point <span id="dbl-add-np">nP</span></figcaption>
 </figure>
 
@@ -393,11 +392,11 @@ the rules of point addition: draw lines between two points, find the curve inter
 </ul>
 
 <p>Because point addition on Curve61 is associative, both `k_b(k_aP)` and `k_a(k_bP)` are the same
-point: they're just the base point added to itself `k_a \times k_b` times.  Since they're the
-same point, both Alice and Bob have agreed on the same number: the coordinates of `k_ak_bP`.
+    point: they're just the base point added to itself `k_a \times k_b` times.  Since they're the
+    same point, both Alice and Bob have agreed on the same number: the coordinates of `k_ak_bP`.
 
 <p>
-Enter numbers for Bob and Alice's private keys below and watch a key exchange occur:
+    Enter numbers for Bob and Alice's private keys below and watch a key exchange occur:
 
 <form class="row row-cols-sm-auto g-3 align-items-center" onsubmit="return false">
     <div class="col-12">
@@ -425,22 +424,22 @@ Enter numbers for Bob and Alice's private keys below and watch a key exchange oc
 </form>
 
 <figure class="illustration">
-<div class="ill-content">
+    <div class="ill-content">
     <div id="alice-desc">Alice:</div>
     <canvas class="animated no-click" id="canvas-alice" width="500" height="300" data-visible=always></canvas>
     <div id="bob-desc">Bob:</div>
     <canvas class="animated no-click" id="canvas-bob" width="500" height="300" data-visible=always></canvas>
-</div>
+    </div>
 </figure>
 
 <h2>The real curve</h2>
 
 <p>
-We've played around with a toy curve, and you've seen what it means to add points or perform a key exchange.
-But how does this compare to real curves used in real cryptography?
+    We've played around with a toy curve, and you've seen what it means to add points or perform a key exchange.
+    But how does this compare to real curves used in real cryptography?
 
 <p>
-The most common curve used for key exchange is Curve25519. That curve has a simple equation:
+    The most common curve used for key exchange is Curve25519. That curve has a simple equation:
 <div class="math-block">
 `y^2 = x^3 + 486662x^2 + x`
 </div>

@@ -456,11 +456,11 @@ async function runAddDemo(ctx, n, Q, updateCb, drawDoneCb) {
 function writeEquation(ctx, vals, np, nq, nr) {
     ctx.save();
     ctx.font = common.mathFont('1.2em');
-    ctx.textBaseline = 'bottom';
+    ctx.textBaseline = 'middle';
     ctx.textAlign = 'center';
     ctx.fillStyle = 'black';
     let s = (n) => { return n === 1 ? '' : n };
-    ctx.fillText(`${s(np)}P + ${s(nq)}P = ${s(nr)}P`, vals.w/2, vals.h-12);
+    ctx.fillText(`${s(np)}P + ${s(nq)}P = ${s(nr)}P`, vals.w/2, vals.h * 3/16);
     ctx.restore();
 }
 
