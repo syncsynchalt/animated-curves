@@ -453,7 +453,6 @@ async function addPointsAnimation(ctx, nP, P, nQ, Q, options) {
                     cache.negLength = negR.y - R.y;
                 }
                 let mult = instate / duration.negate;
-                mult = Math.min(1, mult);
                 mult = common.easeInOut(mult);
                 ctx.moveTo(...pointToCtx(vals, negR.x, negR.y, true));
                 ctx.lineTo(...pointToCtx(vals, negR.x, negR.y - cache.negLength * mult, true));

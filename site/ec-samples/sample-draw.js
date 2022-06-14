@@ -248,7 +248,6 @@ function appendMorphData(morphMult, data, x, yA, yB) {
         if (isNaN(yB) && isNaN(yB)) {
             // accelerate expand or collapse of missing curve data
             morphMult *= 1.5;
-            morphMult = Math.min(1, morphMult);
         }
         morphMult = common.easeInOut(morphMult);
         let a = yA || 0;

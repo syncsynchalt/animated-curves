@@ -15,7 +15,7 @@
  * @typedef BigPoint {{x: BigInt, y: BigInt}}
  */
 
-import { inverseOf, pow, reduce, sqrt } from './field-25519.js';
+import { inverseOf, pow, reduce, sqrt, p } from './field-25519.js';
 
 const curveB = 1n;
 const curveA = 486662n;
@@ -61,7 +61,19 @@ function P() {
     return { x: basePointX, y: y[1] };
 }
 
+/**
+ * @param P {BigPoint}
+ * @return {BigPoint}
+ */
+function negate(P) {
+    return {
+        x: P.x,
+        y: p - P.y,
+    };
+}
+
 export {
     P,
     add,
+    negate,
 };

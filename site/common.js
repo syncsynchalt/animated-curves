@@ -87,6 +87,7 @@ function canvasIsScrolledIntoView(canvas) {
  * @return the eased result, eased at the ends
  */
 function easeInOut(t) {
+    if (t > 1.0) t = 1.0;
     let sq = t * t;
     return sq / (2 * (sq - t) + 1);
 }

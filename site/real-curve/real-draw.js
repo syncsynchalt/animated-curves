@@ -347,7 +347,6 @@ async function addPoints(ctx, nP, P, nQ, Q, drawDoneCb) {
                 ctx.strokeStyle = 'orange';
                 ctx.setLineDash([]);
                 let mult = instate / duration.line;
-                mult = Math.min(1.0, mult);
                 mult = common.easeInOut(mult);
                 ctx.moveTo(...pointToCtx(vals, startPoint.x, startPoint.y));
                 const dest = {x: startPoint.x + mult * (negR.x - startPoint.x),

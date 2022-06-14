@@ -1,6 +1,7 @@
 import * as curve from './curve-25519.js';
 import * as field from './field-25519.js';
 import * as common from '../common.js';
+import * as misc from './misc-25519.js';
 
 const TWO_PI = 2*Math.PI;
 
@@ -25,12 +26,14 @@ function preCalcValues(ctx) {
  * (adjusted for top-left origin and half-pixel anti-aliasing)
  *
  * @param vals {PreCalcVals}
- * @param x {BigInt} between 0 and p
- * @param y {BigInt} between 0 and p
+ * @param x {BigInt|Number} between 0 and p
+ * @param y {BigInt|Number} between 0 and p
  * @param halfPixel {Boolean?} if set, round all pixels to nearest .5 (true) or .0 (false)
  * @return {Number[2]} x,y values transformed for canvas context
  */
 function pointToCtx(vals, x, y, halfPixel) {
+    x = BigInt(x);
+    y = BigInt(y);
     const xRat = Number((vals.fieldW * x) / field.p);
     const yRat = Number((vals.fieldH * y) / field.p);
     let v = [vals.marginWide + xRat, vals.h - vals.labelSpace - vals.marginWide - yRat];
@@ -48,10 +51,10 @@ let drawAxisLines = (ctx, vals) => {
     ctx.save();
     ctx.beginPath();
     ctx.strokeStyle = 'black';
-    ctx.moveTo(...pointToCtx(vals, 0n, 0n, true));
-    ctx.lineTo(...pointToCtx(vals, field.p, 0n, true));
-    ctx.moveTo(...pointToCtx(vals, 0n, 0n, true));
-    ctx.lineTo(...pointToCtx(vals, 0n, field.p, true));
+    ctx.moveTo(...pointToCtx(vals, 0, 0, true));
+    ctx.lineTo(...pointToCtx(vals, field.p, 0, true));
+    ctx.moveTo(...pointToCtx(vals, 0, 0, true));
+    ctx.lineTo(...pointToCtx(vals, 0, field.p, true));
     ctx.stroke();
     ctx.restore();
 };
@@ -61,12 +64,12 @@ let drawAxisLabels = (ctx, vals) => {
     ctx.beginPath();
     ctx.font = 'italic 12px serif';
     ctx.fillStyle = 'black';
-    const bodge = 5n * 2n**247n;
+    const bodge = 5 * 2**247;
     ctx.textBaseline = 'middle';
     ctx.textAlign = 'center';
     ctx.fillText('p', ...pointToCtx(vals, -bodge, field.p, false));
-    ctx.fillText('0', ...pointToCtx(vals, -bodge, -2n * bodge, false));
-    ctx.fillText('p', ...pointToCtx(vals, field.p, -2n * bodge, false));
+    ctx.fillText('0', ...pointToCtx(vals, -bodge, -2 * bodge, false));
+    ctx.fillText('p', ...pointToCtx(vals, field.p, -2 * bodge, false));
     ctx.restore();
 };
 
@@ -75,7 +78,7 @@ let drawArrowHeads = (ctx, vals) => {
     ctx.fillStyle = 'black';
     const arrLen = 10;
     const arrWid = 5;
-    const xHead = pointToCtx(vals, field.p, 0n, true);
+    const xHead = pointToCtx(vals, field.p, 0, true);
     ctx.beginPath();
     ctx.moveTo(...xHead);
     ctx.lineTo(...[xHead[0]-arrLen, xHead[1]-arrWid]);
@@ -84,7 +87,7 @@ let drawArrowHeads = (ctx, vals) => {
     ctx.closePath();
     ctx.fill();
 
-    const yHead = pointToCtx(vals, 0n, field.p, true);
+    const yHead = pointToCtx(vals, 0, field.p, true);
     ctx.beginPath();
     ctx.moveTo(...yHead);
     ctx.lineTo(...[yHead[0]-arrWid, yHead[1]+arrLen]);
@@ -121,8 +124,8 @@ function drawGrid(ctx) {
 
 /**
  * @param vals {PreCalcVals}
- * @param x {BigInt} coordinate
- * @param y {BigInt} coordinate
+ * @param x {BigInt|Number} coordinate
+ * @param y {BigInt|Number} coordinate
  * @param color {String} fill style
  * @param radiusAdj {Number?} adjustment to built-in dot radius
  * @param lineWidth {Number?} line width
@@ -159,11 +162,15 @@ function labelPoint(ctx, vals, n, x, y) {
     ctx['_pointDirCache'] = ctx['_pointDirCache'] || {};
     const dir = ctx['_pointDirCache'][n] || common.pickLabelDirection(ctx, p[0], p[1]);
     ctx['_pointDirCache'][n] = dir;
+    ctx.lineWidth = 2;
+    ctx.strokeStyle = 'white';
     ctx.fillStyle = 'black';
     ctx.font = '14px sans';
     ctx.textAlign = dir[0] === -1 ? 'right' : 'left';
     ctx.textBaseline = dir[1] === -1 ? 'bottom' : 'top';
-    ctx.fillText(`${n === 1 ? '' : n}P`, p[0]+2*dir[0], p[1]+4*dir[1]);
+    const tx = p[0]+2*dir[0], ty = p[1]+4*dir[1];
+    ctx.strokeText(`${n === 1 ? '' : n}P`, tx, ty);
+    ctx.fillText(`${n === 1 ? '' : n}P`, tx, ty);
     ctx.restore();
 }
 
@@ -209,13 +216,27 @@ async function addP(ctx, n, Q, drawDoneCb) {
         Q = P;
     }
     const R = curve.add(P, Q);
+    const negR = curve.negate(R);
+    const slopNR = misc.convertToPoint(negR);
+    const negLength = Number(negR.y - R.y);
+    // noinspection JSUnusedLocalSymbols
+    const [_primLeft, primRight] = misc.primaryLineEdges(P, Q);
+    // noinspection JSUnusedLocalSymbols
+    const [secLeft, _secRight] = misc.secondaryLineEdges(P, Q, negR);
+    const slopP = misc.convertToPoint(P);
+    const primX = (primRight.x - Number(P.x));
+    const secX = (Number(R.x) - secLeft.x);
+    const totX = primX + secX;
+    const primRatio = primX / totX;
 
     const started = {};
     const finished = {};
     const duration = {
-        migrate: 500,
+        line: 500,
+        linePause: 100,
+        negate: 300,
+        done: 100,
     };
-    let lastMidDot;
 
     let markState = (state, timestamp) => {
         started[state] = started[state] || timestamp;
@@ -231,33 +252,76 @@ async function addP(ctx, n, Q, drawDoneCb) {
         if (timestamp !== prev) {
             ctx.beginPath();
             ctx.save();
-            if (!finished['migrate']) {
-                let instate = markState('migrate', timestamp);
+            if (!finished.label) {
+                markState('label', timestamp);
+                drawDot(vals, Q.x, Q.y, 'black');
+                labelPoint(ctx, vals, n, Q.x, Q.y);
+                finished.label = timestamp;
+            } else if (!finished.line) {
+                let instate = markState('line', timestamp);
                 ctx.beginPath();
-                if (lastMidDot) {
-                    // overdraw last orange dot
-                    drawDot(vals, lastMidDot.x, lastMidDot.y, 'white', 0, 2, 'white');
-                    drawAxisLines(ctx, vals);
-                }
-                let mult = instate / duration.migrate;
-                mult = Math.min(1.0, mult);
+                let mult = instate / duration.line;
                 mult = common.easeInOut(mult);
-                let fw = R.x - Q.x;
-                let up = R.y - Q.y;
-                fw = BigInt(Number(fw) * mult);
-                up = BigInt(Number(up) * mult);
-                const midDot = {x: Q.x + fw, y: Q.y + up};
-                drawDot(vals, midDot.x, midDot.y, 'orange', 0, 0);
-                lastMidDot = midDot;
-                if (instate > duration.migrate) {
-                    finished.migrate = timestamp;
+                let primMult, secMult;
+                if (mult < primRatio) {
+                    primMult = mult / primRatio;
+                    secMult = 0.0;
+                } else {
+                    primMult = 1.0;
+                    secMult = (mult - primRatio) / (1 - primRatio);
+                }
+                let primLineEnd = {
+                    x: slopP.x + primMult * (primRight.x - slopP.x),
+                    y: slopP.y + primMult * (primRight.y - slopP.y),
+                };
+                let secLineEnd = {
+                    x: secLeft.x + secMult * (slopNR.x - secLeft.x),
+                    y: secLeft.y + secMult * (slopNR.y - secLeft.y),
+                };
+                ctx.lineWidth = 1;
+                ctx.strokeStyle = 'orange';
+                ctx.setLineDash([4, 4]);
+                ctx.moveTo(...pointToCtx(vals, P.x, P.y));
+                ctx.lineTo(...pointToCtx(vals, primLineEnd.x, primLineEnd.y));
+                if (secMult) {
+                    ctx.moveTo(...pointToCtx(vals, secLeft.x, secLeft.y));
+                    ctx.lineTo(...pointToCtx(vals, secLineEnd.x, secLineEnd.y));
+                }
+                ctx.stroke();
+
+                if (instate > duration.line) {
+                    drawDot(vals, Q.x, Q.y, 'black');
+                    drawDot(vals, negR.x, negR.y, 'red');
+                    finished.line = timestamp;
+                }
+            } else if (!finished.linePause) {
+                let instate = markState('linePause', timestamp);
+                if (instate > duration.linePause) {
+                    finished.linePause = timestamp;
+                }
+            } else if (!finished.negate) {
+                let instate = markState('negate', timestamp);
+                let mult = instate / duration.negate;
+                mult = common.easeInOut(mult);
+                ctx.beginPath();
+                ctx.lineWidth = 2;
+                ctx.strokeStyle = 'red';
+                ctx.setLineDash([3, 2]);
+                ctx.moveTo(...pointToCtx(vals, slopNR.x, slopNR.y, true));
+                ctx.lineTo(...pointToCtx(vals, slopNR.x, slopNR.y - negLength * mult, true));
+                ctx.stroke();
+                ctx.setLineDash([]);
+                if (instate > duration.negate) {
+                    finished.negate = timestamp;
+                    drawDot(vals, R.x, R.y, 'red', 0.5);
+                    labelPoint(ctx, vals, n+1, R.x, R.y);
+                    writeCoordinates(ctx, vals, R.x, R.y);
                 }
             } else if (!finished.done) {
-                markState('done', timestamp);
-                drawDot(vals, R.x, R.y, 'red', 0.5);
-                labelPoint(ctx, vals, n+1, R.x, R.y);
-                writeCoordinates(ctx, vals, R.x, R.y);
-                finished.done = timestamp;
+                let instate = markState('done', timestamp);
+                if (instate > duration.done) {
+                    finished.done = timestamp;
+                }
             }
             ctx.restore();
         }
@@ -292,10 +356,8 @@ async function runDemo(ctx, updateCb, drawDoneCb, n, Q) {
             if (drawDoneCb) drawDoneCb(R);
             if (common.canvasIsScrolledIntoView(ctx.canvas)) {
                 ctx['_timeout'] = setTimeout(() => { next() }, .5 * 1000);
-                return true;
             } else {
                 ctx.canvas.click();
-                return false;
             }
         });
         if (updateCb) updateCb(Q);

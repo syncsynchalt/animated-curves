@@ -134,7 +134,6 @@ async function addSub(ctx, a, b, drawDoneCb) {
         }
         drawGraph(ctx);
         let mult = (timestamp - start) / duration;
-        mult = Math.min(mult, 1.0);
         mult = common.easeInOut(mult);
         let diff = mult * b;
         drawDot(vals, a + diff, 'red');
