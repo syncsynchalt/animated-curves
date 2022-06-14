@@ -188,8 +188,8 @@ function writeCoordinates(ctx, vals, x, y) {
     let padHex = (n) => {
         return '0x' + n.toString(16).padStart(64, '0');
     };
-    ctx.fillText(`x=${padHex(x)}`, 42, vals.h - 20);
-    ctx.fillText(`y=${padHex(y)}`, 42, vals.h - 6);
+    ctx.fillText(`x=${padHex(x)}`, 42, vals.h - 22);
+    ctx.fillText(`y=${padHex(y)}`, 42, vals.h - 8);
     ctx.restore();
 }
 
