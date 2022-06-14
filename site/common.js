@@ -91,13 +91,16 @@ function easeInOut(t) {
     return sq / (2 * (sq - t) + 1);
 }
 
-async function addPausedMask(ctx) {
+/**
+ * Add a grey blur effect to the canvas.
+ * @param ctx {CanvasRenderingContext2D}
+ */
+function addGreyMask(ctx) {
     const canvas = ctx.canvas;
     const ratio = canvas._ratio || 1;
-    const brightness = 0.96;
+    const brightness = 0.98;
 
-    // noinspection JSUnresolvedVariable
-    if (window.CanvasFilter === undefined) {
+    if (window['CanvasFilter'] === undefined) {
         const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
         for (let px = imageData.data, i = 0; i < px.length; i += 4) {
             // rgba order
@@ -109,20 +112,28 @@ async function addPausedMask(ctx) {
         }
         ctx.putImageData(imageData, 0, 0);
     } else {
-        let p = new Promise(success => {
-            ctx.save();
-            let img = new Image();
-            img.src = canvas.toDataURL('image/png');
-            ctx.filter = `blur(1px) brightness(${brightness}) grayscale(1)`;
-            img.addEventListener('load', () => {
-                ctx.drawImage(img, 0, 0, canvas.width, canvas.height,
-                    0, 0, canvas.width / ratio, canvas.height / ratio);
-                ctx.restore();
-                success();
-            });
-        });
-        await p;
+        let saveCanvas = document.createElement('canvas');
+        saveCanvas.width = ctx.canvas.width;
+        saveCanvas.height = ctx.canvas.height;
+        let saveCtx = saveCanvas.getContext('2d');
+        saveCtx.drawImage(ctx.canvas, 0, 0, ctx.canvas.width, ctx.canvas.height);
+        ctx.save();
+        // ctx.filter = `blur(0.8px) brightness(${brightness}) grayscale(1)`;
+        ctx.filter = 'blur(0.8px) grayscale(1) contrast(0.98)';
+        ctx.drawImage(saveCanvas, 0, 0, saveCanvas.width / ratio, saveCanvas.height / ratio);
+        ctx.restore();
     }
+}
+
+/**
+ * Add a "paused" graphic to the canvas.
+ * @param ctx {CanvasRenderingContext2D}
+ */
+function addPausedMask(ctx) {
+    const canvas = ctx.canvas;
+    const ratio = canvas._ratio || 1;
+
+    addGreyMask(ctx);
 
     ctx.save();
     ctx.beginPath();
@@ -161,7 +172,7 @@ async function addPlayPause(ctx, playFunc, stopFunc) {
     };
     ctx.canvas.dataset.paused = 'true';
     ctx.canvas.dataset.clickable = 'true';
-    await addPausedMask(ctx);
+    addPausedMask(ctx);
 }
 
 function cancelAnimation(ctx) {
@@ -185,8 +196,7 @@ function cancelAnimation(ctx) {
  * @return {Number[2]} -1/+1 for left-right, then -1/+1 for up-down
  */
 function pickLabelDirection(ctx, x, y, sampleWidth, sampleMargin) {
-    // noinspection JSUnresolvedVariable
-    const ratio = ctx.canvas._ratio || 1;
+    const ratio = ctx.canvas['_ratio'] || 1;
     let bestDirCount = 0;
     let bestDir = [0, 0];
     const margin = sampleMargin || 2;
@@ -236,10 +246,14 @@ function startVisibleCanvases() {
 /**
  * Sleep the given number of milliseconds.
  * @param ms {Number} milliseconds to sleep
+ * @param ctx {CanvasRenderingContext2D?} optional canvas context to attach timeout handle
  * @return {Promise}
  */
-function sleep(ms) {
-    return new Promise(resolve => { setTimeout(resolve, ms) });
+function sleep(ms, ctx) {
+    ctx = ctx || {};
+    return new Promise(resolve => {
+        ctx['_timeout'] = setTimeout(resolve, ms);
+    });
 }
 
 export {
@@ -250,6 +264,7 @@ export {
     convertCanvasHiDPI,
     canvasIsScrolledIntoView,
     easeInOut,
+    addGreyMask,
     addPlayPause,
     cancelAnimation,
     pickLabelDirection,

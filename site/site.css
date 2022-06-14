@@ -1,3 +1,7 @@
+h1 {
+    text-align: center;
+}
+
 .main-page .container {
     max-width: 600px;
     background-color: #faf1e8;
@@ -106,6 +110,9 @@ table.results td {
         "Lucida Sans Unicode", OpenSymbol, "Standard Symbols L", serif;
 }
 
+.pb0 {
+    padding-bottom: 0;
+}
 .pb1 {
     padding-bottom: 1em;
 }
@@ -126,10 +133,9 @@ table.results td {
 }
 
 .heading-link, .heading-link:hover {
-    position: relative;
-    top: -0.1em;
-    font-size: 0.8em;
-    margin-right: 5px;
+    margin-right: 4px;
     text-decoration: none;
-    color: #999;
+    color: rgba(0, 0, 0, 0.3);
+    font-family: "Trebuchet MS", sans-serif;
+    font-style: italic;
 }

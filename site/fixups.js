@@ -17,13 +17,13 @@
         }
     }
 
-    // make all headers bookmark-able
+    // make all headings bookmark-able
     let linksUsed = {};
     for (let i of [2, 3, 4, 5, 6]) {
         let hTags = document.getElementsByTagName(`h${i}`);
         for (let tag of hTags) {
             const appendTag = document.createElement('a');
-            appendTag.innerHTML = '⌗';
+            appendTag.innerHTML = '&para;';
             appendTag.classList.add('heading-link');
             let link = tag.textContent.toLowerCase()
                 .replaceAll(/[^a-z\d]/g, '-')

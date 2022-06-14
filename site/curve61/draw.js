@@ -853,12 +853,42 @@ async function runExchangeMultDemo(ctx, privKey, pubKey, theirLabel, actor, acto
     drawAndLabelPoints(ctx, vals, {[privKey]: R2}, {label: theirLabel, coords: true});
 }
 
+function labelIdleGraph(ctx, text) {
+    const vals = preCalcValues(ctx);
+    resetGraph(ctx);
+    common.addGreyMask(ctx);
+    ctx.save();
+    ctx.textBaseline = 'middle';
+    ctx.textAlign = 'center';
+    ctx.font = '20px Helvetica, Arial, sans-serif';
+    ctx.lineWidth = 10;
+    ctx.strokeStyle = 'white';
+    ctx.fillStyle = '#333';
+    const loc = pointToCtx(vals, field.p / 2, field.p / 2);
+    ctx.strokeText(text, ...loc);
+    ctx.fillText(text, ...loc);
+    ctx.restore();
+}
+
+async function runExchangeDemo(alice, bob) {
+    const ka = alice.input.value;
+    const kb = bob.input.value;
+
+    labelIdleGraph(bob.ctx, 'Waiting for contact from Alice');
+    const A = await runExchangePubkeyDemo(alice.ctx, ka, 'A', 'Alice', alice.desc);
+    const B = await runExchangePubkeyDemo(bob.ctx, kb, 'B', 'Bob', bob.desc);
+    await common.sleep(3000);
+    const _a = runExchangeMultDemo(alice.ctx, ka, B, 'B', 'Alice', alice.desc);
+    const _b = runExchangeMultDemo(bob.ctx, kb, A, 'A', 'Bob', bob.desc);
+    await Promise.all([_a, _b]);
+}
+
 export {
     INFINITY,
     P,
     resetGraph,
     runAddPDemo,
     runDoubleAddDemo,
-    runExchangePubkeyDemo,
-    runExchangeMultDemo,
+    runExchangeDemo,
+    labelIdleGraph,
 };

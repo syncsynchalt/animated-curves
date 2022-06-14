@@ -1,5 +1,5 @@
 import * as draw25519 from './curve25519/draw-25519.js';
-import * as draw from './curve61/draw.js';
+import * as draw61 from './curve61/draw.js';
 import * as curve61 from './curve61/curve.js';
 import * as sample from './ec-samples/sample-draw.js';
 import * as real from './real-curve/real-draw.js';
@@ -92,7 +92,7 @@ import * as field from './field-math/field-draw.js';
     async function curveSetup() {
         const canvas = common.byId('canvas-curve61-static');
         const ctx = common.convertCanvasHiDPI(canvas);
-        await draw.resetGraph(ctx,true);
+        await draw61.resetGraph(ctx,true);
     }
 
     async function fCurveSetup() {
@@ -102,14 +102,14 @@ import * as field from './field-math/field-draw.js';
         let n = 1;
         let Q = undefined;
         const startDemo1 = async () => {
-            return draw.runAddPDemo(ctx1, n, Q, (nR, R) => { n = nR; Q = R });
+            return draw61.runAddPDemo(ctx1, n, Q, (nR, R) => { n = nR; Q = R });
         };
         await common.addPlayPause(ctx1, startDemo1, common.cancelAnimation);
 
         const canvas2 = common.byId('canvas-double-and-add');
         const ctx2 = common.convertCanvasHiDPI(canvas2);
         const startDemo2 = async () => {
-            return draw.runDoubleAddDemo(ctx2, (np) => {
+            return draw61.runDoubleAddDemo(ctx2, (np) => {
                 common.byId('dbl-add-np').textContent = `${np}`;
             });
         };
@@ -118,28 +118,36 @@ import * as field from './field-math/field-draw.js';
 
     async function exchangeSetup() {
         const canvasA = common.byId('canvas-alice');
-        const ctxA = common.convertCanvasHiDPI(canvasA);
         const canvasB = common.byId('canvas-bob');
-        const ctxB = common.convertCanvasHiDPI(canvasB);
+        const alice = {
+            ctx: common.convertCanvasHiDPI(canvasA),
+            input: common.byId('alice-key'),
+            desc: common.byId('alice-desc'),
+        };
+        const bob = {
+            ctx: common.convertCanvasHiDPI(canvasB),
+            input: common.byId('bob-key'),
+            desc: common.byId('bob-desc'),
+        };
+        draw61.labelIdleGraph(alice.ctx, 'Enter value for Alice or click "Random"');
+        draw61.labelIdleGraph(bob.ctx, 'Enter value for Bob or click "Random"');
 
         let formCheck = () => {
-            const goButton = common.byId('go-exchange'),
-                aliceInput = common.byId('alice-key'),
-                bobInput = common.byId('bob-key');
-            aliceInput.value = aliceInput.value.replaceAll(/\D/g, '');
-            bobInput.value = bobInput.value.replaceAll(/\D/g, '');
-            if (aliceInput.validity.valid && bobInput.validity.valid) {
+            const goButton = common.byId('go-exchange');
+            alice.input.value = alice.input.value.replaceAll(/\D/g, '');
+            bob.input.value = bob.input.value.replaceAll(/\D/g, '');
+            if (alice.input.validity.valid && bob.input.validity.valid) {
                 goButton.removeAttribute('disabled');
             } else {
                 goButton.setAttribute('disabled', 'disabled');
             }
         };
-        common.byId('alice-key').onkeyup = formCheck;
-        common.byId('bob-key').onkeyup = formCheck;
+        alice.input.onkeyup = formCheck;
+        bob.input.onkeyup = formCheck;
 
         function tweakValues() {
-            let ka = common.byId('alice-key').value;
-            let kb = common.byId('bob-key').value;
+            let ka = alice.input.value;
+            let kb = bob.input.value;
             let changed;
             do {
                 changed = false;
@@ -147,23 +155,13 @@ import * as field from './field-math/field-draw.js';
                 while (kb % curve61.basePointOrder === 0) { kb++; changed = true }
                 while ((ka * kb) % curve61.basePointOrder === 0) { ka++; changed = true }
             } while (changed);
-            common.byId('alice-key').value = ka;
-            common.byId('bob-key').value = kb;
+            alice.input.value = ka;
+            bob.input.value = kb;
         }
 
         common.byId('go-exchange').addEventListener('click', async () => {
             tweakValues();
-            const ka = common.byId('alice-key').value;
-            const kb = common.byId('bob-key').value;
-
-            const waitA = draw.runExchangePubkeyDemo(ctxA, ka, 'A', 'Alice', common.byId('alice-desc'));
-            const A = await waitA;
-            const waitB = draw.runExchangePubkeyDemo(ctxB, kb, 'B', 'Bob', common.byId('bob-desc'));
-            const B = await waitB;
-            await common.sleep(2000);
-            const _a = draw.runExchangeMultDemo(ctxA, ka, B, 'B', 'Alice', common.byId('alice-desc'));
-            const _b = draw.runExchangeMultDemo(ctxB, kb, A, 'A', 'Bob', common.byId('bob-desc'));
-            await Promise.all([_a, _b]);
+            await draw61.runExchangeDemo(alice, bob);
         });
         common.byId('rand-exchange').addEventListener('click', () => {
             let ka = Math.ceil(Math.random() * 256);
@@ -171,8 +169,8 @@ import * as field from './field-math/field-draw.js';
             while (ka === kb) {
                 kb = Math.ceil(Math.random() * 256);
             }
-            common.byId('alice-key').value = ka;
-            common.byId('bob-key').value = kb;
+            alice.input.value = ka;
+            bob.input.value = kb;
             formCheck();
             common.byId('go-exchange').click();
         });

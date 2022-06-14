@@ -58,7 +58,6 @@
     this page yet. This page might be broken at times, and I promise the complete page will
     be better anyway.
 <h1>Visualizing Elliptic Curve Cryptography</h1>
-<div>
 <p>
     Every TLS 1.3 session starts with a key exchange
     made via an elliptic curve. The most popular curve is
@@ -78,7 +77,6 @@
     We're looking at the heart of TLS 1.3 key exchange,
     but what's going on? Let's break it down into simple parts.
 </p>
-</div>
 
 <h2>Adding points on a curve</h2>
 <p>
@@ -86,12 +84,9 @@
     `y^2 = x^3 + Ax + B`
 <br>
 
-<div>
 <figure class="illustration">
 <div class="ill-content">
-<div>
 <canvas id="canvas-ec-sample" class="animated" width="500" height="300"></canvas>
-</div>
 </div>
     <figcaption>Examples of elliptic curves</figcaption>
 </figure>
@@ -141,10 +136,8 @@
 </div>
     <figcaption>Point addition is associative and commutative</figcaption>
 </figure>
-</div>
 
 <h2>Finite field math</h2>
-<div>
 <p>Next let's put curves aside and introduce a new set of math operations,
     the operations of the finite field <span class="fat-fp">Fp</span>.
 
@@ -190,7 +183,7 @@ You might be used to negation as flipping a value's sign from positive to negati
 
 <h4>Division (multiplicative inverse)</h4>
 <p>
-In field math division is defined by the idea
+In <span class="fat-fp">Fp</span> division is defined by the idea
     that any non-zero number divided by itself is 1:
     <div class="math-block">
     `\frac{n}{n} = 1`
@@ -231,23 +224,22 @@ To tie it all together, when working in <span class="fat-fp">Fp</span>
     as a number in <span class="fat-fp">Fp</span>
     which satisfies this equation:
 
-    <div class="math-block">
+    <div class="math-block pb0">
     `sqrt(n) \times sqrt(n) = n`
     </div>
-<p>
-In real numbers there are generally two solutions to this problem (positive and negative).
-In a similar way there are two square root solutions to non-zero numbers in <span class="fat-fp">Fp</span>.
 
     <canvas class="numline animated" id="canvas-field-sqrt" width="500" height="80"></canvas>
+
+<p>
+    In real numbers there are two square roots for every non-zero number (positive and negative).
+    The same is true in <span class="fat-fp">Fp</span>, and each solution is the negation of the other.
 
 <p>
     Only half of the non-zero members of <span class="fat-fp">Fp</span> have square roots.
     The square roots in <span class="fat-fp-23">F23</span> are
     provided <a target="_blank" href="sqrt23.html">in this table</a>.
-</div>
 
 <h2>Elliptic curves <em>and</em> finite fields</h2>
-<div>
 <p>
 Now we can combine the two concepts of elliptic curves and finite field math.
 Let's start with an elliptic curve equation:
@@ -274,7 +266,7 @@ Let's start with an elliptic curve equation:
     </div>
 
 <p>
-    Let's call the combination of the above elliptic curve and finite field "Curve61".
+    Let's call the combination of the definitions above "Curve61".
     What would it look like to plot this curve on a graph? Starting with `x=0`
     and working through each number from 0 to 60, using the math operations we defined above:
 
@@ -322,6 +314,7 @@ The resulting graph looks like this:
     <figcaption>An elliptic curve plotted in <span class="fat-fp-61">Fp</span></figcaption>
 </figure>
 
+<h4>Point Addition</h4>
 <p>
 We can still add points on this curve, using the math of <span class="fat-fp-61">F61</span> and
 the rules of point addition: draw lines between two points, find the curve intersection, then negate the point.
@@ -333,9 +326,9 @@ the rules of point addition: draw lines between two points, find the curve inter
     <figcaption>Curve61 point addition</figcaption>
 </figure>
 
-<p>This animation shows lines wrapping from 61 to 0 (the modulus effect shown visually),
-    sometimes many times. Finding the values algebraically is relatively easy though, just remember
-    to use the rules of finite field math:
+<p>This animation shows lines wrapping from 61 to 0, sometimes many times, before intersection
+    with a curve point. Finding the values algebraically is relatively easy, just remember to
+    use the rules of finite field math:
 
 <p>
     To add two points `P: (x_1, y_1)` and `Q: (x_2, y_2)` to get a third point `R: (x_3, y_3)`:
@@ -355,8 +348,14 @@ the rules of point addition: draw lines between two points, find the curve inter
 `\lambda = \frac{3x_1^2 + 9}{2y_1}`
 </div>
 
+<h4>Efficient Point Multiplication</h4>
 <p>
-    We can get to arbitrarily large multiples of `P` quickly using a "double-and-add" method:
+    The point at 100P (the point added to itself 100 times) can also be thought of as the point being
+    multiplied by the number 100. You'll see this referred to as "scalar multiplication", and it's just
+    another way to refer to repeated point addition.
+
+<p>
+    We can get to arbitrarily large multiplication of `P` quickly using a "double-and-add" method:
 <ul class="ml2">
     <li>Repeatedly double `P` to get `\{2P, 4P, 8P, 16P, 32P, …\}`</li>
     <li>Add combinations of the above points to get any needed multiple of `P`</li>
@@ -369,10 +368,8 @@ the rules of point addition: draw lines between two points, find the curve inter
     <figcaption>Double-and-add method for point <span id="dbl-add-np">nP</span></figcaption>
 </figure>
 
-</div>
 
-<h2>Key Exchange</h2>
-<div>
+<h2>Key exchange</h2>
 <p>
     Now we have enough to start doing cryptographic work. We're going to do a key exchange with
     Curve61, much in the same way that TLS 1.3 does a key exchange with Curve25519.
@@ -383,7 +380,7 @@ the rules of point addition: draw lines between two points, find the curve inter
     derive a key for one of the many fast and secure ciphers (such as AES) and encrypt their conversation.
 
 <p>
-The process looks like this:
+    The process looks like this:
 <ul>
     <li>Alice and Bob agree to use Curve61, described in the section above
     <li>Alice picks a random number `k_a`
@@ -434,9 +431,8 @@ Enter numbers for Bob and Alice's private keys below and watch a key exchange oc
     <canvas class="animated no-click" id="canvas-bob" width="500" height="300" data-visible=always></canvas>
     </div>
 </figure>
-</div>
 
-<h2>Back to the real curve</h2>
+<h2>The real curve</h2>
 
 <p>
 We've played around with a toy curve, and you've seen what it means to add points or perform a key exchange.
@@ -468,20 +464,21 @@ The most common curve used for key exchange is Curve25519. That curve has a simp
     `2^251` possible point multiplications for an attacker to guess at, which is a 76-digit number.
 
 <p>
-    Much like the toy curve we've been using, we can add and double points on Curve25519. Using that we
-    can perform a key exchange in the same way as explained above. Because the curve equation is
-    different the formula for adding and doubling is also different, see
-    <a href="https://en.wikipedia.org/wiki/Montgomery_curve">Wikipedia</a> for details.
+    Much like the toy curve we've been using, we can add and double points on Curve25519, though
+    the formula changes due to the different curve equation
+    (see <a href="https://en.wikipedia.org/wiki/Montgomery_curve">Wikipedia</a> for details).
+    Using point addition we can perform a key exchange in the same way that we did with our toy curve.
 
 <p>
-    For more information on Curve25519, including the reason for the choice of curve equation, the prime
-    number used for <span class="fat-fp">Fp</span>, and the exact details of key exchange I can recommend
+    For in-depth information on Curve25519, including the choice of curve equation,
+    the choice of prime number used for <span class="fat-fp">Fp</span>,
+    and the exact details of key exchange I can recommend
     <a href="https://cr.yp.to/ecdh/curve25519-20060209.pdf">the author's paper</a> and also
     <a href="https://martin.kleppmann.com/papers/curve25519.pdf">this technical analysis</a>.
     Most of these details are streamlining of the concepts listed on this page to keep the exchange
     mechanism secure and performant, and should not fundamentally conflict with what's explained here.
 
-<h2>Epilogue</h2>
+<h2>Final words</h2>
 
 <p>
     The code for this project can be found
