@@ -1,14 +1,46 @@
 <!DOCTYPE html>
 <html lang="en" ontouchmove>
 <head>
-    <meta charset="UTF-8">
     <title>Visualizing Elliptic Curves</title>
-    <script type="module" src="page.js" async></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"/>
+    <meta name="format-detection" content="telephone=no"/>
+    <meta name="title" content="Visualizing Elliptic Curves"/>
+    <meta name="description" content="Learn elliptic curve cryptography via animated examples on a toy curve"/>
+
     <link href="site.css" rel="stylesheet">
     <!-- xxx todo grab only what we need -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/css/bootstrap.min.css"
           integrity="sha384-0evHe/X+R7YkIZDRvuzKMRqM+OrBnVFBL6DOitfPri4tjfHxaWutUpFmBp4vmVor"
           rel="stylesheet" crossorigin="anonymous">
+
+    <!-- Facebook Meta Tags -->
+    <meta property="og:url" content="https://curves.ulfheim.net/">
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="Visualizing Elliptic Curves">
+    <meta property="og:description" content="Learn elliptic curve cryptography via animated examples on a toy curve">
+    <meta property="og:image" content="https://curves.ulfheim.net/og.png">
+
+    <!-- Twitter Meta Tags -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta property="twitter:domain" content="curves.ulfheim.net">
+    <meta property="twitter:url" content="https://curves.ulfheim.net/">
+    <meta name="twitter:title" content="Visualizing Elliptic Curves">
+    <meta name="twitter:description" content="Learn elliptic curve cryptography via animated examples on a toy curve">
+    <meta name="twitter:image" content="https://curves.ulfheim.net/og.png">
+
+    <!-- favicons -->
+    <link rel="apple-touch-icon" sizes="152x152" href="favicon/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="favicon/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="favicon/favicon-16x16.png">
+    <link rel="manifest" href="favicon/site.webmanifest">
+    <link rel="mask-icon" href="favicon/safari-pinned-tab.svg" color="#5bbad5">
+    <link rel="shortcut icon" href="favicon.ico">
+    <meta name="msapplication-TileColor" content="#da532c">
+    <meta name="msapplication-config" content="favicon/browserconfig.xml">
+    <meta name="theme-color" content="#ffffff">
+
+    <script type="module" src="page.js" async></script>
     <script>
         MathJax = {
             loader: {load: ['input/asciimath', 'output/chtml']},

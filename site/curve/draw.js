@@ -78,6 +78,7 @@ let drawGreyLines = (ctx, vals) => {
 };
 
 let drawAxisLines = (ctx, vals) => {
+    ctx.save();
     ctx.beginPath();
     ctx.strokeStyle = 'black';
     ctx.moveTo(...pointToCtx(vals, 0, 0, true));
@@ -87,14 +88,17 @@ let drawAxisLines = (ctx, vals) => {
     ctx.stroke();
     ctx.font = 'italic 12px serif';
     ctx.fillStyle = 'black';
-    const bodge = 1.6;
-    ctx.fillText('0', ...pointToCtx(vals, -bodge, -bodge, false));
-    ctx.fillText('p', ...pointToCtx(vals, -bodge, field.p - 0.5, false));
-    ctx.fillText('p/2', ...pointToCtx(vals, -1.5*bodge, field.p/2 - 0.5, false));
-    ctx.fillText('p', ...pointToCtx(vals, field.p - 0.5, -bodge, false));
+    const yBodge = 12 / vals.hScale;
     [10, 20, 30, 40, 50].forEach(x => {
-        ctx.fillText(x, ...pointToCtx(vals, x-1, -bodge));
+        ctx.fillText(x, ...pointToCtx(vals, x-1, -yBodge));
     });
+    ctx.fillText('p', ...pointToCtx(vals, field.p - 0.5, -yBodge, false));
+    ctx.textAlign = 'right';
+    const xBodge = 4 / vals.wScale;
+    ctx.fillText('0', ...pointToCtx(vals, -xBodge, -yBodge, false));
+    ctx.fillText('p', ...pointToCtx(vals, -xBodge, field.p - 0.5, false));
+    ctx.fillText('p/2', ...pointToCtx(vals, -xBodge, field.p/2 - 0.5, false));
+    ctx.restore();
 };
 
 let drawArrowHeads = (ctx, vals) => {
@@ -457,6 +461,8 @@ async function addPointsAnimation(ctx, nP, P, nQ, Q, options) {
                 ctx.setLineDash([]);
                 // overdraw to fix red line covering this dot
                 drawDot(vals, negR.x, negR.y, 'orange', +1, 1);
+                labelPoint(ctx, vals, nP, P, labelOptions);
+                labelPoint(ctx, vals, nQ, Q, labelOptions);
                 if (instate > duration.negate) {
                     ctx.strokeStyle = 'black';
                     drawDot(vals, Q.x, Q.y, 'orange');
