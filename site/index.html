@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=550" />
     <meta name="format-detection" content="telephone=no"/>
     <meta name="title" content="Visualizing Elliptic Curves"/>
-    <meta name="description" content="Learn elliptic curve cryptography with animated examples on a toy curve"/>
+    <meta name="description" content="Learn elliptic curve cryptography on a toy curve with animated examples">
 
     <link href="site.css" rel="stylesheet">
     <!-- xxx todo grab only what we need -->
@@ -446,8 +446,8 @@
 <h2>The real curve</h2>
 
 <p>
-    We've played around with a toy curve, and you've seen what it means to add points or perform a key exchange.
-    But how does this compare to real curves used in real cryptography?
+    We've played around with a toy curve of 72 points, and you've seen what it means to add points or
+    perform a key exchange. But how does this compare to real curves used in real cryptography?
 
 <p>
     The most common curve used for key exchange is Curve25519. That curve has a simple equation:
@@ -475,7 +475,7 @@
     `2^251` possible point multiplications for an attacker to guess at, which is a very large (76-digit) number.
 
 <p>
-    Much like the toy curve we've been using, we can add and double points on Curve25519, though
+    We can add and double points on Curve25519 in much the same way that we did on Curve61, though
     the formula changes due to the different curve equation
     (see <a href="https://en.wikipedia.org/wiki/Montgomery_curve">Wikipedia</a> for details).
     Using point addition we can perform a key exchange in the same way that we did with our toy curve.
@@ -496,7 +496,7 @@
     <a href="https://github.com/syncsynchalt/viz-curves">on GitHub</a>.
 
 <p>
-    I hope you found this page useful or at least interesting! If so let me know at
+    I hope you found this page useful or at least interesting! Let me know at
     <a href="https://twitter.com/xargsnotbombs">@XargsNotBombs</a>.
 
 </div> <!-- container -->
