@@ -9,7 +9,7 @@ const TWO_PI = 2*Math.PI;
 function preCalcValues(ctx) {
     const ratio = ctx.canvas['_ratio'] || 1;
     const labelSpace = 26;
-    const marginWide = 16;
+    const marginWide = 20;
     const marginThin = 10;
     const dotRadius = 2.5;
     const w = ctx.canvas.getBoundingClientRect().width;
@@ -97,7 +97,7 @@ let drawArrowHeads = (ctx, vals) => {
     ctx.fill();
 };
 
-async function resetGraph(ctx, vals) {
+function resetGraph(ctx, vals) {
     if (!vals) {
         vals = preCalcValues(ctx);
     }
@@ -154,12 +154,13 @@ function drawDot(vals, x, y, color,
  * @param ctx {CanvasRenderingContext2D}
  * @param vals {PreCalcVals}
  * @param n {Number}
- * @param x {BigInt}
- * @param y {BigInt}
+ * @param P {Point|BigPoint}
+ * @param color {String}
  */
-function labelPoint(ctx, vals, n, x, y) {
+function labelAndDrawPoint(ctx, vals, n, P, color) {
+    drawDot(vals, P.x, P.y, color);
     ctx.save();
-    const p = pointToCtx(vals, x, y);
+    const p = pointToCtx(vals, P.x, P.y);
     // use a cache to keep the point label locations stable
     ctx['_pointDirCache'] = ctx['_pointDirCache'] || {};
     const dir = ctx['_pointDirCache'][n] || common.pickLabelDirection(ctx, p[0], p[1]);
@@ -225,7 +226,7 @@ function slopReduce(n) {
  */
 async function addP(ctx, n, Q, drawDoneCb) {
     const vals = preCalcValues(ctx);
-    await resetGraph(ctx, vals);
+    resetGraph(ctx, vals);
     let start, prev;
 
     const P = curve.P();
@@ -235,7 +236,15 @@ async function addP(ctx, n, Q, drawDoneCb) {
     const R = curve.add(P, Q);
     const negR = curve.negate(R);
     const slopNR = misc.convertToPoint(negR);
-    const negLength = Number(negR.y - R.y);
+    let negLength = Number(negR.y - R.y);
+    if (Math.abs(negLength) < slop_field_p / 2) {
+        if (slopNR.y < (slop_field_p / 2)) {
+            negLength = 2 * slopNR.y;
+        } else {
+            negLength = -2 * (slop_field_p - slopNR.y);
+        }
+    }
+    const primEdge = misc.primaryLineEdge(P, Q);
     // noinspection JSUnusedLocalSymbols
     const primRight = misc.primaryLineEnd(P, Q);
     // noinspection JSUnusedLocalSymbols
@@ -249,9 +258,9 @@ async function addP(ctx, n, Q, drawDoneCb) {
     const started = {};
     const finished = {};
     const duration = {
-        line: 2000,
+        line: 3000,
         linePause: 0,
-        negate: 400,
+        negate: 800,
         done: 100,
     };
     let lastDot;
@@ -263,6 +272,19 @@ async function addP(ctx, n, Q, drawDoneCb) {
 
     writeCoordinates(ctx, vals, Q.x, Q.y);
 
+    let drawTangentLine = () => {
+        ctx.beginPath();
+        ctx.save();
+        ctx.lineWidth = 2;
+        ctx.strokeStyle = 'orange';
+        ctx.setLineDash([1.5, 5]);
+        ctx.moveTo(...pointToCtx(vals, P.x, P.y));
+        ctx.lineTo(...pointToCtx(vals, primEdge.x, primEdge.y));
+        ctx.stroke();
+        ctx.setLineDash([]);
+        ctx.restore();
+    };
+
     async function step(timestamp) {
         if (!start) {
             start = timestamp;
@@ -272,11 +294,13 @@ async function addP(ctx, n, Q, drawDoneCb) {
             ctx.save();
             if (!finished.label) {
                 markState('label', timestamp);
-                drawDot(vals, P.x, P.y, 'black');
-                labelPoint(ctx, vals, 1, P.x, P.y);
-                drawDot(vals, Q.x, Q.y, 'black');
-                labelPoint(ctx, vals, n, Q.x, Q.y);
+                labelAndDrawPoint(ctx, vals, 1, P, 'black');
+                labelAndDrawPoint(ctx, vals, n, Q, 'black');
                 finished.label = timestamp;
+            } else if (!finished.tangent) {
+                markState('tangent', timestamp);
+                drawTangentLine();
+                finished.tangent = timestamp;
             } else if (!finished.line) {
                 let instate = markState('line', timestamp);
                 ctx.beginPath();
@@ -299,13 +323,12 @@ async function addP(ctx, n, Q, drawDoneCb) {
                 if (lastDot) {
                     // overdraw old point to clear it
                     drawDot(vals, lastDot.x, lastDot.y, 'white', 1, 2, 'white');
+                    drawTangentLine();
                     drawAxisLines(ctx, vals);
-                    drawDot(vals, P.x, P.y, 'black');
-                    labelPoint(ctx, vals, 1, P.x, P.y);
-                    labelPoint(ctx, vals, n, Q.x, Q.y);
                 }
-                drawDot(vals, Q.x, Q.y, 'black');
-                drawDot(vals, dot.x, dot.y, 'orange', 0, 0);
+                labelAndDrawPoint(ctx, vals, 1, P, 'black');
+                labelAndDrawPoint(ctx, vals, n, Q, 'black');
+                drawDot(vals, dot.x, dot.y, 'orange', 0, 1);
                 lastDot = dot;
 
                 if (instate > duration.line) {
@@ -325,19 +348,20 @@ async function addP(ctx, n, Q, drawDoneCb) {
                 if (lastDot) {
                     // overdraw old point to clear it
                     drawDot(vals, lastDot.x, lastDot.y, 'white', 1, 2, 'white');
+                    drawTangentLine();
                     drawAxisLines(ctx, vals);
-                    labelPoint(ctx, vals, n, Q.x, Q.y);
+                    labelAndDrawPoint(ctx, vals, n, Q, 'black');
                 }
                 drawDot(vals, slopNR.x, slopNR.y, 'red');
-                const dot = {x: slopNR.x, y: slopNR.y - negLength * mult};
+                const dot = {x: slopNR.x, y: slopReduce(slopNR.y - negLength * mult)};
                 drawDot(vals, dot.x, dot.y, 'red', 0.5);
                 lastDot = dot;
 
                 if (instate > duration.negate) {
                     finished.negate = timestamp;
-                    drawDot(vals, slopNR.x, slopNR.y, 'white', 1, 0);
-                    drawDot(vals, R.x, R.y, 'red', 0.5);
-                    labelPoint(ctx, vals, n+1, R.x, R.y);
+                    resetGraph(ctx, vals);
+                    labelAndDrawPoint(ctx, vals, 1, P, 'black');
+                    labelAndDrawPoint(ctx, vals, n+1, R, 'red');
                     writeCoordinates(ctx, vals, R.x, R.y);
                 }
             } else if (!finished.done) {

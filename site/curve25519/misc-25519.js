@@ -10,8 +10,8 @@ const slop_p = Number(field.p);
  */
 function getGraphSlope(P, Q) {
     if (P.x === Q.x && P.y === Q.y) {
-        // xxx fake, make this look better
-        return 1;
+        // pre-calculated for P
+        return 0.6556;
     }
     return (Q.y - P.y) / (Q.x - P.x);
 }
@@ -40,13 +40,31 @@ let pointAtY = (P, m, y) => {
 };
 
 /**
- * Return the endpoint of a line segment through P and Q that wraps the axes five times
+ * Return the rightmost endpoint of a line segment through P and Q that ends at the graph edge
+ * @param P {BigPoint}
+ * @param Q {BigPoint}
+ * @return {Point} the end of the line through P and Q that wraps around the field.p five times
+ */
+function primaryLineEdge(P, Q) {
+    [P, Q] = common.orderPointsByX(convertToPoint(P), convertToPoint(Q));
+    const slope = getGraphSlope(P, Q);
+    const rightY = Number(P.y) + slope * (slop_p - Number(P.x));
+    if (rightY >= 0 && rightY < slop_p) {
+        return pointAtY(P, slope, rightY);
+    } else if (rightY < 0) {
+        return pointAtY(P, slope, 0);
+    } else {
+        return pointAtY(P, slope, slop_p);
+    }
+}
+
+/**
+ * Return the endpoint of a line segment through P and Q that wraps the graph five times
  * @param P {BigPoint}
  * @param Q {BigPoint}
  * @return {Point} the end of the line through P and Q that wraps around the field.p five times
  */
 function primaryLineEnd(P, Q) {
-
     [P, Q] = common.orderPointsByX(convertToPoint(P), convertToPoint(Q));
     const slope = getGraphSlope(P, Q);
     if (slope > 1) {
@@ -83,6 +101,7 @@ function lastLineStart(P, Q, R) {
 
 export {
     convertToPoint,
+    primaryLineEdge,
     primaryLineEnd,
     lastLineStart,
 };
