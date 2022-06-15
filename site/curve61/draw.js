@@ -750,17 +750,20 @@ function pickGoodDoubleAddNumber() {
  * @param ctx {CanvasRenderingContext2D}
  * @param n {Number} number of points to
  * @param P {Point} base point
- * @param baseLabel {String?} the label for base point (default 'P')
+ * @param label {String?} the label for base point (default 'P')
+ * @param caption {HTMLSpanElement?}
  * @return {Promise<Point>} the calculated point
  */
-function doubleAndAddAnimation(ctx, n, P, baseLabel) {
+function doubleAndAddAnimation(ctx, n, P, label, caption) {
     resetGraph(ctx);
-    baseLabel = baseLabel || 'P';
+    label = label || 'P';
+    caption = caption || document.createElement('span');
     const vals = preCalcValues(ctx);
 
     return new Promise(success => {
         const minBits = Math.floor(Math.log2(n));
-        quickDoubles(ctx, 2**minBits, P, baseLabel).then(async () => {
+        caption.innerHTML = `Doubling point repeatedly to find 2${label} through ${2**minBits}${label}`;
+        quickDoubles(ctx, 2**minBits, P, label).then(async () => {
             const points = {};
             let runningTotal = 0;
             for (let exp = 0, x = n; exp <= minBits; exp++, x >>= 1) {
@@ -769,23 +772,26 @@ function doubleAndAddAnimation(ctx, n, P, baseLabel) {
                 }
             }
             resetGraph(ctx);
-            drawAndLabelPoints(ctx, vals, points, {label: baseLabel});
+            drawAndLabelPoints(ctx, vals, points, {label});
             await common.sleep(1000, ctx);
             for (let exp = 0, x = n; x !== 0; exp++, x >>= 1) {
                 if ((x & 1) !== 0) {
                     const thisBit = 2**exp;
+                    caption.innerText = `Adding ${runningTotal}${label} to ${thisBit}${label} ` +
+                        `to find ${thisBit+runningTotal}${label}`;
                     if (runningTotal) {
                         const tot = runningTotal;
-                        await new Promise(s => {
+                        await new Promise(resolve => {
                             addPointsAnimation(ctx, thisBit, points[thisBit], tot, points[tot], {
-                                basePointLabel: baseLabel,
+                                basePointLabel: label,
                                 labels: points,
-                                drawDoneCb: () => { s() }
+                                drawDoneCb: () => { resolve() }
                             });
                         });
                     }
                     runningTotal += thisBit;
                     points[runningTotal] = curve.pointMult(P, runningTotal);
+                    caption.innerText = `Result is ${runningTotal}${label}`;
                 }
             }
             success(points[runningTotal]) ;
@@ -793,13 +799,19 @@ function doubleAndAddAnimation(ctx, n, P, baseLabel) {
     });
 }
 
-async function runDoubleAddDemo(ctx, updateCb, drawDoneCb) {
+/**
+ * @param ctx {CanvasRenderingContext2D}
+ * @param captionTag {HTMLSpanElement}
+ * @param updateCb {Function?} called after target nP value selected
+ * @param drawDoneCb {Function?} called after animation is finished
+ */
+async function runDoubleAddDemo(ctx, captionTag, updateCb, drawDoneCb) {
     resetGraph(ctx, true);
 
     let cycle = async () => {
         const numToReach = pickGoodDoubleAddNumber();
         if (updateCb) updateCb(numToReach);
-        await doubleAndAddAnimation(ctx, numToReach, P());
+        await doubleAndAddAnimation(ctx, numToReach, P(), 'P', captionTag);
         if (drawDoneCb) drawDoneCb();
         if (common.canvasIsScrolledIntoView(ctx.canvas)) {
             ctx['_timeout'] = setTimeout(cycle, 2500);

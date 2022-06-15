@@ -108,9 +108,10 @@ import * as field from './field-math/field-draw.js?bustin=1655260032';
 
         const canvas2 = common.byId('canvas-double-and-add');
         const ctx2 = common.convertCanvasHiDPI(canvas2);
+        const captionTag = common.byId('dbl-add-caption');
         const startDemo2 = () => {
-            return draw61.runDoubleAddDemo(ctx2, (np) => {
-                common.byId('dbl-add-np').textContent = `${np}`;
+            return draw61.runDoubleAddDemo(ctx2, captionTag, (np) => {
+                common.byId('dbl-add-np').textContent = `${np}P`;
             });
         };
         await common.addPlayPause(ctx2, startDemo2, common.cancelAnimation);

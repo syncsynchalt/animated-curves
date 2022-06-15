@@ -71,7 +71,7 @@
 </p>
 <figure class="illustration">
     <div class="ill-content">
-    <canvas id="canvas-curve25519" class="animated" width="500" height="300"></canvas>
+    <canvas id="canvas-curve25519" class="animated whiteboard" width="500" height="300"></canvas>
     </div>
     <figcaption>Curve25519 point addition</figcaption>
 </figure>
@@ -88,7 +88,7 @@
 
 <figure class="illustration">
     <div class="ill-content">
-    <canvas id="canvas-ec-sample" class="animated" width="500" height="300"></canvas>
+    <canvas id="canvas-ec-sample" class="animated whiteboard" width="500" height="300"></canvas>
     </div>
     <figcaption>Examples of elliptic curves</figcaption>
 </figure>
@@ -110,7 +110,7 @@
 
 <figure class="illustration">
     <div class="ill-content">
-    <canvas id="canvas-real-add" class="animated" height="400" width="500"></canvas>
+    <canvas id="canvas-real-add" class="animated whiteboard" height="400" width="500"></canvas>
     </div>
     <figcaption>Repeated addition of a point P</figcaption>
 </figure>
@@ -135,7 +135,7 @@
 
 <figure class="illustration">
     <div class="ill-content">
-    <canvas id="canvas-real-assoc" class="animated" width="500" height="400"></canvas>
+    <canvas id="canvas-real-assoc" class="animated whiteboard" width="500" height="400"></canvas>
     </div>
     <figcaption>Point addition is associative and commutative</figcaption>
 </figure>
@@ -311,7 +311,7 @@
     The resulting graph looks like this:
 <figure class="illustration">
     <div class="ill-content">
-    <canvas id="canvas-curve61-static" width="500" height="400"></canvas>
+    <canvas id="canvas-curve61-static" class="whiteboard" width="500" height="400"></canvas>
     </div>
     <figcaption>An elliptic curve plotted in <span class="fat-fp-61">Fp</span></figcaption>
 </figure>
@@ -323,7 +323,7 @@
 
 <figure class="illustration">
     <div class="ill-content">
-    <canvas class="animated" id="canvas-addp" width="500" height="400"></canvas>
+    <canvas class="animated whiteboard" id="canvas-addp" width="500" height="400"></canvas>
     </div>
     <figcaption>Curve61 point addition</figcaption>
 </figure>
@@ -367,7 +367,12 @@
 
 <figure class="illustration">
     <div class="ill-content">
-    <canvas class="animated" id="canvas-double-and-add" width="500" height="400"></canvas>
+    <div class="whiteboard">
+    <canvas class="animated mt-2" id="canvas-double-and-add" width="500" height="400"></canvas>
+    <div class="whiteboard-caption">
+    <span id="dbl-add-caption"></span>
+    </div>
+    </div>
     </div>
     <figcaption>Double-and-add method for point <span id="dbl-add-np">nP</span></figcaption>
 </figure>
@@ -428,9 +433,11 @@
 <figure class="illustration">
     <div class="ill-content">
     <div id="alice-desc">Alice:</div>
-    <canvas class="animated no-click" id="canvas-alice" width="500" height="300" data-visible=always></canvas>
+    <canvas class="animated no-click whiteboard" id="canvas-alice" width="500" height="300" data-visible=always>
+    </canvas>
     <div id="bob-desc">Bob:</div>
-    <canvas class="animated no-click" id="canvas-bob" width="500" height="300" data-visible=always></canvas>
+    <canvas class="animated no-click whiteboard" id="canvas-bob" width="500" height="300" data-visible=always>
+    </canvas>
     </div>
 </figure>
 

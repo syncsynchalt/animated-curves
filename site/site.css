@@ -37,10 +37,24 @@ h1 {
     font-family: Didot, serif;
 }
 
-.illustration canvas {
+.illustration .whiteboard {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
     background-color: white;
     border-radius: 10px;
     box-shadow: 1px 1px 4px rgba(0, 0, 0, 0.3);
+}
+.illustration canvas {
+    background-color: white;
+    display: inline-block;
+}
+
+.whiteboard .whiteboard-caption {
+    font-size: 0.8em;
+    color: #333;
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    padding-bottom: 8px;
 }
 
 canvas.animated {
