@@ -353,7 +353,7 @@
 
 <h4>Efficient Point Multiplication</h4>
 <p>
-    The point at 100P is the P added to itself 100 times. It can <em>also</em> be thought of as the point being
+    The point at 100P is the point `P` added to itself 100 times. It can <em>also</em> be thought of as the point being
     multiplied by the number 100. You'll see this referred to as "scalar multiplication", and it's just
     another way to refer to repeated point addition.
 
@@ -474,7 +474,7 @@
 <p>
     We can add and double points on Curve25519 in much the same way that we did on Curve61, though
     the formula changes due to the different curve equation
-    (see <a href="https://en.wikipedia.org/wiki/Montgomery_curve">Wikipedia</a> for details).
+    (see <a href="https://en.wikipedia.org/wiki/Montgomery_curve#Addition">Wikipedia</a> for details).
     Using point addition we can perform a key exchange in the same way that we did with our toy curve.
 
 <p>
@@ -486,15 +486,17 @@
     Most of these details are streamlining of the concepts listed on this page to keep the exchange
     mechanism secure and performant, and should not fundamentally conflict with what's explained here.
 
-<h2>Final words</h2>
-
-<p>
+<div class="text-center epilogue">
+    <p>
+    <span style="font-size: 2em">❦</span>
+    <br>
     The code for this project can be found
     <a href="https://github.com/syncsynchalt/viz-curves">on GitHub</a>.
-
-<p>
-    I hope you found this page useful or at least interesting! Let me know at
-    <a href="https://twitter.com/xargsnotbombs">@XargsNotBombs</a>.
+    <br>
+    I hope you found this page useful or at least interesting!
+    <br>
+    Let me know at <a href="https://twitter.com/xargsnotbombs">@XargsNotBombs</a>.
+</div> <!-- epilogue -->
 
 </div> <!-- container -->
 
