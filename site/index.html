@@ -403,26 +403,24 @@
     Enter numbers for Bob and Alice's private keys below and watch a key exchange occur:
 
 <form class="row row-cols-sm-auto g-3 align-items-center" onsubmit="return false">
-    <div class="col-12">
-    <div class="input-group input-group-sm">
+    <div class="col-4">
+    <div class="input-group">
     <label for="alice-key" class="col-form-label col-form-label-sm">k<sub>a</sub>&nbsp;</label>
     <input type="text" class="form-control form-control-sm" id="alice-key"
            required pattern="[1-9][0-9]*" placeholder="Alice's key">
     </div>
     </div>
 
-    <div class="col-12">
-    <div class="input-group input-group-sm">
+    <div class="col-4">
+    <div class="input-group">
     <label for="bob-key" class="col-form-label col-form-label-sm">k<sub>b</sub>&nbsp;</label>
     <input type="text" class="form-control form-control-sm" id="bob-key"
            required pattern="[1-9][0-9]*" placeholder="Bob's key">
     </div>
     </div>
 
-    <div class="col-12">
-    <button type="submit" class="btn btn-primary btn-sm" id="go-exchange" disabled>Go</button>
-    </div>
-    <div class="col-12">
+    <div class="col-4">
+    <button type="submit" class="btn btn-primary btn-sm me-2" id="go-exchange" disabled>Go</button>
     <button type="submit" class="btn btn-primary btn-sm" id="rand-exchange">Random</button>
     </div>
 </form>
