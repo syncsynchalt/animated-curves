@@ -1,5 +1,5 @@
-import * as draw from '../sample-draw.js';
-import * as curve from '../sample-curve.js';
+import * as draw from '../sample-draw.js?bustin=';
+import * as curve from '../sample-curve.js?bustin=';
 import * as chai from 'chai';
 
 const expect = chai.expect;

@@ -1,5 +1,5 @@
-import * as curve from './sample-curve.js';
-import * as common from '../common.js';
+import * as curve from './sample-curve.js?bustin=1655260032';
+import * as common from '../common.js?bustin=1655260032';
 
 const EPS = 0.000001;
 

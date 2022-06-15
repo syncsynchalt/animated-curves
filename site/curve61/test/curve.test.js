@@ -1,5 +1,5 @@
-import * as curve from '../curve.js';
-import * as field from '../field.js';
+import * as curve from '../curve.js?bustin=';
+import * as field from '../field.js?bustin=';
 import * as chai from 'chai';
 
 let expect = chai.expect;

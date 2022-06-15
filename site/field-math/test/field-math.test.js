@@ -1,4 +1,4 @@
-import * as fmath from '../field-math.js';
+import * as fmath from '../field-math.js?bustin=';
 import * as chai from 'chai';
 
 const expect = chai.expect;

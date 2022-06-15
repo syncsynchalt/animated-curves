@@ -1,7 +1,7 @@
-import * as curve from './curve-25519.js';
-import * as field from './field-25519.js';
-import * as common from '../common.js';
-import * as misc from './misc-25519.js';
+import * as curve from './curve-25519.js?bustin=1655260032';
+import * as field from './field-25519.js?bustin=1655260032';
+import * as common from '../common.js?bustin=1655260032';
+import * as misc from './misc-25519.js?bustin=1655260032';
 
 const TWO_PI = 2*Math.PI;
 
@@ -114,6 +114,7 @@ async function resetGraph(ctx, vals) {
  * @param ctx {CanvasRenderingContext2D}
  */
 function drawGrid(ctx) {
+    ctx.beginPath();
     const vals = preCalcValues(ctx);
     ctx.lineWidth = 1;
 
@@ -157,6 +158,7 @@ function drawDot(vals, x, y, color,
  * @param y {BigInt}
  */
 function labelPoint(ctx, vals, n, x, y) {
+    ctx.save();
     const p = pointToCtx(vals, x, y);
     // use a cache to keep the point label locations stable
     ctx['_pointDirCache'] = ctx['_pointDirCache'] || {};
@@ -200,6 +202,21 @@ function writeCoordinates(ctx, vals, x, y) {
     ctx.restore();
 }
 
+const slop_field_p = Number(field.p);
+
+/**
+ * Reduce a number to be modulo field.p (approximate due to use of Number)
+ * @param n
+ * @return {Number} the number modulo field.p
+ */
+function slopReduce(n) {
+    n %= slop_field_p;
+    if (n < 0) {
+        n += slop_field_p;
+    }
+    return n;
+}
+
 /**
  * @param ctx {CanvasRenderingContext2D}
  * @param n {Number} the NP of current point 'Q'
@@ -220,9 +237,9 @@ async function addP(ctx, n, Q, drawDoneCb) {
     const slopNR = misc.convertToPoint(negR);
     const negLength = Number(negR.y - R.y);
     // noinspection JSUnusedLocalSymbols
-    const [_primLeft, primRight] = misc.primaryLineEdges(P, Q);
+    const primRight = misc.primaryLineEnd(P, Q);
     // noinspection JSUnusedLocalSymbols
-    const [secLeft, _secRight] = misc.secondaryLineEdges(P, Q, negR);
+    const secLeft = misc.lastLineStart(P, Q, negR);
     const slopP = misc.convertToPoint(P);
     const primX = (primRight.x - Number(P.x));
     const secX = (Number(R.x) - secLeft.x);
@@ -232,9 +249,9 @@ async function addP(ctx, n, Q, drawDoneCb) {
     const started = {};
     const finished = {};
     const duration = {
-        line: 500,
-        linePause: 100,
-        negate: 300,
+        line: 2000,
+        linePause: 0,
+        negate: 400,
         done: 100,
     };
     let lastDot;
@@ -255,6 +272,8 @@ async function addP(ctx, n, Q, drawDoneCb) {
             ctx.save();
             if (!finished.label) {
                 markState('label', timestamp);
+                drawDot(vals, P.x, P.y, 'black');
+                labelPoint(ctx, vals, 1, P.x, P.y);
                 drawDot(vals, Q.x, Q.y, 'black');
                 labelPoint(ctx, vals, n, Q.x, Q.y);
                 finished.label = timestamp;
@@ -267,8 +286,8 @@ async function addP(ctx, n, Q, drawDoneCb) {
                 if (mult < primRatio) {
                     const primMult = mult / primRatio;
                     dot = {
-                        x: slopP.x + primMult * (primRight.x - slopP.x),
-                        y: slopP.y + primMult * (primRight.y - slopP.y),
+                        x: slopReduce(slopP.x + primMult * (primRight.x - slopP.x)),
+                        y: slopReduce(slopP.y + primMult * (primRight.y - slopP.y)),
                     };
                 } else {
                     const secMult = (mult - primRatio) / (1 - primRatio);
@@ -279,12 +298,14 @@ async function addP(ctx, n, Q, drawDoneCb) {
                 }
                 if (lastDot) {
                     // overdraw old point to clear it
-                    drawDot(vals, lastDot.x, lastDot.y, 'white', 0, 2, 'white');
+                    drawDot(vals, lastDot.x, lastDot.y, 'white', 1, 2, 'white');
                     drawAxisLines(ctx, vals);
+                    drawDot(vals, P.x, P.y, 'black');
+                    labelPoint(ctx, vals, 1, P.x, P.y);
                     labelPoint(ctx, vals, n, Q.x, Q.y);
                 }
                 drawDot(vals, Q.x, Q.y, 'black');
-                drawDot(vals, dot.x, dot.y, 'gray', 0, 0);
+                drawDot(vals, dot.x, dot.y, 'orange', 0, 0);
                 lastDot = dot;
 
                 if (instate > duration.line) {
@@ -292,7 +313,6 @@ async function addP(ctx, n, Q, drawDoneCb) {
                     finished.line = timestamp;
                 }
             } else if (!finished.linePause) {
-                // xxx consider getting rid of
                 let instate = markState('linePause', timestamp);
                 if (instate > duration.linePause) {
                     finished.linePause = timestamp;
@@ -304,13 +324,13 @@ async function addP(ctx, n, Q, drawDoneCb) {
 
                 if (lastDot) {
                     // overdraw old point to clear it
-                    drawDot(vals, lastDot.x, lastDot.y, 'white', 0, 2, 'white');
+                    drawDot(vals, lastDot.x, lastDot.y, 'white', 1, 2, 'white');
                     drawAxisLines(ctx, vals);
                     labelPoint(ctx, vals, n, Q.x, Q.y);
                 }
-                drawDot(vals, slopNR.x, slopNR.y, 'red', 0, 0);
+                drawDot(vals, slopNR.x, slopNR.y, 'red');
                 const dot = {x: slopNR.x, y: slopNR.y - negLength * mult};
-                drawDot(vals, dot.x, dot.y, 'red');
+                drawDot(vals, dot.x, dot.y, 'red', 0.5);
                 lastDot = dot;
 
                 if (instate > duration.negate) {

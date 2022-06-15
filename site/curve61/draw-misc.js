@@ -1,6 +1,6 @@
-import * as field from './field.js';
-import * as curve from './curve.js';
-import * as common from '../common.js';
+import * as field from './field.js?bustin=1655260032';
+import * as curve from './curve.js?bustin=1655260032';
+import * as common from '../common.js?bustin=1655260032';
 
 const EPS = 0.0000001;
 
