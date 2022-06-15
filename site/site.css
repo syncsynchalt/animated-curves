@@ -134,28 +134,6 @@ table.results td {
         "Lucida Sans Unicode", OpenSymbol, "Standard Symbols L", serif;
 }
 
-.pb0 {
-    padding-bottom: 0;
-}
-.pb1 {
-    padding-bottom: 1em;
-}
-.pt1 {
-    padding-top: 1em;
-}
-.pthalf {
-    padding-top: 0.5em;
-}
-.pbhalf {
-    padding-bottom: 0.5em;
-}
-.phalf {
-    padding: 0.5em 0;
-}
-.ml3 {
-    margin-left: 3em;
-}
-
 .heading-link, .heading-link:hover {
     margin-right: 4px;
     text-decoration: none;

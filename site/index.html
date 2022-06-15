@@ -121,11 +121,11 @@
     Point addition has two useful properties which we'll need later:
 <ul class="skinny-block">
     <li><strong>commutative</strong>: adding points in any order results in the same point:
-        <div class="text-center mathy phalf">
+        <div class="text-center mathy py-2">
         P+Q+R = R+Q+P = P+R+Q
         </div>
     <li><strong>associative</strong>: addition of additions has the same result as adding the points individually:
-    <div class="text-center mathy phalf">
+    <div class="text-center mathy py-2">
     P+P+P+P+P = (P+P) + (P+P+P) = 2P + 3P = 5P
     <br>
     P+P+P+P+P = (P+P+P+P) + (P) = 4P + 1P = 5P
@@ -228,7 +228,7 @@
     as a number in <span class="fat-fp">Fp</span>
     which satisfies this equation:
 
-<div class="math-block pb0">
+<div class="math-block pb-0">
 `sqrt(n) \times sqrt(n) = n`
 </div>
 
@@ -337,7 +337,7 @@
 <div class="skinny-block">
 <p>
     To add two points `P: (x_1, y_1)` and `Q: (x_2, y_2)` to get a third point `R: (x_3, y_3)`:
-<div class="math-block-left ml3">
+<div class="math-block-left ms-5">
 `\lambda = \frac{y_2 - y_1}{x_2 - x_1}`
 <br>
 `x_3 = \lambda^2 - x_1 - x_2`
@@ -349,7 +349,7 @@
     If `P` and `Q` are the same point, then adding them is called "doubling" the point.
     The formula for this is the same, but the slope (lambda) is the curve tangent:
 
-<div class="math-block-left ml3">
+<div class="math-block-left ms-5">
 `\lambda = \frac{3x_1^2 + 9}{2y_1}`
 </div>
 </div> <!-- skinny-block -->
