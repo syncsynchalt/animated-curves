@@ -110,7 +110,7 @@ function writeLabel(ctx, vals, label) {
     ctx.font = common.mathFont('18px');
     ctx.textAlign = 'center';
     ctx.textBaseline = 'top';
-    ctx.fillText(label, vals.w / 2, 5);
+    ctx.fillText(label, vals.w / 2, 6);
     ctx.restore();
 }
 

@@ -103,7 +103,7 @@
         (or if you're adding a point to itself, make a line tangent to the curve at that
         point),</li>
     <li>find where that line intersects the curve,</li>
-    <li>and finally negate the y-value of that point (flip it from positive to negative or vice versa).</li>
+    <li>and finally negate the y-value of that point.</li>
 </ul>
 </div> <!-- skinny-block -->
 
@@ -151,8 +151,8 @@
 </div>
 
 <p>
-    All the math operations below use only those 23 numbers as inputs as outputs. No negative numbers,
-    no floating point, and nothing higher than 22.
+    All the math operations below use only those 23 numbers as inputs as outputs. <strong>No negative numbers,
+    no floating point, and nothing higher than 22</strong>.
 
 <h4>Addition / Subtraction</h4>
 <p>
@@ -318,7 +318,8 @@
 <h4>Point Addition</h4>
 <p>
     We can still add points on this curve, using the math of <span class="fat-fp-61">F61</span> and
-    the rules of point addition: draw lines between two points, find the curve intersection, then negate the point.
+    the rules of point addition: draw lines between two points, find the curve intersection,
+    then negate the point's y-value.
 
 <figure class="illustration">
     <div class="ill-content">
@@ -406,7 +407,7 @@
 <p>
     Enter numbers for Bob and Alice's private keys below and watch a key exchange occur:
 
-<form class="row row-cols-sm-auto g-3 align-items-center" onsubmit="return false">
+<form class="row g-3 align-items-center" onsubmit="return false">
     <div class="col-4">
     <div class="input-group">
     <label for="alice-key" class="col-form-label col-form-label-sm">k<sub>a</sub>&nbsp;</label>
