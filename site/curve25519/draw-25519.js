@@ -224,7 +224,7 @@ function slopReduce(n) {
  * @param Q {BigPoint} the current point 'Q', to which 'P' will be added
  * @param drawDoneCb {Function?} optional callback when done drawing
  */
-async function addP(ctx, n, Q, drawDoneCb) {
+function addP(ctx, n, Q, drawDoneCb) {
     const vals = preCalcValues(ctx);
     resetGraph(ctx, vals);
     let start, prev;
@@ -244,7 +244,6 @@ async function addP(ctx, n, Q, drawDoneCb) {
             negLength = -2 * (slop_field_p - slopNR.y);
         }
     }
-    const primEdge = misc.primaryLineEdge(P, Q);
     // noinspection JSUnusedLocalSymbols
     const primRight = misc.primaryLineEnd(P, Q);
     // noinspection JSUnusedLocalSymbols
@@ -272,20 +271,7 @@ async function addP(ctx, n, Q, drawDoneCb) {
 
     writeCoordinates(ctx, vals, Q.x, Q.y);
 
-    let drawTangentLine = () => {
-        ctx.beginPath();
-        ctx.save();
-        ctx.lineWidth = 2;
-        ctx.strokeStyle = 'orange';
-        ctx.setLineDash([1.5, 5]);
-        ctx.moveTo(...pointToCtx(vals, P.x, P.y));
-        ctx.lineTo(...pointToCtx(vals, primEdge.x, primEdge.y));
-        ctx.stroke();
-        ctx.setLineDash([]);
-        ctx.restore();
-    };
-
-    async function step(timestamp) {
+    function step(timestamp) {
         if (!start) {
             start = timestamp;
         }
@@ -299,7 +285,6 @@ async function addP(ctx, n, Q, drawDoneCb) {
                 finished.label = timestamp;
             } else if (!finished.tangent) {
                 markState('tangent', timestamp);
-                drawTangentLine();
                 finished.tangent = timestamp;
             } else if (!finished.line) {
                 let instate = markState('line', timestamp);
@@ -323,7 +308,6 @@ async function addP(ctx, n, Q, drawDoneCb) {
                 if (lastDot) {
                     // overdraw old point to clear it
                     drawDot(vals, lastDot.x, lastDot.y, 'white', 1, 2, 'white');
-                    drawTangentLine();
                     drawAxisLines(ctx, vals);
                 }
                 labelAndDrawPoint(ctx, vals, 1, P, 'black');
@@ -348,7 +332,6 @@ async function addP(ctx, n, Q, drawDoneCb) {
                 if (lastDot) {
                     // overdraw old point to clear it
                     drawDot(vals, lastDot.x, lastDot.y, 'white', 1, 2, 'white');
-                    drawTangentLine();
                     drawAxisLines(ctx, vals);
                     labelAndDrawPoint(ctx, vals, n, Q, 'black');
                 }

@@ -279,7 +279,7 @@ function between(a, b, c) {
  * @param drawDoneCb {Function} called when animation is complete
  * @return {Point} R such that P + Q = -R
  */
-async function addPoints(ctx, nP, P, nQ, Q, drawDoneCb) {
+function addPoints(ctx, nP, P, nQ, Q, drawDoneCb) {
     const vals = preCalcValues(ctx);
     let start, prev;
 
@@ -304,7 +304,7 @@ async function addPoints(ctx, nP, P, nQ, Q, drawDoneCb) {
         return timestamp - started[state];
     };
 
-    async function step(timestamp) {
+    function step(timestamp) {
         if (!start) {
             start = timestamp;
         }

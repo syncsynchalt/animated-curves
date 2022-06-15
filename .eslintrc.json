@@ -74,6 +74,7 @@
     "prefer-rest-params": ["error"],
     "prefer-spread": ["error"],
     "rest-spread-spacing": ["error", "never"],
-    "template-curly-spacing": ["error", "never"]
+    "template-curly-spacing": ["error", "never"],
+    "require-await": ["warn"]
   }
 }

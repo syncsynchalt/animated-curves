@@ -40,7 +40,7 @@ import * as field from './field-math/field-draw.js?bustin=1655260032';
         const ctx = common.convertCanvasHiDPI(canvas);
 
         let a = -1, b = -1;
-        const startDemo = async () => {
+        const startDemo = () => {
             return sample.runDemo(ctx, a, b, (newA, newB) => { [a, b] = [newA, newB] });
         };
         await common.addPlayPause(ctx, startDemo, common.cancelAnimation);
@@ -101,14 +101,14 @@ import * as field from './field-math/field-draw.js?bustin=1655260032';
 
         let n = 1;
         let Q = undefined;
-        const startDemo1 = async () => {
+        const startDemo1 = () => {
             return draw61.runAddPDemo(ctx1, n, Q, (nR, R) => { n = nR; Q = R });
         };
         await common.addPlayPause(ctx1, startDemo1, common.cancelAnimation);
 
         const canvas2 = common.byId('canvas-double-and-add');
         const ctx2 = common.convertCanvasHiDPI(canvas2);
-        const startDemo2 = async () => {
+        const startDemo2 = () => {
             return draw61.runDoubleAddDemo(ctx2, (np) => {
                 common.byId('dbl-add-np').textContent = `${np}`;
             });
@@ -129,8 +129,8 @@ import * as field from './field-math/field-draw.js?bustin=1655260032';
             input: common.byId('bob-key'),
             desc: common.byId('bob-desc'),
         };
-        draw61.labelIdleGraph(alice.ctx, 'Enter value for Alice or click "Random"');
-        draw61.labelIdleGraph(bob.ctx, 'Enter value for Bob or click "Random"');
+        await draw61.labelIdleGraph(alice.ctx, 'Enter value for Alice or click "Random"');
+        await draw61.labelIdleGraph(bob.ctx, 'Enter value for Bob or click "Random"');
 
         let formCheck = () => {
             const goButton = common.byId('go-exchange');

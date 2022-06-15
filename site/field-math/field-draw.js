@@ -122,13 +122,13 @@ function writeLabel(ctx, vals, label) {
  * @param drawDoneCb {Function} callback when animation finished
  * @return {Number} the result
  */
-async function addSub(ctx, a, b, drawDoneCb) {
+function addSub(ctx, a, b, drawDoneCb) {
     const vals = preCalcValues(ctx);
     const c = fmath.reduce(a + b);
     const duration = 1000;
     let start;
 
-    async function step(timestamp) {
+    function step(timestamp) {
         if (!start) {
             start = timestamp;
         }
@@ -156,7 +156,7 @@ async function addSub(ctx, a, b, drawDoneCb) {
  * @param drawDoneCb {Function} callback when animation finished
  * @return {Number} the result
  */
-async function mult(ctx, a, b, drawDoneCb) {
+function mult(ctx, a, b, drawDoneCb) {
     const vals = preCalcValues(ctx);
     const cFull = a * b;
     const cDiff = cFull - a;
@@ -164,7 +164,7 @@ async function mult(ctx, a, b, drawDoneCb) {
     const duration = 2000;
     let start;
 
-    async function step(timestamp) {
+    function step(timestamp) {
         if (!start) {
             start = timestamp;
         }

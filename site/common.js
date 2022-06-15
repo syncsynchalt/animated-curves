@@ -93,12 +93,40 @@ function easeInOut(t) {
 }
 
 /**
+ * Save off the state of the canvas image.
+ * @param ctx {CanvasRenderingContext2D}
+ * @return {HTMLCanvasElement} state of the canvas
+ */
+function getCanvasImageState(ctx) {
+    let save = document.createElement('canvas');
+    let mid = document.createElement('canvas');
+    save.width = ctx.canvas.width;
+    save.height = ctx.canvas.height;
+    mid.width = save.width;
+    mid.height = save.height;
+    let saveCtx = save.getContext('2d');
+    let midCtx = mid.getContext('2d');
+    midCtx.drawImage(ctx.canvas, 0, 0);
+    saveCtx.drawImage(midCtx.canvas, 0, 0);
+    return save;
+}
+
+/**
+ * Restore the state of the canvas image.
+ * @param ctx {CanvasRenderingContext2D}
+ * @param state {HTMLCanvasElement} returned from getCanvasImageState
+ */
+function putCanvasImageState(ctx, state) {
+    const ratio = ctx.canvas['_ratio'];
+    ctx.drawImage(state, 0, 0, state.width / ratio, state.height / ratio);
+}
+
+/**
  * Add a grey blur effect to the canvas.
  * @param ctx {CanvasRenderingContext2D}
  */
 function addGreyMask(ctx) {
     const canvas = ctx.canvas;
-    const ratio = canvas._ratio || 1;
     const brightness = 0.98;
 
     if (window['CanvasFilter'] === undefined) {
@@ -113,15 +141,10 @@ function addGreyMask(ctx) {
         }
         ctx.putImageData(imageData, 0, 0);
     } else {
-        let saveCanvas = document.createElement('canvas');
-        saveCanvas.width = ctx.canvas.width;
-        saveCanvas.height = ctx.canvas.height;
-        let saveCtx = saveCanvas.getContext('2d');
-        saveCtx.drawImage(ctx.canvas, 0, 0, ctx.canvas.width, ctx.canvas.height);
         ctx.save();
-        // ctx.filter = `blur(0.8px) brightness(${brightness}) grayscale(1)`;
-        ctx.filter = 'blur(0.8px) grayscale(1) contrast(0.98)';
-        ctx.drawImage(saveCanvas, 0, 0, saveCanvas.width / ratio, saveCanvas.height / ratio);
+        let saved = getCanvasImageState(ctx);
+        ctx.filter = `blur(0.8px) contrast(${brightness}) grayscale(1)`;
+        putCanvasImageState(ctx, saved);
         ctx.restore();
     }
 }
@@ -199,7 +222,7 @@ function cancelAnimation(ctx) {
 function pickLabelDirection(ctx, x, y, sampleWidth, sampleMargin) {
     const ratio = ctx.canvas['_ratio'] || 1;
     let bestDirCount = 0;
-    let bestDir = [0, 0];
+    let bestDir = [1, 1];
     const margin = sampleMargin || 2;
     sampleWidth = sampleWidth || 20;
     [-1, 1].forEach(lr => {
@@ -265,6 +288,8 @@ export {
     convertCanvasHiDPI,
     canvasIsScrolledIntoView,
     easeInOut,
+    getCanvasImageState,
+    putCanvasImageState,
     addGreyMask,
     addPlayPause,
     cancelAnimation,

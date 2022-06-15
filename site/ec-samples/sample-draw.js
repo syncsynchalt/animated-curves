@@ -289,7 +289,7 @@ function morphGraph(ctx, data1, data2, drawDoneCb) {
         return timestamp - started[state];
     };
 
-    async function step(timestamp) {
+    function step(timestamp) {
         if (!start) {
             start = timestamp;
         }
@@ -341,11 +341,11 @@ function morphGraph(ctx, data1, data2, drawDoneCb) {
 async function runDemo(ctx, a, b, updateCb) {
     let state = {a, b};
     let d1 = generateGraph(ctx, state.a, state.b);
-    let step = async () => {
+    let step = () => {
         mutateGraph(state);
         updateCb(state.a, state.b);
         let d2 = generateGraph(ctx, state.a, state.b);
-        morphGraph(ctx, d1, d2, async () => {
+        morphGraph(ctx, d1, d2, () => {
             d1 = d2;
             writeEquation(ctx, d1);
             if (common.canvasIsScrolledIntoView(ctx.canvas)) {
