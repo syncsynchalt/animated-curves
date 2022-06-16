@@ -280,7 +280,7 @@ function drawAndLabelPoints(ctx, vals, points, options) {
  * @param Q {Point}
  * @param options {Object?} optional list of options
  * @param {Object?} options.labels optional list of label:point mappings to label on graph reset
- * @param {Boolean?} options.removeInputs remove each point from options.labels after adding them
+ * @param {Boolean?} options.removeInputs remove each point from options?.labels after adding them
  * @param {String?} options.basePointLabel label to use for base point (default 'P')
  * @param {Boolean?} options.coords whether to label coordinates
  * @param {Boolean?} options.drawPoints whether to draw the points of the curve
@@ -730,15 +730,17 @@ async function runAddPDemo(ctx, nQ, Q, updateCb, drawDoneCb) {
     await next();
 }
 
+function shuffleArray(arr) {
+    for (let i = arr.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [arr[i], arr[j]] = [arr[j], arr[i]];
+    }
+    return arr;
+}
+
 function pickGoodDoubleAddNumber() {
     let result = 0;
     const picks = [0, 0, 0, 1, 1, 1];
-    let shuffleArray = (arr) => {
-        for (let i = arr.length - 1; i > 0; i--) {
-            const j = Math.floor(Math.random() * (i + 1));
-            [arr[i], arr[j]] = [arr[j], arr[i]];
-        }
-    };
     shuffleArray(picks);
     for (let i = 0; i <= 5; i++) {
         if (picks[i]) {
@@ -747,6 +749,29 @@ function pickGoodDoubleAddNumber() {
     }
     result += Math.random() > 0.5 ? 2 ** 7 : 2 ** 6;
     return result;
+}
+
+/**
+ * Checks the list of added points and re-orders them if necessary to avoid a multiple of the base point order.
+ * @param nums {Array[Number]} list of points to add, in the order they'll be added. shuffled in-place if necessary.
+ * @return {Array[Number]} reference to nums
+ */
+function shuffleIfNecessary(nums) {
+    for (let attempt = 0; attempt < 10; attempt++) {
+        let i = 0;
+        for (let tot = 0; i < nums.length; i++) {
+            tot += nums[i];
+            if (tot % curve.basePointOrder === 0) {
+                break;
+            }
+        }
+        if (i < nums.length) {
+            shuffleArray(nums);
+            continue;
+        }
+        break;
+    }
+    return nums;
 }
 
 /**
@@ -775,29 +800,34 @@ function doubleAndAddAnimation(ctx, n, P, label, caption) {
                     points[2**exp] = curve.pointMult(P, 2**exp);
                 }
             }
+
+            // make sure we never land on the base point's order (infinity)
+            let pointsToAdd = Object.keys(points).map(i => { return Number(i) });
+            pointsToAdd = shuffleIfNecessary(pointsToAdd);
+
             resetGraph(ctx);
             drawAndLabelPoints(ctx, vals, points, {label});
             await common.sleep(1000, ctx);
-            for (let exp = 0, x = n; x !== 0; exp++, x >>= 1) {
-                if ((x & 1) !== 0) {
-                    const thisBit = 2**exp;
-                    caption.innerText = `Adding ${runningTotal}${label} to ${thisBit}${label} ` +
-                        `to find ${thisBit+runningTotal}${label}`;
-                    if (runningTotal) {
-                        const tot = runningTotal;
-                        await new Promise(resolve => {
-                            addPointsAnimation(ctx, thisBit, points[thisBit], tot, points[tot], {
-                                basePointLabel: label,
-                                removeInputs: true,
-                                labels: points,
-                                drawDoneCb: () => { resolve() }
-                            });
-                        });
-                    }
-                    runningTotal += thisBit;
-                    points[runningTotal] = curve.pointMult(P, runningTotal);
-                    caption.innerText = `Result is ${runningTotal}${label}`;
+            while (pointsToAdd.length) {
+                if (!runningTotal) {
+                    runningTotal = pointsToAdd.shift();
+                    continue;
                 }
+                const n = pointsToAdd.shift();
+                caption.innerText = `Adding ${runningTotal}${label} to ${n}${label} ` +
+                    `to find ${n+runningTotal}${label}`;
+                const tot = runningTotal;
+                await new Promise(resolve => {
+                    addPointsAnimation(ctx, n, points[n], tot, points[tot], {
+                        basePointLabel: label,
+                        removeInputs: true,
+                        labels: points,
+                        drawDoneCb: () => { resolve() }
+                    });
+                });
+                runningTotal += n;
+                points[runningTotal] = curve.pointMult(P, runningTotal);
+                caption.innerText = `Result is ${runningTotal}${label}`;
             }
             success(points[runningTotal]) ;
         });
