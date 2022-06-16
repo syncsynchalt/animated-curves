@@ -148,9 +148,15 @@ table.results td {
 }
 
 .heading-link, .heading-link:hover {
+    visibility: hidden;
+    position: absolute;
+    left: -40px;
     margin-right: 4px;
     text-decoration: none;
     color: rgba(0, 0, 0, 0.3);
+}
+.heading-link.visible {
+    visibility: visible;
 }
 
 @media (max-width: 600px) {

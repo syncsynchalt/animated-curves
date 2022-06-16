@@ -27,6 +27,22 @@
 
     // make all headings bookmark-able
     let linksUsed = {};
+    let timeoutInFlight;
+    let hideAll = () => {
+        document.querySelectorAll('.heading-link.visible').forEach(el => {
+            el.classList.remove('visible');
+        });
+    };
+    let showOne = (e) => {
+        if (timeoutInFlight) clearTimeout(timeoutInFlight);
+        hideAll();
+        const a = e.currentTarget.tagName === 'A' ? e.currentTarget : e.currentTarget.querySelector('a');
+        a.classList.add('visible');
+    };
+    let timeoutHideAll = () => {
+        if (timeoutInFlight) clearTimeout(timeoutInFlight);
+        timeoutInFlight = setTimeout(() => { hideAll() }, 1000);
+    };
     for (let i of [2, 3, 4, 5, 6]) {
         let hTags = document.getElementsByTagName(`h${i}`);
         for (let tag of hTags) {
@@ -41,7 +57,12 @@
             linksUsed[link] = 1;
             appendTag.href = `#${link}`;
             tag.id = link;
-            tag.insertBefore(appendTag, tag.firstChild);
+            tag.style.position = 'relative';
+            tag.appendChild(appendTag);
+            tag.addEventListener('mouseover', showOne);
+            tag.addEventListener('mouseout', timeoutHideAll);
+            appendTag.addEventListener('mouseover', showOne);
+            appendTag.addEventListener('mouseout', timeoutHideAll);
         }
     }
 })();
