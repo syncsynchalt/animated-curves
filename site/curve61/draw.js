@@ -246,8 +246,8 @@ function labelPoint(ctx, vals, num, P, options) {
         if (pt[1] < 16 || pt[1] > vals.h - 16) flipDir[1] *= -1;
         ctx.textAlign = flipDir[0] === -1 ? 'right' : 'left';
         ctx.textBaseline = flipDir[1] === -1 ? 'bottom' : 'top';
-        ctx.strokeText(coordLabel, pt[0]+3*flipDir[0], pt[1]-2+3*flipDir[1]);
-        ctx.fillText(coordLabel, pt[0]+3*flipDir[0], pt[1]-2+3*flipDir[1]);
+        ctx.strokeText(coordLabel, pt[0]+3*flipDir[0], pt[1]-3+3*flipDir[1]);
+        ctx.fillText(coordLabel, pt[0]+3*flipDir[0], pt[1]-3+3*flipDir[1]);
     }
 
     ctx.restore();
