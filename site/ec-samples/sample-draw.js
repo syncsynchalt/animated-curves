@@ -177,6 +177,9 @@ function mutateGraph(state) {
     } else {
         state.b += state.bDir;
     }
+    if (state.a === 0 && state.b === 0) {
+        state.b += state.bDir;
+    }
 }
 
 /**

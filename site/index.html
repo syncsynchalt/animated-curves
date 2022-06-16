@@ -116,6 +116,8 @@
         </div>
     <li><strong>associative</strong>: addition of additions has the same result as adding the points individually:
     <div class="text-center mathy py-2">
+    (P+Q)+R = P+(Q+R)
+    <br>
     P+P+P+P+P = (P+P) + (P+P+P) = 2P + 3P = 5P
     <br>
     P+P+P+P+P = (P+P+P+P) + (P) = 4P + 1P = 5P
@@ -178,7 +180,7 @@
 
 <h5>Division (multiplicative inverse)</h5>
 <p>
-    In <span class="fat-fp">Fp</span> division is defined around the relation
+    Let's define division in <span class="fat-fp">Fp</span> around the concept
     that any non-zero number divided by itself is 1:
 <div class="math-block">
 `\frac{n}{n} = 1`
@@ -192,13 +194,11 @@
 `n \cdot n^(\text{-}1) = 1`
 </div>
 
-<p>You can see that dividing by `n` is the same as multiplying by the value `n^(\text{-}1)`.
-
 <p>
     In our <span class="fat-fp">Fp</span> multiplication it's possible for two
     positive integers to equal 1 when multiplied together.
     It turns out that for each positive integer in <span class="fat-fp">Fp</span> there is one
-    positive integer that acts as this "multiplicative inverse":
+    positive integer that acts as this "multiplicative inverse" solution to the equation above:
     <canvas class="numline animated" id="canvas-field-div" width="500" height="80"></canvas>
 
 <p>
@@ -225,12 +225,11 @@
 <canvas class="numline animated" id="canvas-field-sqrt" width="500" height="80"></canvas>
 
 <p>
-    In real numbers there are two square roots for every non-zero number (positive and negative).
-    The same is true in <span class="fat-fp">Fp</span>, and each solution is the negation of the other.
+    Only half of the non-zero members of <span class="fat-fp">Fp</span> have a solution to the square root
+    equation. They also have two solutions: much like how real numbers have a positive and negative solution
+    for square root, our finite field members have two solutions (each the negation of the other).
 
-<p>
-    Only half of the non-zero members of <span class="fat-fp">Fp</span> have square roots.
-    The square roots in <span class="fat-fp-23">F23</span> are
+<p>The solutions for <span class="fat-fp-23">F23</span> are
     provided <a target="_blank" href="sqrt23.html">in this table</a>.
 
 <h2>Elliptic curves <em>and</em> finite fields</h2>
