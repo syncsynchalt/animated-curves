@@ -17,13 +17,21 @@
         }
     }
 
+    // fleurons to indent subheadings
+    for (let i of [4, 5, 6]) {
+        let hTags = document.getElementsByTagName(`h${i}`);
+        for (let tag of hTags) {
+            tag.textContent = '➻ ' + tag.textContent;
+        }
+    }
+
     // make all headings bookmark-able
     let linksUsed = {};
     for (let i of [2, 3, 4, 5, 6]) {
         let hTags = document.getElementsByTagName(`h${i}`);
         for (let tag of hTags) {
             const appendTag = document.createElement('a');
-            appendTag.innerHTML = '&para;';
+            appendTag.innerHTML = '❡';
             appendTag.classList.add('heading-link');
             let link = tag.textContent.toLowerCase()
                 .replaceAll(/[^a-z\d]/g, '-')

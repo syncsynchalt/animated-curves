@@ -1,4 +1,17 @@
 h1 {
+    margin-top: 0;
+    margin-bottom: 1.5rem;
+}
+h2, h3 {
+    margin-top: 2rem;
+    margin-bottom: 1rem;
+}
+h4, h5, h6 {
+    margin-top: 1.5rem;
+    margin-bottom: .75rem;
+}
+
+h1 {
     text-align: center;
 }
 
@@ -138,8 +151,6 @@ table.results td {
     margin-right: 4px;
     text-decoration: none;
     color: rgba(0, 0, 0, 0.3);
-    font-family: "Trebuchet MS", sans-serif;
-    font-style: italic;
 }
 
 @media (max-width: 600px) {
