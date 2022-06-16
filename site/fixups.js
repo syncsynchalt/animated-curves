@@ -25,25 +25,33 @@
         }
     }
 
-    // make all headings bookmark-able
     let linksUsed = {};
+    function makeLinkAnchor(tag) {
+        let link = tag.textContent.toLowerCase()
+            .replaceAll(/[^a-z\d]/g, '-')
+            .replaceAll(/-+/g, '-')
+            .replaceAll(/^-|-$/g, '');
+        while (linksUsed[link]) link += '-dup';
+        linksUsed[link] = 1;
+        return link;
+    }
+
+    // make all headings bookmark-able
     for (let i of [2, 3, 4, 5, 6]) {
         let hTags = document.getElementsByTagName(`h${i}`);
         for (let tag of hTags) {
-            const appendTag = document.createElement('a');
-            appendTag.innerHTML = '❡';
-            appendTag.classList.add('heading-link');
-            let link = tag.textContent.toLowerCase()
-                .replaceAll(/[^a-z\d]/g, '-')
-                .replaceAll(/-+/g, '-')
-                .replaceAll(/^-|-$/g, '');
-            while (linksUsed[link]) link += '-dup';
-            linksUsed[link] = 1;
-            appendTag.href = `#${link}`;
+            const hoverTag = document.createElement('span');
+            hoverTag.classList.add('heading-link-hover');
+            const aTag = document.createElement('a');
+            aTag.innerHTML = '❡';
+            aTag.classList.add('heading-link');
+            const link = makeLinkAnchor(tag);
+            aTag.href = `#${link}`;
             tag.id = link;
             tag.style.position = 'relative';
-            tag.classList.add('heading-link-parent');
-            tag.appendChild(appendTag);
+            tag.classList.add('heading');
+            hoverTag.appendChild(aTag);
+            tag.appendChild(hoverTag);
         }
     }
 })();
