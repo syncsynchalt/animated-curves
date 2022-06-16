@@ -752,24 +752,34 @@ function pickGoodDoubleAddNumber() {
 }
 
 /**
- * Checks the list of added points and re-orders them if necessary to avoid a multiple of the base point order.
- * @param nums {Array[Number]} list of points to add, in the order they'll be added. shuffled in-place if necessary.
+ * Checks the list of added points and re-orders them if necessary to avoid landing on the infinite point.
+ * @param nums {Array[Number]} list of points to add, in the order they'll be added. shuffled in-place if necessary
+ * @param basePoint {Point} base point
  * @return {Array[Number]} reference to nums
  */
-function shuffleIfNecessary(nums) {
+function shuffleIfNecessary(nums, basePoint) {
+    let safeOrder;
     for (let attempt = 0; attempt < 10; attempt++) {
-        let i = 0;
-        for (let tot = 0; i < nums.length; i++) {
-            tot += nums[i];
-            if (tot % curve.basePointOrder === 0) {
+        let P = null;
+        let i;
+        for (i = 0; i < nums.length; i++) {
+            let Q = curve.pointMult(basePoint, nums[i]);
+            if (!Q || !curve.pointAdd(P, Q)) {
                 break;
             }
+            P = curve.pointAdd(P, Q);
         }
-        if (i < nums.length) {
+        safeOrder = (i >= nums.length);
+        if (safeOrder) {
+            break;
+        } else {
             shuffleArray(nums);
-            continue;
         }
-        break;
+    }
+    if (!safeOrder) {
+        if (console) {
+            console.warn(`Unable to find a working order of ${JSON.stringify([basePoint, nums])}`);
+        }
     }
     return nums;
 }
@@ -803,7 +813,7 @@ function doubleAndAddAnimation(ctx, n, P, label, caption) {
 
             // make sure we never land on the base point's order (infinity)
             let pointsToAdd = Object.keys(points).map(i => { return Number(i) });
-            pointsToAdd = shuffleIfNecessary(pointsToAdd);
+            pointsToAdd = shuffleIfNecessary(pointsToAdd, P);
 
             resetGraph(ctx);
             drawAndLabelPoints(ctx, vals, points, {label});
