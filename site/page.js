@@ -162,6 +162,8 @@ import * as field from './field-math/field-draw.js?bustin=1655320277';
 
         common.byId('go-exchange').addEventListener('click', async () => {
             tweakValues();
+            common.cancelAnimation(alice.ctx);
+            common.cancelAnimation(bob.ctx);
             await draw61.runExchangeDemo(alice, bob);
         });
         common.byId('rand-exchange').addEventListener('click', () => {

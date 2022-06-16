@@ -279,9 +279,10 @@ function drawAndLabelPoints(ctx, vals, points, options) {
  * @param nQ {Number} the base-P multiple of Q (for labeling)
  * @param Q {Point}
  * @param options {Object?} optional list of options
- * @param {Object?} options.labels optional list of label:point mappings to label on graph reset.
+ * @param {Object?} options.labels optional list of label:point mappings to label on graph reset
+ * @param {Boolean?} options.removeInputs remove each point from options.labels after adding them
  * @param {String?} options.basePointLabel label to use for base point (default 'P')
- * @param {Boolean?} options.coords whether to label coordinates.
+ * @param {Boolean?} options.coords whether to label coordinates
  * @param {Boolean?} options.drawPoints whether to draw the points of the curve
  * @param {Function?} options.drawDoneCb called when animation is finished
  * @return {Point} the result of adding P and Q: R
@@ -470,10 +471,13 @@ function addPointsAnimation(ctx, nP, P, nQ, Q, options) {
         prev = timestamp;
 
         if (finished.done) {
+            if (options?.removeInputs && options?.labels) {
+                delete options.labels[nP];
+                delete options.labels[nQ];
+            }
             resetGraph(ctx, options?.drawPoints);
             drawAndLabelPoints(ctx, vals, options?.labels, labelOptions);
             drawDot(vals, R.x, R.y, 'red');
-            labelPoint(ctx, vals, nP, P, labelOptions);
             labelPoint(ctx, vals, nP+nQ, R, labelOptions);
             if (options?.drawDoneCb) {
                 options.drawDoneCb(nR, R);
@@ -784,6 +788,7 @@ function doubleAndAddAnimation(ctx, n, P, label, caption) {
                         await new Promise(resolve => {
                             addPointsAnimation(ctx, thisBit, points[thisBit], tot, points[tot], {
                                 basePointLabel: label,
+                                removeInputs: true,
                                 labels: points,
                                 drawDoneCb: () => { resolve() }
                             });
@@ -837,6 +842,7 @@ async function runExchangePubkeyDemo(ctx, privKey, myLabel, actor, actorTag) {
     actorTag.textContent = `${actor} multiplies P by their private key (${privKey})` +
         ` to find their public key, ${myLabel}:`;
     const pubkey = await doubleAndAddAnimation(ctx, privKey, P(), 'P');
+    await common.sleep(1000, ctx);
     actorTag.textContent = `${actor} gives their public key (${myLabel}) to the other party.`;
     resetGraph(ctx);
     drawAndLabelPoints(ctx, vals, {1: pubkey}, {label: myLabel, coords: true});
