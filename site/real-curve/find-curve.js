@@ -1,4 +1,4 @@
-import * as curve from './real-curve.js?bustin=1655320277';
+import * as curve from './real-curve.js?bustin=1655408920';
 
 let range = (min, max, step) => {
     step = step || 1;
