@@ -147,17 +147,30 @@ table.results td {
         "Lucida Sans Unicode", OpenSymbol, "Standard Symbols L", serif;
 }
 
-.heading-link, .heading-link:hover {
+.heading-link {
+    display: inline-block;
     visibility: hidden;
     position: absolute;
     left: -60px;
+    vertical-align: middle;
     padding-right: 30px;
-    padding-left: 20px;
+    padding-left: 10px;
     text-decoration: none;
-    color: rgba(0, 0, 0, 0.3);
+    font-size: 3rem;
+    cursor: pointer;
 }
 .heading-link-parent:hover .heading-link, .heading-link:hover {
     visibility: visible;
+    color: #aaa;
+}
+.heading-link:hover {
+    text-shadow: 0 0 2px lightblue;
+}
+h2 .heading-link {
+    top: -0.7rem;
+}
+h5 .heading-link {
+    top: -0.9rem;
 }
 
 @media (max-width: 600px) {
