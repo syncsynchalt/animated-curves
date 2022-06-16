@@ -300,7 +300,7 @@ function morphGraph(ctx, data1, data2, drawDoneCb) {
             ctx.beginPath();
             ctx.save();
             if (!finished['draw1']) {
-                markState('drawA', timestamp);
+                markState('draw1', timestamp);
                 drawGraph(ctx, vals, data1);
                 finished.draw1 = timestamp;
             } else if (!finished['morph']) {
