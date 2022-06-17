@@ -18,7 +18,7 @@ h1 {
     display: inline-block;
     width: 100%;
     text-align: center;
-    font-size: 1.5rem;
+    font-size: 1.3rem;
     font-family: Georgia, serif;
     font-style: italic;
     margin: 0 auto 1.5rem;
@@ -30,13 +30,13 @@ h1 {
     background-color: linen;
     box-shadow: 0 0 3px rgba(0, 0, 0, 0.3);
     border-radius: 0.5em;
-    margin-top: 5px;
-    margin-bottom: 5px;
+    margin: 2rem auto;
+    padding-top: 0.8rem;
+    padding-bottom: 1rem;
     text-overflow: clip;
 }
 
-.container > *:last-child {
-    padding-bottom: 0.5em;
+.container p:last-of-type {
     margin-bottom: 0;
 }
 
