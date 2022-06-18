@@ -1,5 +1,5 @@
-import * as curve from '../curve.js?bustin=';
-import * as field from '../field.js?bustin=';
+import * as curve from '../curve.js';
+import * as field from '../field.js';
 import * as chai from 'chai';
 
 let expect = chai.expect;
@@ -124,5 +124,17 @@ describe('curve library', () => {
             });
         });
         console.log(`landed on ${Object.keys(results).length} X values`);
+    });
+
+    it('calculates the correct result', () => {
+        const P = {x: 5, y: 7};
+        const P23 = {x: 2, y: 24};
+        const Q = curve.pointAdd(P, P23);
+        expect(Q.x).to.equal(59);
+        expect(Q.y).to.equal(55);
+
+        const P24 = curve.pointMult(P, 24);
+        expect(P24.x).to.equal(Q.x);
+        expect(P24.y).to.equal(Q.y);
     });
 });

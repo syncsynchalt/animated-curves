@@ -1,4 +1,4 @@
-import * as field from '../field.js?bustin=';
+import * as field from '../field.js';
 import * as chai from 'chai';
 
 let expect = chai.expect;
