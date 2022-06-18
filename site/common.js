@@ -28,8 +28,12 @@ function range(first, last) {
  */
 function mathFont(size) {
     size = size || '1em';
-    return `${size} STIXGeneral, "DejaVu Serif", "DejaVu Sans", Times, ` +
-        '"Lucida Sans Unicode", OpenSymbol, "Standard Symbols L", serif';
+    // from an old firefox list for mathml
+    let fonts = `${size} STIXGeneral, "DejaVu Serif", "DejaVu Sans", "Cambria Math"`;
+    fonts += ', Times, "Lucida Sans Unicode", OpenSymbol, "Standard Symbols L", serif';
+    // android needs this to show superscript-1
+    fonts += ', "Noto Sans"';
+    return fonts;
 }
 
 /**
