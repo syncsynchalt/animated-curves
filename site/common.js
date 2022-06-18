@@ -184,7 +184,7 @@ function addPausedMask(ctx) {
  * @param playFunc {Function}
  * @param stopFunc {Function}
  */
-async function addPlayPause(ctx, playFunc, stopFunc) {
+function addPlayPause(ctx, playFunc, stopFunc) {
     ctx.canvas.onclick = (e) => {
         if (e) {
             e.stopPropagation();

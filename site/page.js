@@ -22,7 +22,7 @@ import * as field from './field-math/field-draw.js?bustin=1655417954';
         });
     }
 
-    async function curve25519Setup() {
+    function curve25519Setup() {
         const canvas = common.byId('canvas-curve25519');
         const ctx = common.convertCanvasHiDPI(canvas);
 
@@ -32,10 +32,10 @@ import * as field from './field-math/field-draw.js?bustin=1655417954';
             let updateCb = (R) => { n++; Q = R };
             return draw25519.runDemo(ctx, updateCb, () => {}, n, Q);
         };
-        await common.addPlayPause(ctx, startDemo, common.cancelAnimation);
+        common.addPlayPause(ctx, startDemo, common.cancelAnimation);
     }
 
-    async function ecSampleSetup() {
+    function ecSampleSetup() {
         const canvas = common.byId('canvas-ec-sample');
         const ctx = common.convertCanvasHiDPI(canvas);
 
@@ -43,10 +43,10 @@ import * as field from './field-math/field-draw.js?bustin=1655417954';
         const startDemo = () => {
             return sample.runDemo(ctx, a, b, (newA, newB) => { [a, b] = [newA, newB] });
         };
-        await common.addPlayPause(ctx, startDemo, common.cancelAnimation);
+        common.addPlayPause(ctx, startDemo, common.cancelAnimation);
     }
 
-    async function realAddSetup() {
+    function realAddSetup() {
         const canvas = common.byId('canvas-real-add');
         const ctx = common.convertCanvasHiDPI(canvas);
         let n = 1;
@@ -55,38 +55,38 @@ import * as field from './field-math/field-draw.js?bustin=1655417954';
             let update = (nR, R) => { n = nR; Q = R };
             await real.runAddDemo(ctx, n, Q, update);
         };
-        await common.addPlayPause(ctx, startDemo, common.cancelAnimation);
+        common.addPlayPause(ctx, startDemo, common.cancelAnimation);
     }
 
-    async function realAssocSetup() {
+    function realAssocSetup() {
         const canvas = common.byId('canvas-real-assoc');
         const ctx = common.convertCanvasHiDPI(canvas);
         let startDemo = async () => {
             await real.runAssocDemo(ctx);
         };
-        await common.addPlayPause(ctx, startDemo, common.cancelAnimation);
+        common.addPlayPause(ctx, startDemo, common.cancelAnimation);
     }
 
-    async function fieldSetup() {
+    function fieldSetup() {
         let canvas = common.byId('canvas-field-add-sub');
         let ctx = common.convertCanvasHiDPI(canvas);
-        await common.addPlayPause(ctx, field.runAddSubDemo, common.cancelAnimation);
+        common.addPlayPause(ctx, field.runAddSubDemo, common.cancelAnimation);
 
         canvas = common.byId('canvas-field-mult');
         ctx = common.convertCanvasHiDPI(canvas);
-        await common.addPlayPause(ctx, field.runMultDemo, common.cancelAnimation);
+        common.addPlayPause(ctx, field.runMultDemo, common.cancelAnimation);
 
         canvas = common.byId('canvas-field-negate');
         ctx = common.convertCanvasHiDPI(canvas);
-        await common.addPlayPause(ctx, field.runNegateDemo, common.cancelAnimation);
+        common.addPlayPause(ctx, field.runNegateDemo, common.cancelAnimation);
 
         canvas = common.byId('canvas-field-div');
         ctx = common.convertCanvasHiDPI(canvas);
-        await common.addPlayPause(ctx, field.runDivDemo, common.cancelAnimation);
+        common.addPlayPause(ctx, field.runDivDemo, common.cancelAnimation);
 
         canvas = common.byId('canvas-field-sqrt');
         ctx = common.convertCanvasHiDPI(canvas);
-        await common.addPlayPause(ctx, field.runSqrtDemo, common.cancelAnimation);
+        common.addPlayPause(ctx, field.runSqrtDemo, common.cancelAnimation);
     }
 
     async function curveSetup() {
@@ -95,7 +95,7 @@ import * as field from './field-math/field-draw.js?bustin=1655417954';
         await draw61.resetGraph(ctx,true);
     }
 
-    async function fCurveSetup() {
+    function fCurveSetup() {
         const canvas1 = common.byId('canvas-addp');
         const ctx1 = common.convertCanvasHiDPI(canvas1);
 
@@ -104,7 +104,7 @@ import * as field from './field-math/field-draw.js?bustin=1655417954';
         const startDemo1 = () => {
             return draw61.runAddPDemo(ctx1, n, Q, (nR, R) => { n = nR; Q = R });
         };
-        await common.addPlayPause(ctx1, startDemo1, common.cancelAnimation);
+        common.addPlayPause(ctx1, startDemo1, common.cancelAnimation);
 
         const canvas2 = common.byId('canvas-double-and-add');
         const ctx2 = common.convertCanvasHiDPI(canvas2);
@@ -114,7 +114,7 @@ import * as field from './field-math/field-draw.js?bustin=1655417954';
                 common.byId('dbl-add-np').textContent = `${np}P`;
             });
         };
-        await common.addPlayPause(ctx2, startDemo2, common.cancelAnimation);
+        common.addPlayPause(ctx2, startDemo2, common.cancelAnimation);
     }
 
     async function exchangeSetup() {
