@@ -5,7 +5,7 @@ const expect = chai.expect;
 
 describe('field math library', () => {
     it ('can compute inverses', () => {
-        expect(fmath.inverseOf(0)).to.equal(Infinity, 0);
+        expect(fmath.inverseOf(0)).to.equal(Infinity, '0');
         for (let i = 1; i < fmath.p; i++) {
             let j = fmath.inverseOf(i);
             expect(j).to.be.lessThan(fmath.p, `${i}`);
