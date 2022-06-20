@@ -12,10 +12,10 @@ function preCalcValues(ctx) {
     const marginWide = 20;
     const marginThin = 10;
     const dotRadius = 2.5;
-    const w = ctx.canvas.getBoundingClientRect().width;
-    const h = ctx.canvas.getBoundingClientRect().height;
-    const fieldW = BigInt(ctx.canvas.getBoundingClientRect().width - marginWide - marginThin);
-    const fieldH = BigInt(ctx.canvas.getBoundingClientRect().height - marginThin - marginWide - labelSpace);
+    const w = Math.floor(ctx.canvas.getBoundingClientRect().width);
+    const h = Math.floor(ctx.canvas.getBoundingClientRect().height);
+    const fieldW = BigInt(w - marginWide - marginThin);
+    const fieldH = BigInt(h - marginThin - marginWide - labelSpace);
     return {
         ctx, ratio, labelSpace, marginWide, marginThin, w, h, fieldW, fieldH, dotRadius
     };
