@@ -1,5 +1,5 @@
-import * as field from './field.js?bustin=1655597213';
-import * as curve from './curve.js?bustin=1655597213';
+import * as field from './field.js?bustin=';
+import * as curve from './curve.js?bustin=';
 
 const primeOrders = [3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37,
     41, 43, 47, 53, 59, 61, 67, 71, 73, 79, 83, 89, 97, 101, 103, 107,

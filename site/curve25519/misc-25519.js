@@ -1,5 +1,5 @@
-import * as common from '../common.js?bustin=1655597213';
-import * as field from './field-25519.js?bustin=1655597213';
+import * as common from '../common.js?bustin=';
+import * as field from './field-25519.js?bustin=';
 
 const slop_p = Number(field.p);
 

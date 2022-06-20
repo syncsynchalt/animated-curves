@@ -1,5 +1,5 @@
-import * as fmath from './field-math.js?bustin=1655597213';
-import * as common from '../common.js?bustin=1655597213';
+import * as fmath from './field-math.js?bustin=';
+import * as common from '../common.js?bustin=';
 
 const EPS = 0.000001;
 const TWO_PI = Math.PI * 2;

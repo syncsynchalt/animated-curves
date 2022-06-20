@@ -1,5 +1,5 @@
-import * as curve from './real-curve.js?bustin=1655597213';
-import * as common from '../common.js?bustin=1655597213';
+import * as curve from './real-curve.js?bustin=';
+import * as common from '../common.js?bustin=';
 const TWO_PI = 2 * Math.PI;
 
 let dimensions = {xMin: -4, xMax: 9, yMin: -24, yMax: 24};
