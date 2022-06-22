@@ -404,7 +404,7 @@
     <div class="input-group">
     <label for="alice-key" class="col-form-label col-form-label-sm">k<sub>a</sub>&nbsp;</label>
     <input type="text" class="form-control form-control-sm" id="alice-key"
-           required pattern="[1-9][0-9]*" placeholder="Alice's key">
+           required pattern="[1-9][0-9]{0,4}" placeholder="Alice's key">
     </div>
     </div>
 
@@ -412,7 +412,7 @@
     <div class="input-group">
     <label for="bob-key" class="col-form-label col-form-label-sm">k<sub>b</sub>&nbsp;</label>
     <input type="text" class="form-control form-control-sm" id="bob-key"
-           required pattern="[1-9][0-9]*" placeholder="Bob's key">
+           required pattern="[1-9][0-9]{0,4}" placeholder="Bob's key">
     </div>
     </div>
 
@@ -437,7 +437,8 @@
 
 <p>
     We've played around with a toy curve of 72 points, and you've seen what it means to add points or
-    perform a key exchange. But how does this compare to real curves used in real cryptography?
+    perform a key exchange. But how does this compare to real curves used in real cryptography such as
+    <a href="https://tls13.xargs.org">TLS 1.3</a>?
 
 <p>
     The most common curve used for key exchange is Curve25519. That curve has a simple equation:

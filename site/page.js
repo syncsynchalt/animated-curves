@@ -135,8 +135,8 @@ import * as field from './field-math/field-draw.js?bustin=';
 
         let formCheck = () => {
             const goButton = common.byId('go-exchange');
-            alice.input.value = alice.input.value.replaceAll(/\D/g, '');
-            bob.input.value = bob.input.value.replaceAll(/\D/g, '');
+            alice.input.value = alice.input.value.replaceAll(/\D/g, '').substring(0, 4);
+            bob.input.value = bob.input.value.replaceAll(/\D/g, '').substring(0, 4);
             if (alice.input.validity.valid && bob.input.validity.valid) {
                 goButton.removeAttribute('disabled');
             } else {
