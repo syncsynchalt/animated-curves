@@ -206,7 +206,7 @@ function runAddSubDemo(ctx, doneCb) {
     let a = Math.abs(r(0)), b = r(a);
     let cycle = () => {
         const s = (x) => { return Math.sign(x) > 0 ? '+' : '-' };
-        writeLabel(ctx, vals, `${a} ${s(b)} ${Math.abs(b)} = ${a+b}%${fmath.p} = ${fmath.reduce(a+b)}`);
+        writeLabel(ctx, vals, `${a} ${s(b)} ${Math.abs(b)} = ${a+b} mod ${fmath.p} = ${fmath.reduce(a+b)}`);
         addSub(ctx, a, b, (c) => {
             if (doneCb) doneCb(a, b, c);
             if (common.canvasIsScrolledIntoView(ctx.canvas)) {
@@ -231,7 +231,7 @@ function runMultDemo(ctx, doneCb) {
     let r = () => { return Math.ceil(Math.random() * (fmath.p-2)) + 2 };
     let a = r(), b = r();
     let cycle = () => {
-        writeLabel(ctx, vals, `${a} ${TIMES_STR} ${b} = ${a*b}%${fmath.p} = ${fmath.reduce(a*b)}`);
+        writeLabel(ctx, vals, `${a} ${TIMES_STR} ${b} = ${a*b} mod ${fmath.p} = ${fmath.reduce(a*b)}`);
         mult(ctx, a, b, (c) => {
             if (doneCb) doneCb(a, b, c);
             if (common.canvasIsScrolledIntoView(ctx.canvas)) {
@@ -297,7 +297,7 @@ function runDivDemo(ctx, doneCb) {
     };
     let cycle = () => {
         refresh();
-        writeLabel(ctx, vals, `${a} ${TIMES_STR} ${b} = ${a*b}%${fmath.p} ` +
+        writeLabel(ctx, vals, `${a} ${TIMES_STR} ${b} = ${a*b} mod ${fmath.p} ` +
             `= ${fmath.reduce(a*b)}, therefore ${a}${INV_STR} is ${b}`);
         mult(ctx, a, b, (c) => {
             if (doneCb) doneCb(a, b, c);
@@ -329,7 +329,7 @@ function runSqrtDemo(ctx, doneCb) {
     };
     let cycle = () => {
         refresh();
-        writeLabel(ctx, vals, `${b} ${TIMES_STR} ${b} = ${b*b}%${fmath.p} ` +
+        writeLabel(ctx, vals, `${b} ${TIMES_STR} ${b} = ${b*b} mod ${fmath.p} ` +
             `= ${fmath.reduce(b*b)}, therefore ${b} is a square root of ${a}`);
         mult(ctx, b, b, () => {
             if (doneCb) doneCb(a, b);
