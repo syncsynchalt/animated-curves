@@ -12,7 +12,7 @@ describe('curve25519 library', () => {
 
     it('can double', () => {
         let PP = curve.add(curve.P(), curve.P());
-        // from https://x25519.ulfheim.net
+        // from https://x25519.xargs.org
         expect(PP.x).to.equal(
             0x20d342d51873f1b7d9750c687d1571148f3f5ced1e350b5c5cae469cdd684efbn);
         expect(PP.y).to.be.oneOf([
@@ -23,7 +23,7 @@ describe('curve25519 library', () => {
     it('double double', () => {
         let PP = curve.add(curve.P(), curve.P());
         let PPPP = curve.add(PP, PP);
-        // from https://x25519.ulfheim.net
+        // from https://x25519.xargs.org
         expect(PPPP.x).to.equal(
             0x79ce98b7e0689d7de7d1d074a15b315ffe1805dfcd5d2a230fee85e4550013efn);
     });
@@ -31,7 +31,7 @@ describe('curve25519 library', () => {
     it('can add', () => {
         let PP = curve.add(curve.P(), curve.P());
         let PPP = curve.add(PP, curve.P());
-        // from https://x25519.ulfheim.net
+        // from https://x25519.xargs.org
         expect(PPP.x).to.equal(
             0x1c12bc1a6d57abe645534d91c21bba64f8824e67621c0859c00a03affb713c12n);
         expect(PPP.y).to.be.oneOf([
@@ -45,7 +45,7 @@ describe('curve25519 library', () => {
             Q = R;
             R = curve.add(P, Q);
         }
-        // from https://x25519.ulfheim.net
+        // from https://x25519.xargs.org
         expect(R.x).to.equal(
             0x79ce98b7e0689d7de7d1d074a15b315ffe1805dfcd5d2a230fee85e4550013efn);
     });

@@ -2,7 +2,7 @@
 
 An animated exploration of elliptic curve cryptography and ECDH key exchange.
 
-Published at https://curves.ulfheim.net
+Published at https://curves.xargs.org
 
 - `site/`: page source for the finished product
 
