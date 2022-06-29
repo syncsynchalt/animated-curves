@@ -13,7 +13,7 @@
     <meta property="og:type" content="website">
     <meta property="og:title" content="The Animated Elliptic Curve">
     <meta property="og:description" content="Visualize elliptic curve cryptography with animated examples">
-    <meta property="og:image" content="https://curves.xargs.org/og.jpg?b2">
+    <meta property="og:image" content="https://curves.xargs.org/og.jpg?b3">
     <meta property="og:image:width" content="1200">
     <meta property="og:image:height" content="630">
 
@@ -23,7 +23,7 @@
     <meta property="twitter:url" content="https://curves.xargs.org/">
     <meta name="twitter:title" content="The Animated Elliptic Curve">
     <meta name="twitter:description" content="Visualize elliptic curve cryptography with animated examples">
-    <meta name="twitter:image" content="https://curves.xargs.org/og.jpg?b2">
+    <meta name="twitter:image" content="https://curves.xargs.org/og.jpg?b3">
 
     <!-- favicons -->
     <link rel="apple-touch-icon" sizes="152x152" href="favicon/apple-touch-icon.png">
@@ -189,7 +189,7 @@
 <div class="math-block">
 `\frac{n}{n} = 1`
 </div>
-<p>Or if we expand some terms:
+<p>Or if we expand one of the terms:
 <div class="math-block">
 `n \cdot \frac{1}{n} = 1`
 </div>
@@ -217,13 +217,13 @@
 
 <h5>Square root</h5>
 <p>
-    Our last operation to define is taking a square root.
+    Our last operation to define is square root.
     We'll define the square root of `n`
     as a number in <span class="fat-fp">Fp</span>
     which satisfies this equation:
 
 <div class="math-block pb-0">
-`sqrt(n) \times sqrt(n) = n`
+`sqrt(n) \cdot sqrt(n) = n`
 </div>
 
 <canvas class="numline animated" id="canvas-field-sqrt" width="500" height="80"></canvas>
@@ -231,7 +231,7 @@
 <p>
     Only half of the non-zero members of <span class="fat-fp">Fp</span> have a solution to the square root
     equation. They also have two solutions: much like how real numbers have a positive and negative solution
-    for square root, our finite field members have two solutions (each the negation of the other).
+    for square root, members of our finite field have two square roots that are each the negation of the other.
 
 <p>The solutions for <span class="fat-fp-23">F23</span> are
     provided <a target="_blank" href="sqrt23.html">in this table</a>.
@@ -256,15 +256,11 @@
     and <a href="sqrt61.html" target=_blank>square roots</a>
     in <span class="fat-fp-61">F61</span> are pre-computed for convenience.
 
-<p>
-    Finally, we'll nominate one of the points on this curve to be the "base point":
-<div class="math-block">
-`P = (5,7)`
-</div>
+
 
 <p>
-    Let's call the combination of the definitions above "Curve61".
-    What would it look like to plot this curve on a graph? Starting with `x=0`
+    What would it look like to plot the curve above, using the math of a finite field
+    <span class="fat-fp-61">F61</span> on a graph? Starting with `x=0`
     and working through each number from 0 to 60, using the math operations we defined above:
 
 <table class="results">
@@ -308,8 +304,22 @@
     <div class="ill-content">
     <canvas id="canvas-curve61-static" class="whiteboard" width="500" height="400"></canvas>
     </div>
-    <figcaption>Curve61: An elliptic curve plotted in <span class="fat-fp-61">Fp</span></figcaption>
+    <figcaption>Our elliptic curve plotted in <span class="fat-fp-61">Fp</span></figcaption>
 </figure>
+
+<p>
+    Finally, we'll nominate one of the points on this curve to be the "base point":
+<div class="math-block">
+`P = (5,7)`
+</div>
+<p>
+    The point chosen is somewhat arbitrary, but some points are better than others. This point was chosen because
+    it can be added to itself (see below) a relatively large number of times before it comes back to itself
+    (specifically, it repeats every 73 point additions).
+
+<p>
+    Let's give a name to the combination of above definitions (the curve equation,
+    the prime number for the finite field, and the base point).  We'll call it "Curve61".
 
 <h5>Point Addition</h5>
 <p>
