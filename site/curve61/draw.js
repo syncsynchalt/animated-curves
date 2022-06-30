@@ -1,7 +1,7 @@
-import * as curve from './curve.js?bustin=';
-import * as field from './field.js?bustin=';
-import * as misc from './draw-misc.js?bustin=';
-import * as common from '../common.js?bustin=';
+import * as curve from './curve.js';
+import * as field from './field.js';
+import * as misc from './draw-misc.js';
+import * as common from '../common.js';
 
 const TWO_PI = 2*Math.PI;
 const EPS = 0.0000001;

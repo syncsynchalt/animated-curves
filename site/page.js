@@ -1,10 +1,10 @@
-import * as draw25519 from './curve25519/draw-25519.js?bustin=';
-import * as draw61 from './curve61/draw.js?bustin=';
-import * as curve61 from './curve61/curve.js?bustin=';
-import * as sample from './ec-samples/sample-draw.js?bustin=';
-import * as real from './real-curve/real-draw.js?bustin=';
-import * as common from './common.js?bustin=';
-import * as field from './field-math/field-draw.js?bustin=';
+import * as draw25519 from './curve25519/draw-25519.js';
+import * as draw61 from './curve61/draw.js';
+import * as curve61 from './curve61/curve.js';
+import * as sample from './ec-samples/sample-draw.js';
+import * as real from './real-curve/real-draw.js';
+import * as common from './common.js';
+import * as field from './field-math/field-draw.js';
 
 (async () => {
 

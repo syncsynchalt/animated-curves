@@ -1,7 +1,7 @@
-import * as curve from './curve-25519.js?bustin=';
-import * as field from './field-25519.js?bustin=';
-import * as common from '../common.js?bustin=';
-import * as misc from './misc-25519.js?bustin=';
+import * as curve from './curve-25519.js';
+import * as field from './field-25519.js';
+import * as common from '../common.js';
+import * as misc from './misc-25519.js';
 
 const TWO_PI = 2*Math.PI;
 

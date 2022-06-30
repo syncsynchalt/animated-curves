@@ -4,7 +4,7 @@
  * Curve61 is the Weierstrass curve y^2 = x^3 + Ax + B in the field Fp where p = 61.
  */
 
-import * as field from './field.js?bustin=';
+import * as field from './field.js';
 
 let curveA = 9;
 let curveB = 1;
