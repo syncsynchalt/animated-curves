@@ -1,3 +1,7 @@
+:root {
+    --server-bg: hsl(190, 60%, 80%);
+}
+
 h1 {
     margin-top: 0;
     margin-bottom: 0.5rem;
@@ -27,7 +31,7 @@ h1 {
 .main-page .container {
     width: 600px;
     max-width: 600px;
-    background-color: linen;
+    background-color: var(--server-bg);
     box-shadow: 0 0 3px rgba(0, 0, 0, 0.3);
     border-radius: 0.5em;
     margin: 1.5rem auto;
