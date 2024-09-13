@@ -897,15 +897,16 @@ async function runExchangePubkeyDemo(ctx, privKey, myLabel, actor, actorTag) {
  * @param theirLabel {String} label for their pubkey
  * @param actor {String} actor name
  * @param actorTag {HTMLDivElement} actor description tag
+ * @param theirPrivKey {Number} other actor's private key (for illus. purposes)
  */
-async function runExchangeMultDemo(ctx, privKey, pubKey, theirLabel, actor, actorTag) {
+async function runExchangeMultDemo(ctx, privKey, pubKey, theirLabel, actor, actorTag, theirPrivKey) {
     const vals = preCalcValues(ctx);
     common.cancelAnimation(ctx);
 
     actorTag.textContent = `${actor} multiplies ${theirLabel} by their private key (${privKey}):`;
     const R2 = await doubleAndAddAnimation(ctx, privKey, pubKey, theirLabel);
     resetGraph(ctx);
-    actorTag.textContent = `${actor} has found the shared secret: ${privKey}${theirLabel} is (${R2.x}, ${R2.y})`;
+    actorTag.textContent = `${actor} has found the shared secret: ${privKey}${theirLabel} is ${privKey}×${theirPrivKey}P is (${R2.x}, ${R2.y})`;
     drawAndLabelPoints(ctx, vals, {[privKey]: R2}, {label: theirLabel, coords: true});
 }
 
@@ -934,9 +935,9 @@ async function runExchangeDemo(alice, bob) {
     const A = await runExchangePubkeyDemo(alice.ctx, ka, 'A', 'Alice', alice.desc);
     const B = await runExchangePubkeyDemo(bob.ctx, kb, 'B', 'Bob', bob.desc);
     await common.sleep(3000);
-    await runExchangeMultDemo(alice.ctx, ka, B, 'B', 'Alice', alice.desc);
+    await runExchangeMultDemo(alice.ctx, ka, B, 'B', 'Alice', alice.desc, kb);
     await common.sleep(1000);
-    await runExchangeMultDemo(bob.ctx, kb, A, 'A', 'Bob', bob.desc);
+    await runExchangeMultDemo(bob.ctx, kb, A, 'A', 'Bob', bob.desc, ka);
 }
 
 export {
